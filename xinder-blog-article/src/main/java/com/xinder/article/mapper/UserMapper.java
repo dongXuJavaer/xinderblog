@@ -1,5 +1,6 @@
 package com.xinder.article.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
 import org.apache.ibatis.annotations.Mapper;
@@ -11,7 +12,7 @@ import java.util.List;
  * Created by sang on 2017/12/17.
  */
 @Mapper
-public interface UserMapper {
+public interface UserMapper extends BaseMapper<User> {
 
     User loadUserByUsername(@Param("username") String username);
 

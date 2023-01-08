@@ -1,12 +1,17 @@
 package com.xinder.api.bean;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
  * Created by sang on 2017/12/17.
  */
 @Data
+@TableName("eole")
 public class Role {
+
+    @TableId
     private Long id;
     private String name;
 

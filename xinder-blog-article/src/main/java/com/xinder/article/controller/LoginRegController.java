@@ -2,7 +2,7 @@ package com.xinder.article.controller;
 
 import com.xinder.api.bean.RespBean;
 import com.xinder.api.bean.User;
-import com.xinder.article.service.UserService;
+import com.xinder.article.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginRegController {
 
     @Autowired
-    UserService userService;
+    UserServiceImpl userServiceImpl;
 
     @RequestMapping("/login_error")
     public RespBean loginError() {
@@ -41,7 +41,7 @@ public class LoginRegController {
 
     @PostMapping("/reg")
     public RespBean reg(User user) {
-        int result = userService.reg(user);
+        int result = userServiceImpl.reg(user);
         if (result == 0) {
             //成功
             return new RespBean("success", "注册成功!");

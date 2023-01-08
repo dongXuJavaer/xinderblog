@@ -1,68 +1,103 @@
 package com.xinder.article.config;
 
-import com.xinder.article.service.UserService;
+import com.xinder.api.enums.PermissionsEnums;
+import com.xinder.article.auth.login.AuthenticationFailHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+import javax.annotation.Resource;
 
 /**
  * Created by sang on 2017/12/17.
  */
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    UserService userService;
 
+    @Resource(name = "userDetailServiceImpl")
+    UserDetailsService userDetailsService;
+
+    //密码处理器
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    // 认证成功后的处理器
+    @Autowired
+    private AuthenticationSuccessHandler authenticationSuccessHandler;
+    // 认证失败后的处理器
+    @Autowired
+    private AuthenticationFailHandler authenticationFailHandler;
+    // 认证异常时的处理器
+    @Autowired
+    private AccessDeniedHandler accessDeniedHandler;
+
+    @Autowired
+    private LogoutHandler logoutHandler;
+
+
+    /**
+     * 配置认证管理器AuthenticationManager。
+     * 说白了就是所有 UserDetails 相关的它都管，包含 PasswordEncoder 密码等
+     * <p>
+     * 在这里关联数据库和security
+     *
+     * @param auth
+     * @throws Exception
+     */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService);
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
 
+    /**
+     * @param http
+     * @throws Exception
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        System.out.println(PermissionsEnums.ADMINISTRATORS.getValue());
+        http
+                .authorizeRequests()
                 .antMatchers("admin/category/all").authenticated()
-                .antMatchers("admin/**", "/reg").hasRole("超级管理员")///admin/**的URL都需要有超级管理员角色，如果使用.hasAuthority()方法来配置，需要在参数中加上ROLE_,如下.hasAuthority("ROLE_超级管理员")
-                .anyRequest().authenticated()//其他的路径都是登录后即可访问
-                .and().formLogin().loginPage("/login_page").successHandler(new AuthenticationSuccessHandler() {
-            @Override
-            public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
-                httpServletResponse.setContentType("application/json;charset=utf-8");
-                PrintWriter out = httpServletResponse.getWriter();
-                out.write("{\"status\":\"success\",\"msg\":\"登录成功\"}");
-                out.flush();
-                out.close();
-            }
-        })
-                .failureHandler(new AuthenticationFailureHandler() {
-                    @Override
-                    public void onAuthenticationFailure(HttpServletRequest httpServletRequest,
-                                                        HttpServletResponse httpServletResponse,
-                                                        AuthenticationException e) throws IOException, ServletException {
-                        httpServletResponse.setContentType("application/json;charset=utf-8");
-                        PrintWriter out = httpServletResponse.getWriter();
-                        out.write("{\"status\":\"error\",\"msg\":\"登录失败\"}");
-                        out.flush();
-                        out.close();
-                    }
-                }).loginProcessingUrl("/login")
-                .usernameParameter("username").passwordParameter("password").permitAll()
-                .and().logout().permitAll().and().csrf().disable().exceptionHandling().accessDeniedHandler(getAccessDeniedHandler());
+                .antMatchers("admin/**", "/reg").hasRole("管理员") ///admin/**的URL都需要有超级管理员角色，如果使用.hasAuthority()方法来配置，需要在参数中加上ROLE_,如下.hasAuthority("ROLE_超级管理员")
+//                .anyRequest().authenticated()//其他的路径都是登录后即可访问
+                .anyRequest().permitAll()
+                .and()
+                .formLogin()
+                //登录页面
+//                .loginPage("https://baidu.com")
+                // 登录请求
+                .loginProcessingUrl("/login")
+                //默认使用的用户名参数
+                .usernameParameter("username")
+                //默认使用的密码参数
+                .passwordParameter("password")
+                .successHandler(authenticationSuccessHandler)  // 认证成功处理器
+                .failureHandler(authenticationFailHandler) // 认证失败处理器
+                .permitAll()
+
+                .and()
+                // 退出
+                .logout()
+                .addLogoutHandler(logoutHandler)
+                .permitAll()
+                .and()
+                .csrf().disable()
+                .exceptionHandling().accessDeniedHandler(accessDeniedHandler);
+
+        // 解决登录跨域问题
+        http.cors(Customizer.withDefaults());
+
     }
 
     @Override
@@ -70,8 +105,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/blogimg/**", "/index.html", "/static/**");
     }
 
-    @Bean
-    AccessDeniedHandler getAccessDeniedHandler() {
-        return new AuthenticationAccessDeniedHandler();
+
+    public PasswordEncoder getBCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(PermissionsEnums.ADMINISTRATORS.getValue());
     }
 }

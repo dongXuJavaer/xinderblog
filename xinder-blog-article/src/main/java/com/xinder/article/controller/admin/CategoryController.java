@@ -1,4 +1,4 @@
-package com.xinder.article.controller;
+package com.xinder.article.controller.admin;
 
 import com.xinder.api.bean.Category;
 import com.xinder.api.bean.RespBean;

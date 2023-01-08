@@ -1,5 +1,7 @@
 package com.xinder.api.bean;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -8,7 +10,10 @@ import java.sql.Timestamp;
  * Created by sang on 2017/12/19.
  */
 @Data
+@TableName("category")
 public class Category {
+
+    @TableId
     private Long id;
     private String cateName;
     private Timestamp date;

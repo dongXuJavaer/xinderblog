@@ -2,7 +2,7 @@ package com.xinder.article.controller.admin;
 
 import com.xinder.api.bean.Article;
 import com.xinder.api.bean.RespBean;
-import com.xinder.article.service.ArticleService;
+import com.xinder.article.service.impl.ArticleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,8 +20,7 @@ import java.util.Map;
 @RequestMapping("/admin")
 public class AdminController {
     @Autowired
-    ArticleService articleService;
-
+    ArticleServiceImpl articleServiceImpl;
 
     /**
      * 分页获取所有博客
@@ -32,16 +31,16 @@ public class AdminController {
      */
     @RequestMapping(value = "/article/all", method = RequestMethod.GET)
     public Map<String, Object> getArticleByStateByAdmin(@RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "count", defaultValue = "6") Integer count, String keywords) {
-        List<Article> articles = articleService.getArticleByState(-2, page, count, keywords);
+        List<Article> articles = articleServiceImpl.getArticleByState(-2, page, count, keywords);
         Map<String, Object> map = new HashMap<>();
         map.put("articles", articles);
-        map.put("totalCount", articleService.getArticleCountByState(1, null, keywords));
+        map.put("totalCount", articleServiceImpl.getArticleCountByState(1, null, keywords));
         return map;
     }
 
     @RequestMapping(value = "/article/dustbin", method = RequestMethod.PUT)
     public RespBean updateArticleState(Long[] aids, Integer state) {
-        if (articleService.updateArticleState(aids, state) == aids.length) {
+        if (articleServiceImpl.updateArticleState(aids, state) == aids.length) {
             return new RespBean("success", "删除成功!");
         }
         return new RespBean("error", "删除失败!");

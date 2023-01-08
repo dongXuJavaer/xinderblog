@@ -1,5 +1,7 @@
 package com.xinder.article.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
@@ -15,6 +17,9 @@ import org.springframework.util.DigestUtils;
  */
 @Component
 public class MyPasswordEncoder implements PasswordEncoder {
+
+    private final static Logger logger = LoggerFactory.getLogger(MyPasswordEncoder.class);
+
     @Override
     public String encode(CharSequence rawPassword) {
         return DigestUtils.md5DigestAsHex(rawPassword.toString().getBytes());
@@ -22,6 +27,13 @@ public class MyPasswordEncoder implements PasswordEncoder {
 
     @Override
     public boolean matches(CharSequence rawPassword, String encodedPassword) {
+        String pwd = rawPassword.toString();
+        logger.info("[MyPasswordEncoder.matches]前端传来  明文密码:" + pwd);
+        logger.info("[MyPasswordEncoder.matches]前端传来  加密密码:" + DigestUtils.md5DigestAsHex(rawPassword.toString().getBytes()));
+        logger.info("[MyPasswordEncoder.matches]后端校验  加密密码:" + encodedPassword);
+
         return encodedPassword.equals(DigestUtils.md5DigestAsHex(rawPassword.toString().getBytes()));
     }
+
+
 }

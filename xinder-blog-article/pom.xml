@@ -17,6 +17,13 @@
             <artifactId>xinder-blog-api</artifactId>
             <version>1.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.xinder.blog</groupId>
+            <artifactId>xinder-blog-comm</artifactId>
+            <version>1.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

@@ -6,6 +6,7 @@ import lombok.Data;
  * Created by sang on 2017/12/17.
  */
 @Data
+
 public class RespBean {
     private String status;
     private String msg;

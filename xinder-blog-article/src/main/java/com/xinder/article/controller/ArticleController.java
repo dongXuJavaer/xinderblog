@@ -1,9 +1,17 @@
 package com.xinder.article.controller;
 
+import com.xinder.api.abstcontroller.AbstractController;
 import com.xinder.api.bean.Article;
 import com.xinder.api.bean.RespBean;
-import org.apache.commons.io.IOUtils;
+import com.xinder.api.request.ArticleDtoReq;
+import com.xinder.api.response.ArticleListDtoResult;
+import com.xinder.api.response.base.BaseResponse;
+import com.xinder.api.response.result.DtoResult;
+import com.xinder.api.response.result.Result;
+import com.xinder.api.rest.ArticleApi;
 import com.xinder.article.service.ArticleService;
+import org.apache.commons.io.IOUtils;
+import com.xinder.article.service.impl.ArticleServiceImpl;
 import com.xinder.article.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,20 +25,22 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Created by sang on 2017/12/20.
+ * Created by Xinder on 2023-1-6 23:43:03.
  */
 @RestController
-@RequestMapping("/article")
-public class ArticleController {
+public class ArticleController extends AbstractController implements ArticleApi {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
+    @Autowired
+    ArticleServiceImpl articleServiceImpl;
 
     @Autowired
     ArticleService articleService;
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public RespBean addNewArticle(Article article) {
-        int result = articleService.addNewArticle(article);
+        int result = articleServiceImpl.addNewArticle(article);
         if (result == 1) {
             return new RespBean("success", article.getId() + "");
         } else {
@@ -72,22 +82,22 @@ public class ArticleController {
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public Map<String, Object> getArticleByState(@RequestParam(value = "state", defaultValue = "-1") Integer state, @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "count", defaultValue = "6") Integer count,String keywords) {
-        int totalCount = articleService.getArticleCountByState(state, Util.getCurrentUser().getId(),keywords);
-        List<Article> articles = articleService.getArticleByState(state, page, count,keywords);
+        int totalCount = articleServiceImpl.getArticleCountByState(state, Util.getCurrentUser().getId(),keywords);
+        List<Article> articles = articleServiceImpl.getArticleByState(state, page, count,keywords);
         Map<String, Object> map = new HashMap<>();
         map.put("totalCount", totalCount);
         map.put("articles", articles);
         return map;
     }
 
-    @RequestMapping(value = "/{aid}", method = RequestMethod.GET)
-    public Article getArticleById(@PathVariable Long aid) {
-        return articleService.getArticleById(aid);
+//    @RequestMapping(value = "/{aid}", method = RequestMethod.GET)
+    public Article getArticleById1(@PathVariable Long aid) {
+        return articleServiceImpl.getArticleById(aid);
     }
 
     @RequestMapping(value = "/dustbin", method = RequestMethod.PUT)
     public RespBean updateArticleState(Long[] aids, Integer state) {
-        if (articleService.updateArticleState(aids, state) == aids.length) {
+        if (articleServiceImpl.updateArticleState(aids, state) == aids.length) {
             return new RespBean("success", "删除成功!");
         }
         return new RespBean("error", "删除失败!");
@@ -95,7 +105,7 @@ public class ArticleController {
 
     @RequestMapping(value = "/restore", method = RequestMethod.PUT)
     public RespBean restoreArticle(Integer articleId) {
-        if (articleService.restoreArticle(articleId) == 1) {
+        if (articleServiceImpl.restoreArticle(articleId) == 1) {
             return new RespBean("success", "还原成功!");
         }
         return new RespBean("error", "还原失败!");
@@ -104,20 +114,27 @@ public class ArticleController {
     @RequestMapping("/dataStatistics")
     public Map<String,Object> dataStatistics() {
         Map<String, Object> map = new HashMap<>();
-        List<String> categories = articleService.getCategories();
-        List<Integer> dataStatistics = articleService.getDataStatistics();
+        List<String> categories = articleServiceImpl.getCategories();
+        List<Integer> dataStatistics = articleServiceImpl.getDataStatistics();
         map.put("categories", categories);
         map.put("ds", dataStatistics);
         return map;
     }
 
-    @RequestMapping("/list")
-    public Map<String,Object> getByPage() {
-        Map<String, Object> map = new HashMap<>();
-        List<String> categories = articleService.getCategories();
-        List<Integer> dataStatistics = articleService.getDataStatistics();
-        map.put("categories", categories);
-        map.put("ds", dataStatistics);
-        return map;
+
+    @Override
+    public BaseResponse<ArticleListDtoResult> articleList(
+            @RequestBody ArticleDtoReq articleDtoReq,
+            @RequestParam(value = "keywords", required = false) String keywords) {
+
+        ArticleListDtoResult articleListDtoResult = articleService.getArticleByState(articleDtoReq, keywords);
+        return buildJson(articleListDtoResult);
     }
+
+    @Override
+    public BaseResponse<DtoResult> getArticleById(@PathVariable("aid") Long aid) {
+        DtoResult result = articleService.getById(aid);
+        return buildJson(result);
+    }
+
 }
