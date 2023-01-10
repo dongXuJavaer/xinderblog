@@ -1,4 +1,4 @@
-package com.xinder.article.utils;
+package com.xinder.article.util;
 
 import java.io.Serializable;
 

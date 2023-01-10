@@ -1,8 +1,8 @@
-package com.xinder.article.auth.login;
+package com.xinder.article.config.handler.login;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xinder.api.bean.User;
-import com.xinder.api.response.UserDtoResult;
+import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.article.mapper.UserMapper;
@@ -49,8 +49,9 @@ public class AuthenticationSuccessHandler extends SavedRequestAwareAuthenticatio
         User user = userMapper.loadUserByUsername(username);
         HttpSession session = request.getSession();
 
-        System.out.println(session.getAttribute("currentUser"));
-
+        System.out.println();
+        logger.info("【AuthenticationSuccessHandler.onAuthenticationSuccess】" +
+                "当前session用户信息：{}", session.getAttribute("currentUser"));
         session.setAttribute("currentUser", user);
         response.setContentType("application/json;charset=utf-8");
 

@@ -2,20 +2,17 @@ package com.xinder.article.service.impl;
 
 import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
-import com.xinder.api.response.UserDtoResult;
+import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.article.mapper.RolesMapper;
 import com.xinder.article.mapper.UserMapper;
 import com.xinder.article.service.AuthService;
 import com.xinder.article.service.UserService;
-import com.xinder.article.utils.AuthToken;
-import com.xinder.article.utils.CookieUtil;
-import com.xinder.article.utils.Util;
+import com.xinder.article.util.AuthToken;
+import com.xinder.article.util.CookieUtils;
+import com.xinder.article.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -131,7 +128,7 @@ public class UserServiceImpl implements UserService {
         }
 
         AuthToken authToken = authService.login(username, password, clientId, clientSecret);
-        CookieUtil.addCookie(response, cookieDomain,
+        CookieUtils.addCookie(response, cookieDomain,
                 "/", "Authorization", authToken.getAccessToken(), cookieMaxAge, false);
 
         userDtoResult = (UserDtoResult) DtoResult.DataDtoSuccess(UserDtoResult.class);

@@ -4,11 +4,20 @@ package com.xinder.api.enums;
 import org.apache.commons.lang3.StringUtils;
 
 public enum ResultCode {
+
     SUCCESS("成功", 10001),
     FAIL("服务端异常", 10002),
     PARAM_ERROR("参数错误", 10003),
     DATA_ERROR("数据异常", 10004),
+
+    // 文章
     SENSITIVE_WORD("含有敏感词", 10005),
+
+    // 用户
+    LOGIN_SUCCESS("登录成功", 20001),
+    LOGIN_FAIL("登录失败", 20002),
+    LOGOUT_SUCCESS("退出成功", 20003),
+    LOGOUT_FAIL("退出失败", 20004),
 
     ;
 

@@ -1,14 +1,11 @@
 package com.xinder.api.rest;
 
-import com.xinder.api.bean.Article;
 import com.xinder.api.request.ArticleDtoReq;
-import com.xinder.api.response.ArticleListDtoResult;
+import com.xinder.api.response.dto.ArticleListDtoResult;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.result.DtoResult;
-import com.xinder.api.response.result.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

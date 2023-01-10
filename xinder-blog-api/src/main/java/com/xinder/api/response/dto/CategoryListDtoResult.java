@@ -1,0 +1,23 @@
+package com.xinder.api.response.dto;
+
+import com.xinder.api.bean.Article;
+import com.xinder.api.bean.Category;
+import com.xinder.api.response.result.DtoResult;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import java.util.List;
+
+/**
+ * @author Xinder
+ * @date 2023-01-09 21:35
+ */
+@Data
+public class CategoryListDtoResult extends DtoResult {
+
+    private static final long serialVersionUID = 574217966803557L;
+
+    @ApiModelProperty(name = "list", notes = "文章列表")
+    private List<Category> list;
+
+}

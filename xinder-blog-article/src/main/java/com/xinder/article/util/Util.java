@@ -1,4 +1,4 @@
-package com.xinder.article.utils;
+package com.xinder.article.util;
 
 import com.xinder.api.bean.User;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,4 +11,6 @@ public class Util {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return user;
     }
+
+
 }

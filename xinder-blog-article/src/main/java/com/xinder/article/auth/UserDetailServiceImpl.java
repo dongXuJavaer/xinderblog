@@ -10,10 +10,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 自定义认证类，用来查询出用户基本信息
@@ -46,10 +46,14 @@ public class UserDetailServiceImpl implements UserDetailsService {
         org.springframework.security.core.userdetails.User userDetails =
                 new org.springframework.security.core.userdetails.User(username, password,
                         AuthorityUtils.commaSeparatedStringToAuthorityList(permissions));
+
         return userDetails;
     }
 
     private String buildPermissions(List<Role> roleList) {
+        if (CollectionUtils.isEmpty(roleList)){
+            return "";
+        }
         StringBuilder stringBuffer = new StringBuilder();
         roleList.forEach(role -> {
             stringBuffer.append(roleList).append(",");

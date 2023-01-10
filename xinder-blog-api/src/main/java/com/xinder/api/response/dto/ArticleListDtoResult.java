@@ -1,4 +1,4 @@
-package com.xinder.api.response;
+package com.xinder.api.response.dto;
 
 import com.xinder.api.bean.Article;
 import com.xinder.api.response.result.PageDtoResult;

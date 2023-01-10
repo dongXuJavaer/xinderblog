@@ -1,4 +1,4 @@
-package com.xinder.article.utils;
+package com.xinder.article.util;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +10,7 @@ import java.util.Map;
  * @author dong
  * @since 2022-09-07 09:20
  */
-public class CookieUtil {
+public class CookieUtils {
 
     /**
      * 设置cookie

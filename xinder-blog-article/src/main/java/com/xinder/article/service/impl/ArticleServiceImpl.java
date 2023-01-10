@@ -1,14 +1,13 @@
 package com.xinder.article.service.impl;
 
 import com.xinder.api.bean.Article;
-import com.xinder.api.enums.ResultCode;
 import com.xinder.api.request.ArticleDtoReq;
-import com.xinder.api.response.ArticleListDtoResult;
+import com.xinder.api.response.dto.ArticleListDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.article.mapper.ArticleMapper;
 import com.xinder.article.mapper.TagsMapper;
 import com.xinder.article.service.ArticleService;
-import com.xinder.article.utils.Util;
+import com.xinder.article.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

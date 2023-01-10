@@ -1,6 +1,6 @@
 package com.xinder.article.service;
 
-import com.xinder.article.utils.AuthToken;
+import com.xinder.article.util.AuthToken;
 
 /**
  * 认证服务接口

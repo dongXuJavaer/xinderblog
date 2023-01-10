@@ -1,4 +1,4 @@
-package com.xinder.api.response;
+package com.xinder.api.response.dto;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.xinder.api.bean.Role;

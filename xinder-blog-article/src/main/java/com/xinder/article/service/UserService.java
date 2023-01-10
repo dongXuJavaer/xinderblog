@@ -1,6 +1,6 @@
 package com.xinder.article.service;
 
-import com.xinder.api.response.UserDtoResult;
+import com.xinder.api.response.dto.UserDtoResult;
 
 import javax.servlet.http.HttpServletResponse;
 

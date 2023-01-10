@@ -1,4 +1,4 @@
-package com.xinder.article.auth;
+package com.xinder.article.config.handler;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;

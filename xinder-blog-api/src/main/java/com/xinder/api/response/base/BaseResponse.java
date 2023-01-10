@@ -31,6 +31,7 @@ public class BaseResponse<T> implements Serializable {
 	private BaseResponse(T data) {
 		this.code = ResultCode.SUCCESS.getCode();
 		this.msg = ResultCode.SUCCESS.getDesc();
+		this.setSuccess(true);
 		this.data = data;
 	}
 
@@ -65,12 +66,40 @@ public class BaseResponse<T> implements Serializable {
 	}
 
 	/**
-	 * 返回系统异常的错误信息JSON串
+	 * 返回成功响应
 	 * @return
 	 */
 	public static BaseResponse success() {
 		BaseResponse baseResponse = new BaseResponse(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getDesc(), null);
 		baseResponse.setSuccess(true);
+		return baseResponse;
+	}
+
+	public static BaseResponse success(Integer code, String msg) {
+		return BaseResponse.success(code, msg, null);
+	}
+
+	/**
+	 * 返回成功的JSON
+	 *
+	 * @param code
+	 * @param msg
+	 * @param data
+	 * @return
+	 */
+	public static BaseResponse success(Integer code, String msg, Object data) {
+		BaseResponse baseResponse = new BaseResponse(code, msg, data);
+		baseResponse.setSuccess(true);
+		return baseResponse;
+	}
+
+	/**
+	 * 返回失败响应
+	 * @return
+	 */
+	public static BaseResponse fail() {
+		BaseResponse baseResponse = new BaseResponse(ResultCode.FAIL.getCode(), ResultCode.FAIL.getDesc(), null);
+		baseResponse.setSuccess(false);
 		return baseResponse;
 	}
 

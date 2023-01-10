@@ -33,7 +33,7 @@ public class DtoResult implements Serializable {
         return new DtoResult(code, msg);
     }
 
-    public static<T extends DtoResult> T DataDtoSuccess(Class<? extends DtoResult> c) {
+    public static <T extends DtoResult> T DataDtoSuccess(Class<T> c) {
         T dtoResult = null;
         try {
             dtoResult = (T) c.newInstance();

@@ -1,39 +1,18 @@
 package com.xinder.article.service;
 
-import com.xinder.api.bean.Category;
-import com.xinder.article.mapper.CategoryMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.Timestamp;
-import java.util.List;
+import com.xinder.api.response.dto.CategoryListDtoResult;
 
 /**
- * Created by sang on 2017/12/19.
+ * @author Xinder
+ * @date 2023-01-09 21:50
  */
-@Service
-@Transactional
-public class CategoryService {
-    @Autowired
-    CategoryMapper categoryMapper;
+public interface CategoryService {
 
-    public List<Category> getAllCategories() {
-        return categoryMapper.getAllCategories();
-    }
 
-    public boolean deleteCategoryByIds(String ids) {
-        String[] split = ids.split(",");
-        int result = categoryMapper.deleteCategoryByIds(split);
-        return result == split.length;
-    }
+    /**
+     * 和获取所有分类
+     * @return
+     */
+    CategoryListDtoResult getAllCategories();
 
-    public int updateCategoryById(Category category) {
-        return categoryMapper.updateCategoryById(category);
-    }
-
-    public int addCategory(Category category) {
-        category.setDate(new Timestamp(System.currentTimeMillis()));
-        return categoryMapper.addCategory(category);
-    }
 }

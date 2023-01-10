@@ -1,10 +1,13 @@
 package com.xinder.api.bean;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Created by sang on 2017/12/19.
@@ -14,34 +17,14 @@ import java.sql.Timestamp;
 public class Category {
 
     @TableId
+    @ApiModelProperty(value = "id")
     private Long id;
+
+    @ApiModelProperty(value = "分类名")
+    @TableField(value = "cate_name")
     private String cateName;
-    private Timestamp date;
 
-    public Category() {
-    }
+    @ApiModelProperty(value = "创建时间")
+    private Date date;
 
-    public Timestamp getDate() {
-        return date;
-    }
-
-    public void setDate(Timestamp date) {
-        this.date = date;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCateName() {
-        return cateName;
-    }
-
-    public void setCateName(String cateName) {
-        this.cateName = cateName;
-    }
 }

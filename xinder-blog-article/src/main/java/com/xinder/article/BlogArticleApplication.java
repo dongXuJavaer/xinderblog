@@ -11,10 +11,10 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @EnableScheduling//开启定时任务支持
 @MapperScan("com.xinder.article.mapper")
-public class BlogserverApplication {
+public class BlogArticleApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(BlogserverApplication.class, args);
+        SpringApplication.run(BlogArticleApplication.class, args);
     }
 
     @Bean

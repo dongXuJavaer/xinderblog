@@ -1,9 +1,8 @@
 package com.xinder.article.service;
 
 import com.xinder.api.request.ArticleDtoReq;
-import com.xinder.api.response.ArticleListDtoResult;
+import com.xinder.api.response.dto.ArticleListDtoResult;
 import com.xinder.api.response.result.DtoResult;
-import com.xinder.api.response.result.Result;
 
 
 /**

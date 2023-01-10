@@ -1,7 +1,7 @@
 package com.xinder.article.config;
 
 import com.xinder.api.enums.PermissionsEnums;
-import com.xinder.article.auth.login.AuthenticationFailHandler;
+import com.xinder.article.config.handler.login.AuthenticationFailHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import javax.annotation.Resource;
 
@@ -34,6 +35,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     // 认证成功后的处理器
     @Autowired
     private AuthenticationSuccessHandler authenticationSuccessHandler;
+
     // 认证失败后的处理器
     @Autowired
     private AuthenticationFailHandler authenticationFailHandler;
@@ -41,8 +43,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AccessDeniedHandler accessDeniedHandler;
 
+    // 退出登录处理器
     @Autowired
     private LogoutHandler logoutHandler;
+
+    // 成功退出登录处理器
+    @Autowired
+    private LogoutSuccessHandler logoutSuccessHandler;
 
 
     /**
@@ -90,6 +97,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 退出
                 .logout()
                 .addLogoutHandler(logoutHandler)
+                .logoutSuccessHandler(logoutSuccessHandler)
                 .permitAll()
                 .and()
                 .csrf().disable()
