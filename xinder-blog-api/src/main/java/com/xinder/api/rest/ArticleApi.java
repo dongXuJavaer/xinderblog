@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @date 2023-01-06 21:50
  */
 @Api(tags = "ArticleController")
-@RequestMapping("/article")
 public interface ArticleApi {
 
 

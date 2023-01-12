@@ -1,9 +1,13 @@
 package com.xinder.api.rest;
 
+import com.xinder.api.bean.RespBean;
 import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.base.BaseResponse;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,11 +19,22 @@ import javax.servlet.http.HttpServletResponse;
 @Api(tags = "UserController")
 public interface UserApi {
 
-    //登录方法
-    @PostMapping("/login")
-    BaseResponse<UserDtoResult> login(String username, String password, HttpServletResponse response);
+    @RequestMapping("/currentUserName")
+    public String currentUserName();
+
+    @RequestMapping("/currentUserId")
+    public Long currentUserId();
+
+    @RequestMapping("/currentUserEmail")
+    public String currentUserEmail();
+
+    @RequestMapping("/isAdmin")
+    public Boolean isAdmin();
+
+    @RequestMapping(value = "/updateUserEmail", method = RequestMethod.PUT)
+    RespBean updateUserEmail(String email);
 
     //退出
     @PostMapping("/logout")
-    BaseResponse<UserDtoResult> logout(HttpServletRequest request);
+    BaseResponse<UserDtoResult> logout();
 }

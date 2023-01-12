@@ -1,11 +1,12 @@
 package com.xinder.article.service.impl;
 
 import com.xinder.api.bean.Category;
-import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.CategoryListDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.article.mapper.CategoryMapper;
 import com.xinder.article.service.CategoryService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,12 +20,16 @@ import java.util.List;
 @Service
 @Transactional
 public class CategoryServiceImpl implements CategoryService {
+
+    private final static Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
+
     @Autowired
     CategoryMapper categoryMapper;
 
     public CategoryListDtoResult getAllCategories() {
+
         List<Category> categoryList = categoryMapper.getAllCategories();
-        CategoryListDtoResult categoryListDtoResult = DtoResult.DataDtoSuccess(CategoryListDtoResult.class);
+        CategoryListDtoResult categoryListDtoResult = DtoResult.dataDtoSuccess(CategoryListDtoResult.class);
         categoryListDtoResult.setList(categoryList);
         return categoryListDtoResult;
     }

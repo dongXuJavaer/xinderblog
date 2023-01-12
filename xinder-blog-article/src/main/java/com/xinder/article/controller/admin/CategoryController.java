@@ -1,12 +1,12 @@
 package com.xinder.article.controller.admin;
 
-import com.xinder.api.abstcontroller.AbstractController;
 import com.xinder.api.bean.Category;
 import com.xinder.api.bean.RespBean;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.CategoryListDtoResult;
 import com.xinder.api.rest.CategoryApi;
 import com.xinder.article.service.impl.CategoryServiceImpl;
+import com.xinder.common.abstcontroller.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

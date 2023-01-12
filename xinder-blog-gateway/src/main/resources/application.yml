@@ -1,0 +1,45 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: getway
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+  cloud:
+    gateway:
+      httpclient:
+        connect-timeout: 1000
+        response-timeout: 30S
+      # 跨域配置
+      globalcors:
+        cors-configurations:
+          '[/**]': #匹配所有请求
+            allowedOrigins: "*" # 跨域处理允许所有请求
+            allowedMethods: # 支持的方法
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedHeaders: "*" #允许请求中携带的头信息
+            allowedCredentials: true #是否允许携带cookie
+      # 路由配置
+      routes:
+        - id: blog_user_router
+          uri: lb://user
+          predicates:
+            - Path=/login
+        - id: blog_article_router  # 路由id，唯一，见名知意
+          #          uri: http://localhost:9001   # 路由对应的微服务的地址
+          uri: lb://article   # 写服务的名字，实现负载均衡
+          predicates: # 断言
+            - Path=/article/**, /**  # 断言规则，配置请求路径， ** 表示多级目录， 这里表示凡是以brand开头的请求，都交给上面配置的对应的微服务去处理
+#          filters: # 符合断言的话，在断言之后，执行过滤（如果配置了过滤的话），那么在执行了过滤之后才去交给微服务
+            #          - PrefixPath=/brand   # 前缀过滤规则，在前面加上前缀
+            #          - StripPrefix=1  # 去掉几层前缀  /sellergoods/goods/  =>  /goods/
+#            - RewritePath=/article/(?<segment>.*), /$\{segment}  # 用 /$\{segment} 替换前面的
+
+
+

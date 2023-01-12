@@ -12,6 +12,7 @@ import java.util.List;
  */
 @Mapper
 public interface TagsMapper extends BaseMapper<Tags> {
+
     int deleteTagsByAid(Long aid);
 
     int saveTags(@Param("tags") String[] tags);

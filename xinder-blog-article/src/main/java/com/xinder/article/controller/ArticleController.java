@@ -1,6 +1,5 @@
 package com.xinder.article.controller;
 
-import com.xinder.api.abstcontroller.AbstractController;
 import com.xinder.api.bean.Article;
 import com.xinder.api.bean.RespBean;
 import com.xinder.api.request.ArticleDtoReq;
@@ -9,10 +8,12 @@ import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.rest.ArticleApi;
 import com.xinder.article.service.ArticleService;
+import com.xinder.common.abstcontroller.AbstractController;
 import org.apache.commons.io.IOUtils;
 import com.xinder.article.service.impl.ArticleServiceImpl;
-import com.xinder.article.util.Util;
+import com.xinder.common.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +27,9 @@ import java.util.*;
 /**
  * Created by Xinder on 2023-1-6 23:43:03.
  */
+@RequestMapping("/article")
 @RestController
+@CrossOrigin
 public class ArticleController extends AbstractController implements ArticleApi {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -36,6 +39,9 @@ public class ArticleController extends AbstractController implements ArticleApi 
 
     @Autowired
     ArticleService articleService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public RespBean addNewArticle(Article article) {
@@ -80,16 +86,16 @@ public class ArticleController extends AbstractController implements ArticleApi 
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public Map<String, Object> getArticleByState(@RequestParam(value = "state", defaultValue = "-1") Integer state, @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "count", defaultValue = "6") Integer count,String keywords) {
-        int totalCount = articleServiceImpl.getArticleCountByState(state, Util.getCurrentUser().getId(),keywords);
-        List<Article> articles = articleServiceImpl.getArticleByState(state, page, count,keywords);
+    public Map<String, Object> getArticleByState(@RequestParam(value = "state", defaultValue = "-1") Integer state, @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "count", defaultValue = "6") Integer count, String keywords) {
+        int totalCount = articleServiceImpl.getArticleCountByState(state, Util.getCurrentUser(redisTemplate).getId(), keywords);
+        List<Article> articles = articleServiceImpl.getArticleByState(state, page, count, keywords);
         Map<String, Object> map = new HashMap<>();
         map.put("totalCount", totalCount);
         map.put("articles", articles);
         return map;
     }
 
-//    @RequestMapping(value = "/{aid}", method = RequestMethod.GET)
+    //    @RequestMapping(value = "/{aid}", method = RequestMethod.GET)
     public Article getArticleById1(@PathVariable Long aid) {
         return articleServiceImpl.getArticleById(aid);
     }
@@ -111,7 +117,7 @@ public class ArticleController extends AbstractController implements ArticleApi 
     }
 
     @RequestMapping("/dataStatistics")
-    public Map<String,Object> dataStatistics() {
+    public Map<String, Object> dataStatistics() {
         Map<String, Object> map = new HashMap<>();
         List<String> categories = articleServiceImpl.getCategories();
         List<Integer> dataStatistics = articleServiceImpl.getDataStatistics();
@@ -125,6 +131,7 @@ public class ArticleController extends AbstractController implements ArticleApi 
     public BaseResponse<ArticleListDtoResult> articleList(
             @RequestBody ArticleDtoReq articleDtoReq,
             @RequestParam(value = "keywords", required = false) String keywords) {
+
 
         ArticleListDtoResult articleListDtoResult = articleService.getArticleByState(articleDtoReq, keywords);
         return buildJson(articleListDtoResult);

@@ -8,13 +8,18 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
+  redis:
+    host: 39.105.106.135
+    port: 6379
+    password: 123456789PP
+  main:
+    allow-bean-definition-overriding: true
 
 mybatis:
   config-location: classpath:/mybatis-config.xml
 
-
 server:
-  port: 8081
+  port: 8082
 
 logging:
 #  config: classpath:config/logback.xml
@@ -32,3 +37,16 @@ auth:
   clientSecret: 123 #客户端密码
   cookieDomain: localhost #cookie域名
   cookieMaxAge: -1     #cookie有效期
+
+encrypt:
+  key-store:
+    alias: dongyimai
+    location: classpath:dongyimai.jks
+    password: dongyimai
+    secret: dongyimai
+
+
+feign:
+  client:
+    user:
+      name: user

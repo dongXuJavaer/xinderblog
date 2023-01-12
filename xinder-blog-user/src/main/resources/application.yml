@@ -1,0 +1,50 @@
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql:///vueblog2?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+#  redis:
+#    host: 39.105.106.135
+#    port: 6379
+#    password: 123456789PP
+
+mybatis:
+  config-location: classpath:/mybatis-config.xml
+
+server:
+  port: 8083
+
+logging:
+#  config: classpath:config/logback.xml
+  level:
+    org:
+      springframework:
+        security: info
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*Mapper.xml
+
+auth:
+  ttl: 3600000  #token过期时间
+  clientId: dongyimai  #客户端账号
+  clientSecret: 123 #客户端密码
+  cookieDomain: localhost #cookie域名
+  cookieMaxAge: -1     #cookie有效期
+
+encrypt:
+  key-store:
+    alias: dongyimai
+    location: classpath:dongyimai.jks
+    password: dongyimai
+    secret: dongyimai
+
+feign:
+  client:
+    user:
+      name: USER
+

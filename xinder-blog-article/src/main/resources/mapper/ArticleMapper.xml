@@ -34,10 +34,12 @@
         <result column="edit_time" property="editTime"/>
         <result column="page_view" property="pageView"/>
         <result column="state" property="state"/>
+        <result column="read_count" property="readCount"/>
         <result column="create_time" property="createTime"/>
         <result column="uid" property="uid"/>
         <result column="nickname" property="nickname"/>
         <result column="cate_name" property="cateName"/>
+
         <collection column="id" property="tags"  ofType="com.xinder.api.bean.Tags"
                     select="com.xinder.article.mapper.TagsMapper.selectByAid"/>
     </resultMap>
@@ -118,6 +120,7 @@
         a.`state`        as state ,
         a.`create_time`  as create_time,
         a.uid            as uid,
+        a.read_count,
         u.`nickname`     as nickname,
         c.`cate_name`    as cate_name
         FROM article a
@@ -186,6 +189,7 @@
         a.`page_view`    as page_view,
         a.`state`        as state ,
         a.`create_time`  as create_time ,
+        a.`read_count`   as read_count,
         a.uid            as uid,
         u.`nickname`     as nickname,
         c.`cate_name`    as cate_name

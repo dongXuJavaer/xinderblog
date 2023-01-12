@@ -1,5 +1,6 @@
 package com.xinder.article.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinder.api.bean.Article;
 import com.xinder.api.request.ArticleDtoReq;
 import com.xinder.api.response.dto.ArticleListDtoResult;
@@ -7,8 +8,9 @@ import com.xinder.api.response.result.DtoResult;
 import com.xinder.article.mapper.ArticleMapper;
 import com.xinder.article.mapper.TagsMapper;
 import com.xinder.article.service.ArticleService;
-import com.xinder.article.util.Util;
+import com.xinder.common.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -18,12 +20,15 @@ import java.util.List;
  * Created by Xinder on 2023-1-6 23:07:57.
  */
 @Service
-public class ArticleServiceImpl  implements ArticleService {
+public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
 
     @Autowired
     ArticleMapper articleMapper;
     @Autowired
     TagsMapper tagsMapper;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     public int addNewArticle(Article article) {
         //处理文章摘要
@@ -41,7 +46,7 @@ public class ArticleServiceImpl  implements ArticleService {
             }
             article.setEditTime(timestamp);
             //设置当前用户
-            article.setUid(Util.getCurrentUser().getId());
+            article.setUid(Util.getCurrentUser(redisTemplate).getId());
             int i = articleMapper.addNewArticle(article);
             //打标签
             String[] dynamicTags = article.getDynamicTags();
@@ -94,7 +99,7 @@ public class ArticleServiceImpl  implements ArticleService {
 
     public List<Article> getArticleByState(Integer state, Integer page, Integer count, String keywords) {
         int start = (page - 1) * count;
-        Long uid = Util.getCurrentUser().getId();
+        Long uid = Util.getCurrentUser(redisTemplate).getId();
         return articleMapper.getArticleByState(state, start, count, uid, keywords);
     }
 
@@ -136,7 +141,7 @@ public class ArticleServiceImpl  implements ArticleService {
      * @return
      */
     public List<String> getCategories() {
-        return articleMapper.getCategories(Util.getCurrentUser().getId());
+        return articleMapper.getCategories(Util.getCurrentUser(redisTemplate).getId());
     }
 
     /**
@@ -145,7 +150,7 @@ public class ArticleServiceImpl  implements ArticleService {
      * @return
      */
     public List<Integer> getDataStatistics() {
-        return articleMapper.getDataStatistics(Util.getCurrentUser().getId());
+        return articleMapper.getDataStatistics(Util.getCurrentUser(redisTemplate).getId());
     }
 
     @Override
@@ -157,7 +162,7 @@ public class ArticleServiceImpl  implements ArticleService {
         Long rows = articleMapper.getCount(req.getState(), keywords);
         List<Article> articleList = articleMapper.getArticleList(req, offset, keywords);
 
-        ArticleListDtoResult dtoResult = DtoResult.DataDtoSuccess(ArticleListDtoResult.class);
+        ArticleListDtoResult dtoResult = DtoResult.dataDtoSuccess(ArticleListDtoResult.class);
         long totalPage = Double.valueOf(Math.ceil((float) rows / (float) pageSize)).longValue();
         dtoResult.setTotalCount(rows);
         dtoResult.setTotalPage(totalPage);
@@ -169,8 +174,20 @@ public class ArticleServiceImpl  implements ArticleService {
     @Override
     public DtoResult getById(Long id) {
         Article article = articleMapper.getArticleById(id);
+        this.addReadCount(article);
         DtoResult result = DtoResult.success();
         result.setData(article);
         return result;
+    }
+
+    /**
+     * 浏览数+1
+     *
+     * @param article
+     * @return
+     */
+    private boolean addReadCount(Article article) {
+        article.setReadCount(article.getReadCount() + 1);
+        return articleMapper.updateById(article) > 0;
     }
 }
