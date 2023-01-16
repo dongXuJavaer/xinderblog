@@ -22,11 +22,6 @@ public class CategoryController extends AbstractController implements CategoryAp
     @Autowired
     CategoryServiceImpl categoryServiceImpl;
 
-    public BaseResponse<CategoryListDtoResult> getAllCategories() {
-        CategoryListDtoResult dtoResult = categoryServiceImpl.getAllCategories();
-        return buildJson(dtoResult);
-    }
-
     @RequestMapping(value = "/admin/category{ids}", method = RequestMethod.DELETE)
     public RespBean deleteById(@PathVariable String ids) {
         boolean result = categoryServiceImpl.deleteCategoryByIds(ids);
@@ -51,13 +46,19 @@ public class CategoryController extends AbstractController implements CategoryAp
         return new RespBean("error", "添加失败!");
     }
 
-    @RequestMapping(value = "/admin//category", method = RequestMethod.PUT)
+    @RequestMapping(value = "/admin/category", method = RequestMethod.PUT)
     public RespBean updateCate(Category category) {
         int i = categoryServiceImpl.updateCategoryById(category);
         if (i == 1) {
             return new RespBean("success", "修改成功!");
         }
         return new RespBean("error", "修改失败!");
+    }
+
+    @Override
+    public BaseResponse<CategoryListDtoResult> getAllCategories() {
+        CategoryListDtoResult dtoResult = categoryServiceImpl.getAllCategories();
+        return buildJson(dtoResult);
     }
 
 }

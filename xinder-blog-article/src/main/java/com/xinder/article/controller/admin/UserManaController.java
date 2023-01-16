@@ -5,6 +5,7 @@ import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
 import com.xinder.article.feign.UserManaFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,6 +25,9 @@ public class UserManaController {
 
     @Autowired
     private UserManaFeignClient userManaFeignClient;
+
+    @Value("${appname.user}")
+    private String username;
 
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public List<User> getUserByNickname(String nickname) {

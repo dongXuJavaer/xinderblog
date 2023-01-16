@@ -3,9 +3,13 @@ package com.xinder.user.auth;
 
 import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
+import com.xinder.user.config.MyPasswordEncoder;
 import com.xinder.user.mapper.RolesMapper;
 import com.xinder.user.mapper.UserMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,7 +17,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 自定义认证类，用来查询出用户基本信息
@@ -24,11 +30,16 @@ import java.util.List;
 @Component
 public class UserDetailServiceImpl implements UserDetailsService {
 
+    private final static Logger logger = LoggerFactory.getLogger(UserDetailServiceImpl.class);
+
     @Autowired
     private RolesMapper rolesMapper;
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -37,6 +48,8 @@ public class UserDetailServiceImpl implements UserDetailsService {
             //避免返回null，这里返回一个不含有任何值的User对象，在后期的密码比对过程中一样会验证失败
 //            return new User();
         }
+        redisTemplate.opsForValue().set(username, user, Duration.ofMinutes(30));
+        logger.info("用户{}信息存入redis",username);
 
         //查询用户的角色信息，并返回存入user中
         List<Role> roles = rolesMapper.getRolesByUid(user.getId());
@@ -51,7 +64,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     }
 
     private String buildPermissions(List<Role> roleList) {
-        if (CollectionUtils.isEmpty(roleList)){
+        if (CollectionUtils.isEmpty(roleList)) {
             return "";
         }
         StringBuilder stringBuffer = new StringBuilder();

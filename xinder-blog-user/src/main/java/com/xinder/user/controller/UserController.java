@@ -5,18 +5,16 @@ import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.common.abstcontroller.AbstractController;
 import com.xinder.api.rest.UserApi;
+import com.xinder.common.util.TokenDecode;
 import com.xinder.common.util.Util;
 import com.xinder.user.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * Created by sang on 2017/12/24.
@@ -28,21 +26,24 @@ public class UserController extends AbstractController implements UserApi {
     UserServiceImpl userServiceImpl;
 
     @Autowired
+    private TokenDecode tokenDecode;
+
+    @Autowired
     private RedisTemplate redisTemplate;
 
-    @RequestMapping("/currentUserName")
+    @Override
     public String currentUserName() {
-        return Util.getCurrentUser(redisTemplate).getNickname();
+        return Util.getCurrentUser(tokenDecode, redisTemplate).getNickname();
     }
 
     @RequestMapping("/currentUserId")
     public Long currentUserId() {
-        return Util.getCurrentUser(redisTemplate).getId();
+        return Util.getCurrentUser(tokenDecode, redisTemplate).getId();
     }
 
     @RequestMapping("/currentUserEmail")
     public String currentUserEmail() {
-        return Util.getCurrentUser(redisTemplate).getEmail();
+        return Util.getCurrentUser(tokenDecode, redisTemplate).getEmail();
     }
 
     @RequestMapping("/isAdmin")
@@ -66,7 +67,7 @@ public class UserController extends AbstractController implements UserApi {
     }
 
 
-    @RequestMapping("login1")
+    @RequestMapping("/login")
     public BaseResponse<UserDtoResult> login(
             String username,
             String password,

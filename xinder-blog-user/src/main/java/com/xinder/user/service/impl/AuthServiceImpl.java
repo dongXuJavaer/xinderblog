@@ -1,12 +1,14 @@
 package com.xinder.user.service.impl;
 
 import com.xinder.common.util.AuthToken;
+import com.xinder.user.config.MyPasswordEncoder;
 import com.xinder.user.service.AuthService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,8 @@ import java.util.Map;
 @Service
 public class AuthServiceImpl implements AuthService {
 
+    private final static Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -37,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
     private LoadBalancerClient loadBalancerClient;
 
     @Value("${feign.client.user.name}")
-    private String serverName;
+    private String userServerName;
 
 
     @Override
@@ -47,6 +51,7 @@ public class AuthServiceImpl implements AuthService {
         if(authToken == null){
             throw new RuntimeException("申请令牌失败");
         }
+
         return authToken;
     }
 
@@ -62,12 +67,13 @@ public class AuthServiceImpl implements AuthService {
     private AuthToken applyToken(String username, String password, String clientId, String clientSecret) {
 
         // 远程调用服务, 选中认证服务的地址
-        ServiceInstance instance = loadBalancerClient.choose(serverName.toLowerCase());
+        ServiceInstance instance = loadBalancerClient.choose(userServerName.toLowerCase());
         if (instance == null) {
             throw new RuntimeException("找不到认证服务");
         }
         //获取令牌的url
         String url = instance.getUri().toString() + "/oauth/token";
+//        String url = "https://www.baidu.com";
 
         //封装body里面的参数
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -99,11 +105,18 @@ public class AuthServiceImpl implements AuthService {
                     new HttpEntity<MultiValueMap<String, String>>(formData, header), Map.class);
             // 获取响应结果
             body = responseEntity.getBody();
-            System.out.println(body);
-            if (body == null || body.get("access_token") == null ||
-                    body.get("jti") == null || body.get("refresh_token") == null) {
+            logger.info("请求token的响应结果：{}",body);
+            System.out.println(body.get("access_token"));
+            try {
+                if (body == null || body.get("access_token") == null ||
+                        body.get("jti") == null || body.get("refresh_token") == null) {
+                    System.out.println("请求body响应信息 :" + body);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
                 throw new RuntimeException("令牌创建失败");
             }
+
         }catch (RestClientException e) {
             throw new RuntimeException(e);
         }

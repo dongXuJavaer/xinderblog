@@ -4,6 +4,7 @@ import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
 import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.result.DtoResult;
+import com.xinder.common.util.TokenDecode;
 import com.xinder.user.mapper.RolesMapper;
 import com.xinder.user.mapper.UserMapper;
 import com.xinder.common.util.AuthToken;
@@ -11,6 +12,7 @@ import com.xinder.common.util.CookieUtils;
 import com.xinder.common.util.Util;
 import com.xinder.user.service.AuthService;
 import com.xinder.user.service.UserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -60,6 +62,9 @@ public class UserServiceImpl implements UserService {
     @Value("${auth.cookieMaxAge}")
     private int cookieMaxAge;
 
+    @Autowired
+    private TokenDecode tokenDecode;
+
 
     /**
      * @param user
@@ -88,7 +93,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public int updateUserEmail(String email) {
-        return userMapper.updateUserEmail(email, Util.getCurrentUser(redisTemplate).getId());
+        return userMapper.updateUserEmail(email, Util.getCurrentUser(tokenDecode, redisTemplate).getId());
     }
 
     public List<User> getUserByNickname(String nickname) {
@@ -132,10 +137,13 @@ public class UserServiceImpl implements UserService {
         }
 
         AuthToken authToken = authService.login(username, password, clientId, clientSecret);
+
         CookieUtils.addCookie(response, cookieDomain,
                 "/", "Authorization", authToken.getAccessToken(), cookieMaxAge, false);
 
+        User user = userMapper.loadUserByUsername(username);
         userDtoResult = DtoResult.dataDtoSuccess(UserDtoResult.class);
+        BeanUtils.copyProperties(user, userDtoResult);
 
         return userDtoResult;
     }

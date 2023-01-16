@@ -23,14 +23,14 @@
             <artifactId>xinder-blog-comm</artifactId>
             <version>1.0</version>
             <exclusions>
-                <exclusion>
-                    <artifactId>spring-cloud-starter-oauth2</artifactId>
-                    <groupId>org.springframework.cloud</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spring-boot-starter-security</artifactId>
-                    <groupId>org.springframework.boot</groupId>
-                </exclusion>
+<!--                <exclusion>-->
+<!--                    <artifactId>spring-cloud-starter-oauth2</artifactId>-->
+<!--                    <groupId>org.springframework.cloud</groupId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <artifactId>spring-boot-starter-security</artifactId>-->
+<!--                    <groupId>org.springframework.boot</groupId>-->
+<!--                </exclusion>-->
             </exclusions>
         </dependency>
 

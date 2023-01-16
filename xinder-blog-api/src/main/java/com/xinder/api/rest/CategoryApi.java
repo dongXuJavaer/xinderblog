@@ -16,12 +16,11 @@ import java.util.List;
  */
 
 @Api(tags = "CategoryApi")
-@RequestMapping("/category")
 public interface CategoryApi {
 
 
     @ApiOperation(value = "获取所有博客分类", notes = "", tags = {"CategoryApi"})
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/category/all", method = RequestMethod.GET)
     BaseResponse<CategoryListDtoResult> getAllCategories();
 
 }

@@ -23,7 +23,8 @@ public class MyPasswordEncoder extends BCryptPasswordEncoder {
 
     @Override
     public String encode(CharSequence rawPassword) {
-        return DigestUtils.md5DigestAsHex(rawPassword.toString().getBytes());
+//        return DigestUtils.md5DigestAsHex(rawPassword.toString().getBytes());
+        return super.encode(rawPassword);
     }
 
     @Override
@@ -32,6 +33,7 @@ public class MyPasswordEncoder extends BCryptPasswordEncoder {
         String pwd = rawPassword.toString();
         logger.info("[MyPasswordEncoder.matches]前端传来  明文密码:" + pwd);
 //        logger.info("[MyPasswordEncoder.matches]前端传来  加密密码:" + DigestUtils.md5DigestAsHex(rawPassword.toString().getBytes()));
+//        logger.info("[MyPasswordEncoder.matches]前端传来  加密密码:" + BCrypt.hashpw(rawPassword.toString(), encodedPassword));
         logger.info("[MyPasswordEncoder.matches]前端传来  加密密码:" + BCrypt.hashpw(rawPassword.toString(), encodedPassword));
         logger.info("[MyPasswordEncoder.matches]后端校验  加密密码:" + encodedPassword);
 

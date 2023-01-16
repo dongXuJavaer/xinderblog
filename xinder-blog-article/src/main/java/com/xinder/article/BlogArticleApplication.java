@@ -1,5 +1,6 @@
 package com.xinder.article;
 
+import com.xinder.common.util.TokenDecode;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 @EnableScheduling//开启定时任务支持
 @MapperScan("com.xinder.article.mapper")
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients(basePackages = "com.xinder.article.feign")
 public class BlogArticleApplication {
 
     public static void main(String[] args) {
@@ -27,6 +28,11 @@ public class BlogArticleApplication {
 //    public RedisTemplate redisTemplate(){
 //        return new RedisTemplate();
 //    }
+
+    @Bean
+    public TokenDecode tokenDecode() {
+        return new TokenDecode();
+    }
 
 
 }

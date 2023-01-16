@@ -3,24 +3,21 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xinder.article.mapper.ArticleMapper">
+
     <insert id="addNewArticle" parameterType="com.xinder.api.bean.Article" useGeneratedKeys="true" keyProperty="id">
-
-                INSERT INTO article SET title=#{title},mdContent=#{mdContent},htmlContent=#{htmlContent},summary=#{summary},cid=#{cid},uid=#{uid},publishDate=#{publishDate},state=#{state},editTime=#{editTime}
-
+        INSERT INTO article SET title=#{title},md_content=#{mdContent},html_content=#{htmlContent},summary=#{summary},cid=#{cid},uid=#{uid},create_time=#{createTime},state=#{state},edit_time=#{editTime}
     </insert>
     <update id="pvIncrement" parameterType="Long">
-
-                UPDATE article set pageView=pageView+1 WHERE id=#{aid}
-
+        UPDATE article set read_count = read_count+1 WHERE id=#{aid}
     </update>
     <update id="updateArticle" parameterType="com.xinder.api.bean.Article">
         UPDATE article SET
-        title=#{title},mdContent=#{mdContent},htmlContent=#{htmlContent},summary=#{summary},cid=#{cid},editTime=#{editTime}
+        title=#{title},md_content=#{mdContent}, html_content=#{htmlContent},summary=#{summary},cid=#{cid},edit_time=#{editTime}
         <if test="state==1">
             ,state=1
         </if>
-        <if test="publishDate!=null">
-            ,publishDate=#{publishDate}
+        <if test="createTime!=null">
+            ,create_time=#{createTime}
         </if>
         WHERE id=#{id}
     </update>
@@ -37,6 +34,7 @@
         <result column="read_count" property="readCount"/>
         <result column="create_time" property="createTime"/>
         <result column="uid" property="uid"/>
+        <result column="cid" property="cid"/>
         <result column="nickname" property="nickname"/>
         <result column="cate_name" property="cateName"/>
 
@@ -59,7 +57,9 @@
         FROM article a, `user` u, category c
         WHERE a.`cid`=c.`id` AND a.`uid`=u.`id`
         <if test="state!=null">
-            and a.state = #{state}
+            <if test="state!='-1'">
+                and a.state = #{state}
+            </if>
         </if>
 
         <if test="keywords!=null">
@@ -82,9 +82,6 @@
         <where>
             <if test="state!=-1">
                 AND state=#{state}
-            </if>
-            <if test="uid!=null">
-                AND uid=#{uid}
             </if>
             <if test="keywords!=null">
                 AND title LIKE concat('%',#{keywords},'%')
@@ -122,6 +119,7 @@
         a.uid            as uid,
         a.read_count,
         u.`nickname`     as nickname,
+        c.id             as cid,
         c.`cate_name`    as cate_name
         FROM article a
         LEFT JOIN `user` u ON a.`uid`=u.`id`

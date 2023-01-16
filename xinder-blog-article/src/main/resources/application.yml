@@ -31,6 +31,8 @@ logging:
 mybatis-plus:
   mapper-locations: classpath:mapper/*Mapper.xml
 
+
+
 auth:
   ttl: 3600000  #token过期时间
   clientId: dongyimai  #客户端账号
@@ -38,15 +40,7 @@ auth:
   cookieDomain: localhost #cookie域名
   cookieMaxAge: -1     #cookie有效期
 
-encrypt:
-  key-store:
-    alias: dongyimai
-    location: classpath:dongyimai.jks
-    password: dongyimai
-    secret: dongyimai
 
-
-feign:
-  client:
-    user:
-      name: user
+# hystrix:
+#   # 启用fegin断路器
+#   enabled: true

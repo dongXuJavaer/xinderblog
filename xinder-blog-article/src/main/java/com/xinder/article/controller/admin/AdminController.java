@@ -23,18 +23,21 @@ public class AdminController {
     ArticleServiceImpl articleServiceImpl;
 
     /**
-     * 分页获取所有博客
+     * 管理端  博客管理
      * @param page
      * @param count
      * @param keywords
      * @return
      */
     @RequestMapping(value = "/article/all", method = RequestMethod.GET)
-    public Map<String, Object> getArticleByStateByAdmin(@RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "count", defaultValue = "6") Integer count, String keywords) {
+    public Map<String, Object> getArticleByStateByAdmin(
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "count", defaultValue = "6") Integer count,
+            String keywords) {
         List<Article> articles = articleServiceImpl.getArticleByState(-2, page, count, keywords);
         Map<String, Object> map = new HashMap<>();
         map.put("articles", articles);
-        map.put("totalCount", articleServiceImpl.getArticleCountByState(1, null, keywords));
+        map.put("totalCount", articleServiceImpl.getArticleCountByState(-2,  keywords));
         return map;
     }
 

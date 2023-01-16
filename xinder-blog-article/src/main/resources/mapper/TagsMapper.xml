@@ -7,13 +7,13 @@
       DELETE FROM article_tags WHERE aid=#{aid}
     </delete>
     <insert id="saveTags">
-        INSERT IGNORE INTO tags(tagName) VALUES
+        INSERT IGNORE INTO tags(tag_name) VALUES
         <foreach collection="tags" item="tag" separator=",">
             (#{tag})
         </foreach>
     </insert>
     <select id="getTagsIdByTagName" resultType="long">
-        SELECT id FROM tags WHERE tagName IN
+        SELECT id FROM tags WHERE tag_name IN
         <foreach collection="tagNames" item="tagName" separator="," open="(" close=")">
             #{tagName}
         </foreach>

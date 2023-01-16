@@ -23,6 +23,7 @@
         <module>xinder-blog-common</module>
         <module>xinder-blog-user</module>
         <module>xinder-blog-gateway</module>
+        <module>xinder-blog-file</module>
     </modules>
 
 

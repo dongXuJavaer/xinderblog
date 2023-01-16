@@ -5,31 +5,32 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by sang on 2017/12/20.
  */
 public class Util {
 
-    public static User getCurrentUser(RedisTemplate redisTemplate) {
+    public static User getCurrentUser(TokenDecode tokenDecode, RedisTemplate redisTemplate) {
 
 //        org.springframework.security.core.userdetails.User userDetailService =
 //                (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (o == null || (o instanceof String)){
-            return new User();
+        Map<String, String> userInfo = tokenDecode.getUserInfo();
+        String username = userInfo.get("user_name");
+
+        User user = (User) redisTemplate.opsForValue().get(username);
+        if (user != null) {
+            redisTemplate.opsForValue().set(username, user, 30, TimeUnit.MINUTES);
+        } else {
+            user = new User();
         }
-
-        UserDetails userDetails = (UserDetails) o;
-        User user = (User) redisTemplate.opsForValue().get(userDetails.getUsername());
-
-//        if (RequestContextHolder.getRequestAttributes() != null) {
-//            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-//            HttpSession session = request.getSession();
-//            Object currentUser = session.getAttribute("currentUser");
-//            return (User) currentUser;
-//        }
         return user;
+
     }
 
 

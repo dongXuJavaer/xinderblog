@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by sang on 2017/12/20.
+ * Created by xinder on 2017/12/20.
  */
 
 @Data
@@ -80,7 +80,17 @@ public class Article implements Serializable {
     @ApiModelProperty(value = "浏览量")
     private Integer readCount;
 
-    private String[] dynamicTags;
+    @TableField("headPic")
+    @ApiModelProperty(value = "封面图片链接")
+    private Integer headPic;
+
+    @TableField("attachment")
+    @ApiModelProperty(value = "附件链接")
+    private Integer attachment;
+
+    @TableField("dynamicTags")
+    @ApiModelProperty(value = "用户新添加的标签")
+    private List<Tags> dynamicTags;
 
     private String stateStr;
 }

@@ -50,7 +50,7 @@ public class User implements Serializable {
     @ApiModelProperty(value = "邮箱")
     private String email;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "头像地址")
     private String userface;
 
     @ApiModelProperty(value = "上次修改时间")

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author Xinder
  * @date 2023-01-12 19:21
  */
-@FeignClient("${feign.client.user.name}")
+@FeignClient("${appname.user}")
 public interface UserManaFeignClient extends UserManaApi {
 
     @Override

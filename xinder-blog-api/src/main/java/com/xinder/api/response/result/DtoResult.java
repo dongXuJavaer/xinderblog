@@ -21,6 +21,12 @@ public class DtoResult implements Serializable {
         this.msg = msg;
     }
 
+    public DtoResult(Integer code, String msg, Object data) {
+        this.code = code;
+        this.msg = msg;
+        this.data = data;
+    }
+
     public static DtoResult success() {
         return new DtoResult(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getDesc());
     }

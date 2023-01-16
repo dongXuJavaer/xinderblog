@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -76,46 +77,46 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         System.out.println(PermissionsEnums.ADMINISTRATORS.getValue());
-        http
-                .authorizeRequests()
-                .antMatchers("admin/category/all").authenticated()
-//                .antMatchers("admin/**", "/reg").hasRole("管理员") ///admin/**的URL都需要有超级管理员角色，如果使用.hasAuthority()方法来配置，需要在参数中加上ROLE_,如下.hasAuthority("ROLE_超级管理员")
-//                .anyRequest().authenticated()//其他的路径都是登录后即可访问
-                .anyRequest().permitAll()
-                .and()
-                .formLogin()
-                //登录页面
-//                .loginPage("https://baidu.com")
-                // 登录请求
-                .loginProcessingUrl("/login")
-                //默认使用的用户名参数
-                .usernameParameter("username")
-                //默认使用的密码参数
-                .passwordParameter("password")
-                .successHandler(authenticationSuccessHandler)  // 认证成功处理器
-                .failureHandler(authenticationFailHandler) // 认证失败处理器
-                .permitAll()
-
-                .and()
-                // 退出
-                .logout()
-                .addLogoutHandler(logoutHandler)
-                .logoutSuccessHandler(logoutSuccessHandler)
-                .permitAll()
-                .and()
-                .csrf().disable()
-                .exceptionHandling().accessDeniedHandler(accessDeniedHandler);
+//        http
+//                .authorizeRequests()
+//                .antMatchers("admin/category/all").authenticated()
+////                .antMatchers("admin/**", "/reg").hasRole("管理员") ///admin/**的URL都需要有超级管理员角色，如果使用.hasAuthority()方法来配置，需要在参数中加上ROLE_,如下.hasAuthority("ROLE_超级管理员")
+////                .anyRequest().authenticated()//其他的路径都是登录后即可访问
+//                .anyRequest().permitAll()
+//                .and()
+//                .formLogin()
+//                //登录页面
+////                .loginPage("https://baidu.com")
+//                // 登录请求
+//                .loginProcessingUrl("/login")
+//                //默认使用的用户名参数
+//                .usernameParameter("username")
+//                //默认使用的密码参数
+//                .passwordParameter("password")
+//                .successHandler(authenticationSuccessHandler)  // 认证成功处理器
+//                .failureHandler(authenticationFailHandler) // 认证失败处理器
+//                .permitAll()
+//
+//                .and()
+//                // 退出
+//                .logout()
+//                .addLogoutHandler(logoutHandler)
+//                .logoutSuccessHandler(logoutSuccessHandler)
+//                .permitAll()
+//                .and()
+//                .csrf().disable()
+//                .exceptionHandling().accessDeniedHandler(accessDeniedHandler);
 
 //        // 解决登录跨域问题
         http.cors(Customizer.withDefaults());
 
-//
-//        http.requestMatchers()
-//                .anyRequest() // 匹配任何请求
+
+        http.requestMatchers()
+                .anyRequest() // 匹配任何请求
 //                .and()
 //                .formLogin()// 匹配 登录界面
-//                .and()
-//                .csrf().disable(); // 跨站攻击防御禁用
+                .and()
+                .csrf().disable(); // 跨站攻击防御禁用
 
 
     }
@@ -126,12 +127,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
-    /**
-     * 往容器中添加认证管理器(解决无法直接注入的问题，所以需要我们手动注入)
-     *
-     * @return
-     * @throws Exception
-     */
+    // 往容器中添加认证管理器(解决无法直接注入的问题，所以需要我们手动注入)
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -139,9 +135,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 //    @Bean
-//    public PasswordEncoder getBCryptPasswordEncoder() {
+//    public PasswordEncoder passwordEncoder() {
 //        return new BCryptPasswordEncoder();
 //    }
+
+
+
+
 
     public static void main(String[] args) {
         System.out.println(PermissionsEnums.ADMINISTRATORS.getValue());

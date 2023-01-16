@@ -2,6 +2,7 @@ package com.xinder.article.controller;
 
 import com.xinder.api.bean.Article;
 import com.xinder.api.bean.RespBean;
+import com.xinder.api.enums.ResultCode;
 import com.xinder.api.request.ArticleDtoReq;
 import com.xinder.api.response.dto.ArticleListDtoResult;
 import com.xinder.api.response.base.BaseResponse;
@@ -9,18 +10,14 @@ import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.rest.ArticleApi;
 import com.xinder.article.service.ArticleService;
 import com.xinder.common.abstcontroller.AbstractController;
-import org.apache.commons.io.IOUtils;
+import com.xinder.common.util.FileUtils;
+import com.xinder.common.util.TokenDecode;
 import com.xinder.article.service.impl.ArticleServiceImpl;
-import com.xinder.common.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -34,6 +31,10 @@ public class ArticleController extends AbstractController implements ArticleApi 
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
+    String accessKey = "0OHdkTxmT_nnOMhVVqSre9Kqo-sSPJYIu-0RhHdz";
+    String secretKey = "tuHYk95xUWWstg7OPVQYDS290CkUA7ubLTUTVgIc";
+    String bucket = "xinderblog";
+
     @Autowired
     ArticleServiceImpl articleServiceImpl;
 
@@ -42,6 +43,9 @@ public class ArticleController extends AbstractController implements ArticleApi 
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private TokenDecode tokenDecode;
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public RespBean addNewArticle(Article article) {
@@ -59,35 +63,25 @@ public class ArticleController extends AbstractController implements ArticleApi 
      * @return 返回值为图片的地址
      */
     @RequestMapping(value = "/uploadimg", method = RequestMethod.POST)
-    public RespBean uploadImg(HttpServletRequest req, MultipartFile image) {
-        StringBuffer url = new StringBuffer();
-        String filePath = "/blogimg/" + sdf.format(new Date());
-        String imgFolderPath = req.getServletContext().getRealPath(filePath);
-        File imgFolder = new File(imgFolderPath);
-        if (!imgFolder.exists()) {
-            imgFolder.mkdirs();
-        }
-        url.append(req.getScheme())
-                .append("://")
-                .append(req.getServerName())
-                .append(":")
-                .append(req.getServerPort())
-                .append(req.getContextPath())
-                .append(filePath);
-        String imgName = UUID.randomUUID() + "_" + image.getOriginalFilename().replaceAll(" ", "");
+    public RespBean uploadImg(@RequestParam("file") MultipartFile file) {
+        String url = null;
         try {
-            IOUtils.write(image.getBytes(), new FileOutputStream(new File(imgFolder, imgName)));
-            url.append("/").append(imgName);
-            return new RespBean("success", url.toString());
-        } catch (IOException e) {
+            url = FileUtils.upload(file, FileUtils.FOLDER_ING);
+        } catch (Exception e) {
             e.printStackTrace();
+            return new RespBean("error", "上传失败!");
         }
-        return new RespBean("error", "上传失败!");
+        return new RespBean("success", url);
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public Map<String, Object> getArticleByState(@RequestParam(value = "state", defaultValue = "-1") Integer state, @RequestParam(value = "page", defaultValue = "1") Integer page, @RequestParam(value = "count", defaultValue = "6") Integer count, String keywords) {
-        int totalCount = articleServiceImpl.getArticleCountByState(state, Util.getCurrentUser(redisTemplate).getId(), keywords);
+    public Map<String, Object> getArticleByState(
+            @RequestParam(value = "state", defaultValue = "-1") Integer state,
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "count", defaultValue = "6") Integer count,
+            String keywords) {
+
+        int totalCount = articleServiceImpl.getArticleCountByState(state, keywords);
         List<Article> articles = articleServiceImpl.getArticleByState(state, page, count, keywords);
         Map<String, Object> map = new HashMap<>();
         map.put("totalCount", totalCount);
@@ -142,5 +136,36 @@ public class ArticleController extends AbstractController implements ArticleApi 
         DtoResult result = articleService.getById(aid);
         return buildJson(result);
     }
+
+    @Override
+    public BaseResponse<String> uploadHeadPic(@RequestParam("file")  MultipartFile file) {
+        String url = null;
+        try {
+            url = FileUtils.upload(file, FileUtils.FOLDER_HEADPIC);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return buildJson(ResultCode.FAIL.getCode(), ResultCode.FAIL.getDesc());
+        }
+        return buildJson(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getDesc(), url);
+    }
+
+    @Override
+    public BaseResponse<String> uploadAttachment(MultipartFile file) {
+        String url = null;
+        try {
+            url = FileUtils.upload(file, FileUtils.FOLDER_ATTACHMENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return buildJson(ResultCode.FAIL.getCode(), ResultCode.FAIL.getDesc());
+        }
+        return buildJson(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getDesc(), url);
+    }
+
+    @Override
+    public BaseResponse<String> publish(Article article) {
+
+        return null;
+    }
+
 
 }

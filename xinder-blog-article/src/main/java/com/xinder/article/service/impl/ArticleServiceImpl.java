@@ -8,6 +8,7 @@ import com.xinder.api.response.result.DtoResult;
 import com.xinder.article.mapper.ArticleMapper;
 import com.xinder.article.mapper.TagsMapper;
 import com.xinder.article.service.ArticleService;
+import com.xinder.common.util.TokenDecode;
 import com.xinder.common.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,6 +29,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     TagsMapper tagsMapper;
 
     @Autowired
+    private TokenDecode tokenDecode;
+
+    @Autowired
     private RedisTemplate redisTemplate;
 
     public int addNewArticle(Article article) {
@@ -46,7 +50,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             }
             article.setEditTime(timestamp);
             //设置当前用户
-            article.setUid(Util.getCurrentUser(redisTemplate).getId());
+            article.setUid(Util.getCurrentUser(tokenDecode, redisTemplate).getId());
             int i = articleMapper.addNewArticle(article);
             //打标签
             String[] dynamicTags = article.getDynamicTags();
@@ -79,7 +83,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     private int addTagsToArticle(String[] dynamicTags, Long aid) {
-        //1.删除该文章目前所有的标签
+        //1.删除该文章目前所有的标签关联关系
         tagsMapper.deleteTagsByAid(aid);
         //2.将上传上来的标签全部存入数据库
         tagsMapper.saveTags(dynamicTags);
@@ -99,8 +103,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     public List<Article> getArticleByState(Integer state, Integer page, Integer count, String keywords) {
         int start = (page - 1) * count;
-        Long uid = Util.getCurrentUser(redisTemplate).getId();
-        return articleMapper.getArticleByState(state, start, count, uid, keywords);
+        return articleMapper.getArticleByState(state, start, count, keywords);
     }
 
 
@@ -109,8 +112,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //        return articleMapper.getArticleByStateByAdmin(start, count,keywords);
 //    }
 
-    public int getArticleCountByState(Integer state, Long uid, String keywords) {
-        return articleMapper.getArticleCountByState(state, uid, keywords);
+    public int getArticleCountByState(Integer state, String keywords) {
+        return articleMapper.getArticleCountByState(state, keywords);
     }
 
     public int updateArticleState(Long[] aids, Integer state) {
@@ -141,7 +144,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      * @return
      */
     public List<String> getCategories() {
-        return articleMapper.getCategories(Util.getCurrentUser(redisTemplate).getId());
+        return articleMapper.getCategories(Util.getCurrentUser(tokenDecode, redisTemplate).getId());
     }
 
     /**
@@ -150,7 +153,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      * @return
      */
     public List<Integer> getDataStatistics() {
-        return articleMapper.getDataStatistics(Util.getCurrentUser(redisTemplate).getId());
+        return articleMapper.getDataStatistics(Util.getCurrentUser(tokenDecode, redisTemplate).getId());
     }
 
     @Override

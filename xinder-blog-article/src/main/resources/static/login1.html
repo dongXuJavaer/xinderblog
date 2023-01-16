@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>测试qq登录</h1>
+<span id="qqLoginBtn">QC</span>
+</body>
+<!--<script type="text/javascript" charset="utf-8"-->
+<!--        src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js"-->
+<!--        data-appid="102037068"-->
+<!--        data-redirecturi="http://127.0.0.1/:8081"-->
+<!--        >-->
+<!--</script>-->
+<script type="text/javascript"  charset="utf-8"
+        src="http://connect.qq.com/qc_jssdk.js"
+        data-appid="102037068"
+        data-redirecturi="http://127.0.0.1/:8081"
+></script>
+<!--<script type="text/javascript"-->
+<!--        src="./static/js/qc_jssdk.js"-->
+<!--        data-appid="102037068"-->
+<!--        data-redirecturi="http://127.0.0.1/:8081"-->
+<!--        charset="utf-8">-->
+<!--    // QC.Login({-->
+<!--    //     btnId:"qqLoginBtn"	//插入按钮的节点id-->
+<!--    // });-->
+<!--</script>-->
+
+<script>
+    console.log(QC)
+    QC.Login({
+        btnId: "qqLoginBtn"	//插入按钮的节点id
+    });
+</script>
+</html>

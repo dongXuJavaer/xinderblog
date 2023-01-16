@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  * @date 2023-01-08 10:54
  */
 @Api(tags = "UserController")
+@RequestMapping("/user")
 public interface UserApi {
 
     @RequestMapping("/currentUserName")
@@ -33,6 +34,12 @@ public interface UserApi {
 
     @RequestMapping(value = "/updateUserEmail", method = RequestMethod.PUT)
     RespBean updateUserEmail(String email);
+
+//    @PostMapping("/login")
+//     BaseResponse<UserDtoResult> login(
+//            String username,
+//            String password,
+//            HttpServletResponse response);
 
     //退出
     @PostMapping("/logout")

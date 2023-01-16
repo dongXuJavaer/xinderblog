@@ -13,9 +13,9 @@
         </foreach>
     </delete>
     <update id="updateCategoryById" parameterType="com.xinder.api.bean.Category">
-        UPDATE category SET cateName=#{cateName} WHERE id=#{id}
+        UPDATE category SET cate_name=#{cateName} WHERE id=#{id}
     </update>
     <insert id="addCategory" parameterType="com.xinder.api.bean.Category">
-        INSERT INTO category SET date=#{date},cateName=#{cateName}
+        INSERT INTO category SET date=#{date},cate_name=#{cateName}
     </insert>
 </mapper>
