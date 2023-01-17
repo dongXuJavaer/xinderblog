@@ -11,7 +11,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  * @date 2023-01-12 21:24
  */
 @SpringBootApplication(exclude = RedisAutoConfiguration.class)
-//@EnableDiscoveryClient
+@EnableDiscoveryClient
 public class BlogGatewayApplication {
 
     public static void main(String[] args) {
