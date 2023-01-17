@@ -1,5 +1,7 @@
 package com.xinder.gateway.filtet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -24,6 +26,8 @@ import java.net.URLEncoder;
 @Component
 public class AuthorizeFilter implements GlobalFilter, Ordered {
 
+    private final static Logger logger = LoggerFactory.getLogger(AuthorizeFilter.class);
+
     // 令牌头名字
     private static final String AUTHORIZE_TOKEN = "Authorization";
 
@@ -43,12 +47,15 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
 
+
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpResponse response = exchange.getResponse();
 
         // 登录不被拦截
         //获取请求的URI  api/user/login?username=zhangsan9527&password=123456
         String path = request.getURI().getPath();
+
+        logger.info("请求路径--{}",path);
 
         // 如果请求是blog等开放服务，则直接放行
         if (path.startsWith("/api/article/")
