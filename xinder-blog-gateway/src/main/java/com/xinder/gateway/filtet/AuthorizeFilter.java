@@ -56,6 +56,7 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         String path = request.getURI().getPath();
 
         logger.info("请求路径--{}",path);
+        System.out.println("请求路径---------" + path);
 
         // 如果请求是blog等开放服务，则直接放行
         if (path.startsWith("/api/article/")
