@@ -61,6 +61,9 @@ public class User implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
+    @ApiModelProperty(value = "用户等级")
+    private Integer level;
+
 //    @Override
 //    @JsonIgnore
 //    public boolean isAccountNonExpired() {

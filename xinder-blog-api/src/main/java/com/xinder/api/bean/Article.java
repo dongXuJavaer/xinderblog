@@ -90,7 +90,7 @@ public class Article implements Serializable {
 
     @TableField("dynamicTags")
     @ApiModelProperty(value = "用户新添加的标签")
-    private List<Tags> dynamicTags;
+    private String[] dynamicTags;
 
     private String stateStr;
 }

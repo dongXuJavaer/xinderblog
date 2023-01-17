@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev  #   ${prefix}-${spring.profile.active}.${file-extension}
+    active: dev  # 默认匹配的dataId  为  ${spring.application.name}-${spring.profile.active}.${file-extension}
   cloud:
     nacos:
       discovery:
@@ -10,7 +10,7 @@ spring:
         server-addr: http://39.105.106.135:8848
         file-extension: yml
         namespace: 84c90b39-8826-48bc-bef4-d66ae40e1c73
-        extension-configs[0]:
+        extension-configs[0]:  # 配置
           data-id: global.yml
           refresh: true
   application:
