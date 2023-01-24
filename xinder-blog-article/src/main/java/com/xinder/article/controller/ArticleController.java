@@ -58,7 +58,7 @@ public class ArticleController extends AbstractController implements ArticleApi 
     }
 
     /**
-     * 上传图片
+     * 管理端，文章内容上传图片
      *
      * @return 返回值为图片的地址
      */
@@ -125,7 +125,6 @@ public class ArticleController extends AbstractController implements ArticleApi 
     public BaseResponse<ArticleListDtoResult> articleList(
             @RequestBody ArticleDtoReq articleDtoReq,
             @RequestParam(value = "keywords", required = false) String keywords) {
-
 
         ArticleListDtoResult articleListDtoResult = articleService.getArticleByState(articleDtoReq, keywords);
         return buildJson(articleListDtoResult);
