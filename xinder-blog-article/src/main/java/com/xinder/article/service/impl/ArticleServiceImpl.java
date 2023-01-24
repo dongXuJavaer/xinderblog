@@ -13,9 +13,11 @@ import com.xinder.common.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by Xinder on 2023-1-6 23:07:57.
@@ -164,6 +166,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         req.setState(1);
         Long rows = articleMapper.getCount(req.getState(), keywords);
         List<Article> articleList = articleMapper.getArticleList(req, offset, keywords);
+        articleList.forEach(item -> {
+            if (StringUtils.isEmpty(item.getHeadPic())) {
+                item.setHeadPic("");
+            }
+        });
+
 
         ArticleListDtoResult dtoResult = DtoResult.dataDtoSuccess(ArticleListDtoResult.class);
         long totalPage = Double.valueOf(Math.ceil((float) rows / (float) pageSize)).longValue();
