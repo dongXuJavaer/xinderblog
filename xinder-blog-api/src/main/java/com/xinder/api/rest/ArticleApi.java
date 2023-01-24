@@ -60,7 +60,7 @@ public interface ArticleApi {
     BaseResponse<String> uploadAttachment(MultipartFile file);
 
     /**
-     * 发表特尼
+     * 发表文章
      * @param article ..
      * @return
      */
