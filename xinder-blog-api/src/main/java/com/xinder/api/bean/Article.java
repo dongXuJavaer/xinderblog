@@ -82,7 +82,7 @@ public class Article implements Serializable {
 
     @TableField("headPic")
     @ApiModelProperty(value = "封面图片链接")
-    private Integer headPic;
+    private String headPic;
 
     @TableField("attachment")
     @ApiModelProperty(value = "附件链接")
