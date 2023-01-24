@@ -14,6 +14,10 @@ spring:
     password: 123456789PP
   main:
     allow-bean-definition-overriding: true
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 
 mybatis:
   config-location: classpath:/mybatis-config.xml
