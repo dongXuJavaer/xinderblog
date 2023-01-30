@@ -51,10 +51,11 @@ public class DtoResult implements Serializable {
         return dtoResult;
     }
 
-    public static DtoResult dataDtoFail(Class<? extends DtoResult> c) {
-        DtoResult dtoResult = null;
+
+    public static  <T extends DtoResult> T dataDtoFail(Class<T> c) {
+        T dtoResult = null;
         try {
-            dtoResult = c.newInstance();
+            dtoResult = (T) c.newInstance();
             dtoResult.setCode(ResultCode.FAIL.getCode());
             dtoResult.setMsg(ResultCode.FAIL.getDesc());
         } catch (InstantiationException | IllegalAccessException e) {

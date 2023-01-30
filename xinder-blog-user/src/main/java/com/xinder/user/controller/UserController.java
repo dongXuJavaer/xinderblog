@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
@@ -74,6 +75,21 @@ public class UserController extends AbstractController implements UserApi {
             HttpServletResponse response) {
 
         UserDtoResult userDtoResult = userServiceImpl.login(username, password, response);
+        return buildJson(userDtoResult);
+    }
+
+    /**
+     * qq登录
+     * @param accessToken
+     * @param response
+     * @return
+     */
+    @RequestMapping("/login/qq")
+    public BaseResponse<UserDtoResult> qqLogin(
+            @RequestParam( value = "access_token", required = false) String accessToken,
+            HttpServletResponse response) {
+
+        UserDtoResult userDtoResult = userServiceImpl.qqLogin(accessToken, response);
         return buildJson(userDtoResult);
     }
 

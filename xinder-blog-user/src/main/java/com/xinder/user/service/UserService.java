@@ -18,4 +18,11 @@ public interface UserService {
      * @return
      */
     UserDtoResult login(String username, String password, HttpServletResponse response);
+
+    /**
+     * qq登录
+     * @param token
+     * @return
+     */
+    UserDtoResult qqLogin(String token, HttpServletResponse response);
 }

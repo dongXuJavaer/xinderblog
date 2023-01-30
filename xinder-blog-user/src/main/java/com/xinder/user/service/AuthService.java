@@ -21,4 +21,11 @@ public interface AuthService {
      * @return
      */
     AuthToken login(String username, String password, String clientId, String clientSecret);
+
+    /**
+     * 授权认证
+     * @param username
+     * @return
+     */
+    String createJwtToken(String username);
 }

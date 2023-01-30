@@ -34,6 +34,7 @@
         SELECT u.*,r.`id` AS rid,r.`name` AS rname FROM user u,roles r,roles_user ru WHERE u.`id`=ru.`uid` AND
         r.`id`=ru.`rid` AND u.`id`=#{id}
     </select>
+
     <resultMap id="BaseResultMap" type="com.xinder.api.bean.User">
         <id column="id" property="id"/>
         <result column="username" property="username"/>
@@ -48,6 +49,7 @@
             <result column="rname" property="name"/>
         </collection>
     </resultMap>
+
     <select id="getAllRole" resultType="com.xinder.api.bean.Role">
         select * from roles;
     </select>
@@ -66,4 +68,26 @@
             (#{rid},#{id})
         </foreach>
     </insert>
+
+    <resultMap id="baseMap" type="com.xinder.api.bean.User">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="nickname" property="nickname"/>
+        <result column="password" property="password"/>
+        <result column="enabled" property="enabled"/>
+        <result column="email" property="email"/>
+        <result column="userface" property="userface"/>
+        <result column="reg_time" property="regTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="openid" property="openid"/>
+        <result column="gender" property="gender"/>
+        <collection  column="id" property="roles" ofType="com.xinder.api.bean.Role"
+           select="com.xinder.user.mapper.RolesMapper.getRolesByUid" />
+    </resultMap>
+
+    <select id="selectByOpenid" resultMap="baseMap">
+        SELECT  id, username, nickname, password, enabled, email, userface, reg_time, openid, gender, create_time
+        FROM user u
+        where openid = #{openid}
+    </select>
 </mapper>

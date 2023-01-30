@@ -33,4 +33,11 @@ public interface UserMapper extends BaseMapper<User> {
     int setUserRoles(@Param("rids") Long[] rids, @Param("id") Long id);
 
     User getUserById(@Param("id") Long id);
+
+    /**
+     * 查询openId查询用户
+     * @param openId
+     * @return
+     */
+    User selectByOpenid(String openId);
 }

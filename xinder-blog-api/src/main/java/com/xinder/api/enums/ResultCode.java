@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 public enum ResultCode {
 
     SUCCESS("成功", 10001),
-    FAIL("服务端异常", 10002),
+    FAIL("失败", 10002),
     PARAM_ERROR("参数错误", 10003),
     DATA_ERROR("数据异常", 10004),
 

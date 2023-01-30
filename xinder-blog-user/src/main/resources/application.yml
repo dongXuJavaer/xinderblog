@@ -40,8 +40,8 @@ encrypt:
   key-store:
     alias: dongyimai
     location: classpath:dongyimai.jks
-    password: dongyimai
-    secret: dongyimai
+    password: dongyimai # 密码
+    secret: dongyimai  #密钥库的访问密码
 
 feign:
   client:

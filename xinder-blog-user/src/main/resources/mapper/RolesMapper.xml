@@ -9,7 +9,9 @@
             (null,#{role},#{uid})
         </foreach>
     </insert>
+
     <select id="getRolesByUid" parameterType="long" resultType="com.xinder.api.bean.Role">
         SELECT r.* FROM roles r,roles_user ru WHERE r.`id`=ru.`rid` AND ru.`uid`=#{uid}
     </select>
+
 </mapper>

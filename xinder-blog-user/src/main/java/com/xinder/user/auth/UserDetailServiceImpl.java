@@ -43,13 +43,20 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userMapper.loadUserByUsername(username);
+        // 如果使用的是QQ登录，则username传入的实际值是openid
+        User user = userMapper.selectByOpenid(username);
         if (user == null) {
-            //避免返回null，这里返回一个不含有任何值的User对象，在后期的密码比对过程中一样会验证失败
+            // 不是QQ登录，则是通过用户名登录
+            user = userMapper.loadUserByUsername(username);
+
+            if (user == null) {
+                //避免返回null，这里返回一个不含有任何值的User对象，在后期的密码比对过程中一样会验证失败
 //            return new User();
+            }
+
         }
-        redisTemplate.opsForValue().set(username, user, Duration.ofMinutes(30));
-        logger.info("用户{}信息存入redis",username);
+        redisTemplate.opsForValue().set(user.getUsername(), user, Duration.ofMinutes(30));
+        logger.info("用户{}信息存入redis", user.getUsername());
 
         //查询用户的角色信息，并返回存入user中
         List<Role> roles = rolesMapper.getRolesByUid(user.getId());
@@ -71,6 +78,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
         roleList.forEach(role -> {
             stringBuffer.append(role.getName()).append(",");
         });
-        return stringBuffer.substring(0, stringBuffer.length() - 2);
+        return stringBuffer.substring(0, stringBuffer.length() - 1);
     }
 }

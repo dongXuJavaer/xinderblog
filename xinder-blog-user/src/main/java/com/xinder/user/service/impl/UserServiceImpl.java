@@ -1,10 +1,15 @@
 package com.xinder.user.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
+import com.xinder.api.enums.QQLoginEnums;
 import com.xinder.api.response.dto.UserDtoResult;
+import com.xinder.api.response.dto.qqlogin.IdsDto;
+import com.xinder.api.response.dto.qqlogin.QQUserDto;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.common.util.TokenDecode;
+import com.xinder.user.auth.UserDetailServiceImpl;
 import com.xinder.user.mapper.RolesMapper;
 import com.xinder.user.mapper.UserMapper;
 import com.xinder.common.util.AuthToken;
@@ -12,17 +17,25 @@ import com.xinder.common.util.CookieUtils;
 import com.xinder.common.util.Util;
 import com.xinder.user.service.AuthService;
 import com.xinder.user.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.provider.token.AbstractTokenGranter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by sang on 2017/12/17.
@@ -30,6 +43,8 @@ import java.util.List;
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
+
+    private final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     UserMapper userMapper;
@@ -45,6 +60,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     //客户端ID
     @Value("${auth.clientId}")
@@ -64,6 +82,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private TokenDecode tokenDecode;
+
+//    @Autowired
+//    private AbstractTokenGranter abstractTokenGranter;
 
 
     /**
@@ -124,7 +145,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDtoResult login(String username, String password, HttpServletResponse response) {
-        UserDtoResult userDtoResult = (UserDtoResult) DtoResult.dataDtoFail(UserDtoResult.class);
+        UserDtoResult userDtoResult = DtoResult.dataDtoFail(UserDtoResult.class);
         //判断用户是否为空
         if (StringUtils.isEmpty(username)) {
             userDtoResult.setMsg("用户名不能为空");
@@ -146,5 +167,54 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(user, userDtoResult);
 
         return userDtoResult;
+    }
+
+    @Override
+    public UserDtoResult qqLogin(String token, HttpServletResponse response) {
+
+        if (StringUtils.isEmpty(token) || "null".equals(token)) {
+            return DtoResult.dataDtoFail(UserDtoResult.class);
+        }
+
+        IdsDto idsDto = this.getOpenId(token);
+        User user = userMapper.selectByOpenid(idsDto.getOpenId());
+        if (user == null) {
+            // todo 用户注册
+            QQUserDto qqUserDto = this.getUserInfo(idsDto, token);
+
+        }
+        // 使用qq登录，则登录接口传入的username实际值为openid
+        UserDtoResult userDtoResult = this.login(user.getUsername(), user.getPassword(), response);
+//        Optional.ofNullable(user).orElse()
+        return userDtoResult;
+    }
+
+    /**
+     * 主要是获取openId
+     *
+     * @param token
+     * @return
+     */
+    private IdsDto getOpenId(String token) {
+        String url = QQLoginEnums.OPENID_URL.getValue() + "?access_token={token}&unionid=1&fmt=json";
+        String ids = restTemplate.getForObject(url, String.class, token);
+        IdsDto idsDto = JSONObject.parseObject(ids, IdsDto.class);
+        return idsDto;
+    }
+
+    /**
+     * 根据openid和token获取用户信息
+     *
+     * @param idsDto
+     * @param token
+     * @return
+     */
+    private QQUserDto getUserInfo(IdsDto idsDto, String token) {
+        String url = QQLoginEnums.USERINFO_URL.getValue()
+                + "?access_token={token}&oauth_consumer_key={clientId}&openid={openid}";
+        String userInfo = restTemplate.getForObject(url, String.class,
+                token, idsDto.getClientId(), idsDto.getOpenId());
+        QQUserDto qqUserDto = JSONObject.parseObject(userInfo, QQUserDto.class);
+        return qqUserDto;
     }
 }

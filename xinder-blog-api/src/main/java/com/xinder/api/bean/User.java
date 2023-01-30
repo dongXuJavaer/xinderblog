@@ -64,6 +64,14 @@ public class User implements Serializable {
     @ApiModelProperty(value = "用户等级")
     private Integer level;
 
+    @ApiModelProperty(value = "openid（qq登录的对应的）")
+    private String openid;
+
+    @ApiModelProperty(value = "性别")
+    private Integer gender;
+
+
+
 //    @Override
 //    @JsonIgnore
 //    public boolean isAccountNonExpired() {

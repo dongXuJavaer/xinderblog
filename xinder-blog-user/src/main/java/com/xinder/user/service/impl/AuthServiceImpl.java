@@ -1,5 +1,7 @@
 package com.xinder.user.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.xinder.api.enums.QQLoginEnums;
 import com.xinder.common.util.AuthToken;
 import com.xinder.user.config.MyPasswordEncoder;
 import com.xinder.user.service.AuthService;
@@ -7,12 +9,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.bootstrap.encrypt.KeyProperties;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.security.jwt.Jwt;
+import org.springframework.security.jwt.JwtHelper;
+import org.springframework.security.jwt.crypto.sign.RsaSigner;
+import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -21,11 +29,16 @@ import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
 import java.io.IOException;
+import java.security.KeyPair;
+import java.security.interfaces.RSAPrivateKey;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 用户认证服务
+ *
  * @author Xinder
  * @date 2023-01-08 11:13
  */
@@ -43,18 +56,19 @@ public class AuthServiceImpl implements AuthService {
     @Value("${feign.client.user.name}")
     private String userServerName;
 
+    @Resource(name = "KeyProp")
+    private KeyProperties keyProperties;
 
     @Override
     public AuthToken login(String username, String password, String clientId, String clientSecret) {
         // 申请令牌
         AuthToken authToken = this.applyToken(username, password, clientId, clientSecret);
-        if(authToken == null){
+        if (authToken == null) {
             throw new RuntimeException("申请令牌失败");
         }
 
         return authToken;
     }
-
 
     /****
      * 认证方法，申请token
@@ -105,19 +119,19 @@ public class AuthServiceImpl implements AuthService {
                     new HttpEntity<MultiValueMap<String, String>>(formData, header), Map.class);
             // 获取响应结果
             body = responseEntity.getBody();
-            logger.info("请求token的响应结果：{}",body);
+            logger.info("请求token的响应结果：{}", body);
             System.out.println(body.get("access_token"));
             try {
                 if (body == null || body.get("access_token") == null ||
                         body.get("jti") == null || body.get("refresh_token") == null) {
                     System.out.println("请求body响应信息 :" + body);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException("令牌创建失败");
             }
 
-        }catch (RestClientException e) {
+        } catch (RestClientException e) {
             throw new RuntimeException(e);
         }
 
@@ -141,6 +155,41 @@ public class AuthServiceImpl implements AuthService {
         //进行base64编码
         byte[] encode = Base64Utils.encode(string.getBytes());
         return "Basic " + new String(encode); // 返回的认证的请求头格式，比如：Basic Y2xpZW50OjEyMzQ1Ng==
+    }
+
+    @Override
+    public String createJwtToken(String username) {
+
+        // 路径资源
+        org.springframework.core.io.Resource location = keyProperties.getKeyStore().getLocation();
+        // 密钥库的访问密码
+        char[] chars = keyProperties.getKeyStore().getSecret().toCharArray();
+        //创建秘钥工厂
+        KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(location, chars);
+
+        //读取秘钥对(公钥、私钥)
+        KeyPair keyPair = keyStoreKeyFactory.getKeyPair(keyProperties.getKeyStore().getAlias());
+
+        //获取公钥
+        //  RSAPublicKey rsaPublicKey= (RSAPublicKey) keyPair.getPublic();
+        //  Base64Encoder base64Encoder = new Base64Encoder();
+        //  String encode = base64Encoder.encode(rsaPublicKey.getEncoded());
+        //  System.out.println("公钥:-----BEGIN PUBLIC KEY-----"+encode+"-----END PUBLIC KEY-----");
+
+        //获取私钥
+        RSAPrivateKey rsaPrivate = (RSAPrivateKey) keyPair.getPrivate();
+
+        //定义Payload
+        Map<String, Object> tokenMap = new HashMap<>();
+        tokenMap.put(QQLoginEnums.OPEN_ID.getValue(), username);
+
+        //生成Jwt令牌
+        Jwt jwt = JwtHelper.encode(JSON.toJSONString(tokenMap), new RsaSigner(rsaPrivate));
+
+        //取出令牌
+        String token = jwt.getEncoded();
+        System.out.println("token:" + token);
+        return token;
     }
 
 }
