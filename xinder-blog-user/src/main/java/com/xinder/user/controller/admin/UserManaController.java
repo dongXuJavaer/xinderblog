@@ -6,6 +6,7 @@ import com.xinder.api.bean.User;
 import com.xinder.api.rest.admin.UserManaApi;
 import com.xinder.user.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class UserManaController implements UserManaApi {
     @Autowired
     UserServiceImpl userServiceImpl;
 
+//    @PreAuthorize("hasAuthority('管理员')")
     @Override
     public List<User> getUserByNickname(@RequestParam(value = "nickname", required = false) String nickname) {
         return userServiceImpl.getUserByNickname(nickname);
