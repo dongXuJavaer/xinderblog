@@ -33,7 +33,7 @@ auth:
   ttl: 3600000  #token过期时间
   clientId: dongyimai  #客户端账号
   clientSecret: 123 #客户端密码
-  cookieDomain: localhost #cookie域名
+  cookieDomain: xinder.top #cookie域名
   cookieMaxAge: -1     #cookie有效期
 
 encrypt:
