@@ -1,11 +1,14 @@
 package com.xinder.api.bean;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.experimental.Accessors;
 //import lombok.ToString;
 //import org.springframework.format.annotation.DateTimeFormat;
 //import org.springframework.security.core.GrantedAuthority;
@@ -24,51 +27,64 @@ import java.util.Objects;
  */
 @TableName("user")
 @Data
+@Accessors(chain = true)
 public class User implements Serializable {
 
     private static final long serialVersionUID = 7456453555365L;
 
-    @TableId
+    @TableId( type = IdType.AUTO)
     @ApiModelProperty(value = "用户id")
     private Long id;
 
     @ApiModelProperty(value = "用户名")
+    @TableField(value = "username")
     private String username;
 
     @ApiModelProperty(value = "密码")
+    @TableField(value = "password")
     private String password;
 
     @ApiModelProperty(value = "昵称")
+    @TableField(value = "nickname")
     private String nickname;
 
     @ApiModelProperty(value = "是否启用", notes = "0:禁用    1: 启用")
+    @TableField(value = "enabled")
     private Integer enabled = 1;
 
-    @ApiModelProperty(value = "用户权限")
-    private List<Role> roles;
-
     @ApiModelProperty(value = "邮箱")
+    @TableField(value = "email")
     private String email;
 
     @ApiModelProperty(value = "头像地址")
+    @TableField(value = "userface")
     private String userface;
 
     @ApiModelProperty(value = "上次修改时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @TableField(value = "regTime")
     private Date regTime;
 
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @TableField(value = "createTime")
     private Date createTime;
 
     @ApiModelProperty(value = "用户等级")
+    @TableField(value = "level")
     private Integer level;
 
     @ApiModelProperty(value = "openid（qq登录的对应的）")
+    @TableField(value = "openid")
     private String openid;
 
     @ApiModelProperty(value = "性别" , notes = "1:女    2:男")
+    @TableField(value = "gender")
     private Integer gender;
+
+
+    @ApiModelProperty(value = "用户权限")
+    private List<Role> roles;
 
 
 

@@ -23,10 +23,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.token.AbstractTokenGranter;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -37,16 +40,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by sang on 2017/12/17.
  */
 @Service
-@Transactional
 public class UserServiceImpl implements UserService {
 
     private final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -71,6 +70,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private TokenDecode tokenDecode;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
 
     //客户端ID
     @Value("${auth.clientId}")
@@ -184,10 +186,26 @@ public class UserServiceImpl implements UserService {
         IdsDto idsDto = this.getOpenId(token);
         User user = userMapper.selectByOpenid(idsDto.getOpenId());
         if (user == null) {
-            // todo 用户注册
-            QQUserDto qqUserDto = this.getUserInfo(idsDto, token);
 
+            // 未注册的用户，QQ登录自动注册
+            QQUserDto qqUserDto = this.getUserInfo(idsDto, token);
+            user = new User();
+
+            user.setNickname(qqUserDto.getNickname())
+                    .setGender(qqUserDto.getGender_type())
+                    .setUserface(qqUserDto.getFigureurl_qq_2())
+                    .setOpenid(idsDto.getOpenId())
+                    .setUsername(idsDto.getOpenId())
+                    .setPassword(new BCryptPasswordEncoder().encode(UUID.randomUUID().toString()))
+            ;
+            User finalUser = user;
+            int count = transactionTemplate.execute(status -> {
+                int insert = userMapper.insert(finalUser);
+                return insert;
+            });
+            System.out.println(count);
         }
+
         // 使用qq登录，则登录接口传入的username实际值为openid
         UserDtoResult userDtoResult = this.login(user.getUsername(), user.getPassword(), response);
 //        Optional.ofNullable(user).orElse()
@@ -208,7 +226,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 根据openid和token获取用户信息
+     * 根据openid和token请求qq，获取用户信息
      *
      * @param idsDto
      * @param token
@@ -233,11 +251,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public DtoResult logout() {
-//        HttpSession session = request.getSession();
-//        session.invalidate();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpSession session = request.getSession();
+        session.invalidate();
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         CookieUtils.deleteCookie(response, cookieDomain,
                 "/", "Authorization", false);
         return DtoResult.success();
     }
+
 }
