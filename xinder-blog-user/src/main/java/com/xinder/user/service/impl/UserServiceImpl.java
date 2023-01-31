@@ -29,8 +29,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +69,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private TokenDecode tokenDecode;
+
     //客户端ID
     @Value("${auth.clientId}")
     private String clientId;
@@ -80,12 +88,9 @@ public class UserServiceImpl implements UserService {
     @Value("${auth.cookieMaxAge}")
     private int cookieMaxAge;
 
-    @Autowired
-    private TokenDecode tokenDecode;
 
 //    @Autowired
 //    private AbstractTokenGranter abstractTokenGranter;
-
 
     /**
      * @param user
@@ -216,5 +221,23 @@ public class UserServiceImpl implements UserService {
                 token, idsDto.getClientId(), idsDto.getOpenId());
         QQUserDto qqUserDto = JSONObject.parseObject(userInfo, QQUserDto.class);
         return qqUserDto;
+    }
+
+    @Override
+    public UserDtoResult getCurrentUser() {
+        User user = Util.getCurrentUser(tokenDecode, redisTemplate);
+        UserDtoResult userDtoResult = DtoResult.dataDtoSuccess(UserDtoResult.class);
+        BeanUtils.copyProperties(user, userDtoResult);
+        return userDtoResult;
+    }
+
+    @Override
+    public DtoResult logout() {
+//        HttpSession session = request.getSession();
+//        session.invalidate();
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+        CookieUtils.deleteCookie(response, cookieDomain,
+                "/", "Authorization", false);
+        return DtoResult.success();
     }
 }

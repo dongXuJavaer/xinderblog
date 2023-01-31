@@ -3,6 +3,7 @@ package com.xinder.api.rest;
 import com.xinder.api.bean.RespBean;
 import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.base.BaseResponse;
+import com.xinder.api.response.result.DtoResult;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,9 @@ public interface UserApi {
 
     @RequestMapping("/currentUserName")
     public String currentUserName();
+
+    @RequestMapping("/currentUser")
+    BaseResponse<UserDtoResult> currentUser();
 
     @RequestMapping("/currentUserId")
     public Long currentUserId();
@@ -43,5 +47,5 @@ public interface UserApi {
 
     //退出
     @PostMapping("/logout")
-    BaseResponse<UserDtoResult> logout();
+    BaseResponse<DtoResult> logout();
 }

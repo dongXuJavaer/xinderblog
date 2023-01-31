@@ -1,8 +1,10 @@
 package com.xinder.user.controller;
 
 import com.xinder.api.bean.RespBean;
+import com.xinder.api.bean.User;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.UserDtoResult;
+import com.xinder.api.response.result.DtoResult;
 import com.xinder.common.abstcontroller.AbstractController;
 import com.xinder.api.rest.UserApi;
 import com.xinder.common.util.TokenDecode;
@@ -35,6 +37,12 @@ public class UserController extends AbstractController implements UserApi {
     @Override
     public String currentUserName() {
         return Util.getCurrentUser(tokenDecode, redisTemplate).getNickname();
+    }
+
+    @Override
+    public BaseResponse<UserDtoResult> currentUser() {
+        UserDtoResult userDtoResult = userServiceImpl.getCurrentUser();
+        return buildJson(userDtoResult);
     }
 
     @RequestMapping("/currentUserId")
@@ -80,22 +88,22 @@ public class UserController extends AbstractController implements UserApi {
 
     /**
      * qq登录
+     *
      * @param accessToken
      * @param response
      * @return
      */
     @RequestMapping("/login/qq")
     public BaseResponse<UserDtoResult> qqLogin(
-            @RequestParam( value = "access_token", required = false) String accessToken,
+            @RequestParam(value = "access_token", required = false) String accessToken,
             HttpServletResponse response) {
 
         UserDtoResult userDtoResult = userServiceImpl.qqLogin(accessToken, response);
         return buildJson(userDtoResult);
     }
 
-    public BaseResponse<UserDtoResult> logout() {
-//        HttpSession session = request.getSession();
-//        session.invalidate();
-        return BaseResponse.success();
+    public BaseResponse<DtoResult> logout() {
+        DtoResult dtoResult = userServiceImpl.logout();
+        return buildJson(dtoResult);
     }
 }

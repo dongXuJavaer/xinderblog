@@ -1,6 +1,7 @@
 package com.xinder.user.service;
 
 import com.xinder.api.response.dto.UserDtoResult;
+import com.xinder.api.response.result.DtoResult;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,6 +13,7 @@ public interface UserService {
 
     /**
      * 用户登录
+     *
      * @param username
      * @param password
      * @param response
@@ -21,8 +23,25 @@ public interface UserService {
 
     /**
      * qq登录
+     *
      * @param token
      * @return
      */
     UserDtoResult qqLogin(String token, HttpServletResponse response);
+
+    /**
+     * 从Cookie中获取当前登录用户信息
+     *
+     * @return UserDtoResult
+     */
+    UserDtoResult getCurrentUser();
+
+    /**
+     * 从Cookie中获取当前登录用户信息
+     *
+     * @return UserDtoResult
+     */
+    DtoResult logout();
+
+
 }
