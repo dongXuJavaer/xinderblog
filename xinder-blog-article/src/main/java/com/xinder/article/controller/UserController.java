@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 /**
@@ -31,7 +29,7 @@ public class UserController {
     public String currentUserName() {
 //        return Util.getCurrentUser(redisTemplate).getNickname();
         System.out.println("调用这里不行----" + new Date());
-        return userFeignClient.currentUserName();
+        return userFeignClient.currentNickName();
     }
 
     @RequestMapping("/currentUserId")

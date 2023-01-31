@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 public interface UserApi {
 
     @RequestMapping("/currentUserName")
-    public String currentUserName();
+    String currentNickName();
 
     @RequestMapping("/currentUser")
     BaseResponse<UserDtoResult> currentUser();
