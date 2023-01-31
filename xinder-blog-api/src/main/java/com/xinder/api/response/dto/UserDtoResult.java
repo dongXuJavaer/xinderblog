@@ -48,4 +48,7 @@ public class UserDtoResult extends DtoResult {
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
+    @ApiModelProperty(value = "性别" , notes = "1:女    2:男")
+    private Integer gender;
+
 }
