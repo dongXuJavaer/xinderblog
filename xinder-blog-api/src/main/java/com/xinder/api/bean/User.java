@@ -67,7 +67,7 @@ public class User implements Serializable {
     @ApiModelProperty(value = "openid（qq登录的对应的）")
     private String openid;
 
-    @ApiModelProperty(value = "性别")
+    @ApiModelProperty(value = "性别" , notes = "1:女    2:男")
     private Integer gender;
 
 
