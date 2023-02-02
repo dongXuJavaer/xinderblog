@@ -1,10 +1,15 @@
 package com.xinder.common.util;
 
 import com.xinder.api.bean.User;
+import com.xinder.common.constant.CommonConstant;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -18,10 +23,13 @@ public class Util {
 
 //        org.springframework.security.core.userdetails.User userDetailService =
 //                (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        Object o = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        SecurityContext context = SecurityContextHolder.getContext();
+        Authentication authentication = context.getAuthentication();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        Object o = authentication.getPrincipal();
 
-        Map<String, String> userInfo = tokenDecode.getUserInfo();
-        String username = userInfo.get("user_name");
+        Map<String, Object> userInfo = tokenDecode.getUserInfo();
+        String username = (String) userInfo.get(CommonConstant.TOKEN_USERNAME);
 
         User user = (User) redisTemplate.opsForValue().get(username);
         if (user != null) {

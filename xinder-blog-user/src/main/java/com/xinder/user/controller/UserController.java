@@ -12,6 +12,8 @@ import com.xinder.common.util.Util;
 import com.xinder.user.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,7 +37,10 @@ public class UserController extends AbstractController implements UserApi {
     private RedisTemplate redisTemplate;
 
     @Override
-    public String currentUserName() {
+    public String currentNickName() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String property = System.getProperty("spring.security.strategy");
         return Util.getCurrentUser(tokenDecode, redisTemplate).getNickname();
     }
 

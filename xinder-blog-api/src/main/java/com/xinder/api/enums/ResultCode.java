@@ -10,14 +10,17 @@ public enum ResultCode {
     PARAM_ERROR("参数错误", 10003),
     DATA_ERROR("数据异常", 10004),
 
-    // 文章
-    SENSITIVE_WORD("含有敏感词", 10005),
+    UNAUTHORIZED("没有权限！",100005),
 
     // 用户
     LOGIN_SUCCESS("登录成功", 20001),
     LOGIN_FAIL("登录失败", 20002),
     LOGOUT_SUCCESS("退出成功", 20003),
     LOGOUT_FAIL("退出失败", 20004),
+
+    // 文章
+    SENSITIVE_WORD("含有敏感词", 30005),
+
 
     ;
 

@@ -39,7 +39,7 @@ public class UserDtoResult extends DtoResult {
     @ApiModelProperty(value = "邮箱")
     private String email;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "头像链接")
     private String userface;
 
     @ApiModelProperty(value = "上次修改时间")

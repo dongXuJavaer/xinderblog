@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -53,7 +54,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
                 //避免返回null，这里返回一个不含有任何值的User对象，在后期的密码比对过程中一样会验证失败
 //            return new User();
             }
-
         }
         redisTemplate.opsForValue().set(user.getUsername(), user, Duration.ofMinutes(30));
         logger.info("用户{}信息存入redis", user.getUsername());
@@ -76,7 +76,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         }
         StringBuilder stringBuffer = new StringBuilder();
         roleList.forEach(role -> {
-            stringBuffer.append(role.getName()).append(",");
+            stringBuffer.append("ROLE_").append(role.getName()).append(",");
         });
         return stringBuffer.substring(0, stringBuffer.length() - 1);
     }

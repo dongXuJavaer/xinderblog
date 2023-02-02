@@ -1,6 +1,7 @@
 package com.xinder.common.util;
 
 import com.alibaba.fastjson.JSON;
+import com.xinder.common.constant.CommonConstant;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.core.Authentication;
@@ -53,10 +54,9 @@ public class TokenDecode {
      * @param token 令牌
      * @return 返回解析后的数据
      */
-    public Map<String, String> dcodeToken(String token) {
+    public Map<String, Object> dcodeToken(String token) {
         //校验并解析Jwt
         Jwt jwt = JwtHelper.decodeAndVerify(token, new RsaVerifier(this.getPubKey()));
-        System.out.println("common模块中: token============" + token);
         //获取Jwt原始内容
         String claims = jwt.getClaims();
         return JSON.parseObject(claims, Map.class);
@@ -66,24 +66,38 @@ public class TokenDecode {
      * 从容器中获取用户信息
      * @return
      */
-    public Map<String, String> getUserInfo() {
+    public Map<String, Object> getUserInfo() {
+
+        String token = getToken();
+        //令牌解码
+        Map<String, Object> map = dcodeToken(token);
+        return map;
+    }
+
+
+    /**
+     * 获取Token
+     *
+     * @return
+     */
+    public String getToken() {
         //获取授权信息  springSecurity上下文对象获取认证详情，OAuth2AuthenticationDetails详情需要符合Oauth2格式
-//        SecurityContext context = SecurityContextHolder.getContext();
-//        Authentication authentication = context.getAuthentication();
-//        Object details1 = authentication.getDetails();
-//        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails)
-//                SecurityContextHolder.getContext().getAuthentication().getDetails();
-//        String tokenValue = details.getTokenValue();
+        //        SecurityContext context = SecurityContextHolder.getContext();
+        //        Authentication authentication = context.getAuthentication();
+        //        Object details1 = authentication.getDetails();
+        //        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails)
+        //                SecurityContextHolder.getContext().getAuthentication().getDetails();
+        //        String tokenValue = details.getTokenValue();
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         Cookie[] cookies = request.getCookies();
-        String name = "Authorization";
+        String name = CommonConstant.HTTP_HEADER_TOKEN;
 
         String token = "";
-        if (null == cookies || null == name || name.length() == 0) {
-            token =  "";
+        if (null == cookies) {
+            token = "";
         }
-        if (cookies != null && name != null) {
+        if (cookies != null) {
             for (int i = 0; i < cookies.length; i++) {
                 if (name.equals(cookies[i].getName())) {
                     token = cookies[i].getValue();
@@ -91,13 +105,11 @@ public class TokenDecode {
             }
         }
         // 从请求头中获取令牌
-        if (token.equals("")){
-            String headerToken = request.getHeader(name);
-            token = headerToken;
+        if (token.equals("")) {
+            token = request.getHeader(name);
         }
-        //令牌解码
-        Map<String, String> map = dcodeToken(token);
-        return map;
+        return token;
     }
+
 
 }
