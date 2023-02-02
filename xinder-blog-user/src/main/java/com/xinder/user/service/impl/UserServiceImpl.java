@@ -5,9 +5,11 @@ import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
 import com.xinder.api.enums.QQLoginEnums;
 import com.xinder.api.response.dto.UserDtoResult;
+import com.xinder.api.response.dto.UserListDtoResult;
 import com.xinder.api.response.dto.qqlogin.IdsDto;
 import com.xinder.api.response.dto.qqlogin.QQUserDto;
 import com.xinder.api.response.result.DtoResult;
+import com.xinder.api.response.result.Result;
 import com.xinder.common.util.TokenDecode;
 import com.xinder.user.auth.UserDetailServiceImpl;
 import com.xinder.user.mapper.RolesMapper;
@@ -124,9 +126,23 @@ public class UserServiceImpl implements UserService {
         return userMapper.updateUserEmail(email, Util.getCurrentUser(tokenDecode, redisTemplate).getId());
     }
 
-    public List<User> getUserByNickname(String nickname) {
-        List<User> list = userMapper.getUserByNickname(nickname);
-        return list;
+    /**
+     * 【管理端】  查询用户
+     * @param nickname
+     * @return
+     */
+    public UserListDtoResult getUserByNickname(String nickname) {
+        List<User> userList = userMapper.getUserByNickname(nickname);
+        List<UserDtoResult> userDtoResultList = new ArrayList<>(userList.size());
+        userList.forEach(item -> {
+            UserDtoResult userDtoResult = DtoResult.dataDtoSuccess(UserDtoResult.class);
+            BeanUtils.copyProperties(item, userDtoResult);
+            userDtoResultList.add(userDtoResult);
+        });
+
+        UserListDtoResult dtoResult = DtoResult.dataDtoSuccess(UserListDtoResult.class);
+        dtoResult.setList(userDtoResultList);
+        return dtoResult;
     }
 
     public List<Role> getAllRole() {

@@ -3,6 +3,8 @@ package com.xinder.article.controller.admin;
 import com.xinder.api.bean.RespBean;
 import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
+import com.xinder.api.response.base.BaseResponse;
+import com.xinder.api.response.dto.UserListDtoResult;
 import com.xinder.article.feign.UserManaFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +32,7 @@ public class UserManaController {
     private String username;
 
     @RequestMapping(value = "/user", method = RequestMethod.GET)
-    public List<User> getUserByNickname(String nickname) {
+    public BaseResponse<UserListDtoResult> getUserByNickname(String nickname) {
 //        return userServiceImpl.getUserByNickname(nickname);
         return userManaFeignClient.getUserByNickname(nickname);
     }

@@ -12,24 +12,20 @@
     <update id="updateUserEmail">
         UPDATE user set email=#{email} WHERE id=#{id}
     </update>
-    <select id="getUserByNickname" resultMap="BaseResultMap">
-        SELECT
-        u.*,
-        r.`id` AS rid,
-        r.`name` AS rname
-        FROM user u,roles r,roles_user ru
-        WHERE u.`id`=ru.`uid`
-        AND r.`id`=ru.`rid`
-<!--        AND u.`id` NOT IN(SELECT u.`id` FROM user u,roles_user ru WHERE u.`id`=ru.`uid` AND ru.`rid`=1)-->
+
+    <select id="getUserByNickname" resultMap="baseMap">
+        SELECT id, username, nickname, password, enabled, email, userface, reg_time, openid, gender, create_time
+        FROM user u
         <choose>
             <when test="nickname!=null and nickname!=''">
                 and u.nickname like concat('%',#{nickname},'%') ORDER BY u.`id`
             </when>
             <otherwise>
-                ORDER BY u.`id` limit 20
+                ORDER BY u.`id`
             </otherwise>
         </choose>
     </select>
+
     <select id="getUserById" resultMap="BaseResultMap">
         SELECT u.*,r.`id` AS rid,r.`name` AS rname FROM user u,roles r,roles_user ru WHERE u.`id`=ru.`uid` AND
         r.`id`=ru.`rid` AND u.`id`=#{id}

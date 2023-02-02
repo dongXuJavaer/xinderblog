@@ -26,7 +26,6 @@ import javax.annotation.Resource;
  * Created by sang on 2017/12/17.
  */
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Resource(name = "userDetailServiceImpl")
@@ -78,7 +77,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        System.out.println(PermissionsEnums.ADMINISTRATORS.getValue());
 //        http
 //                .authorizeRequests()
 //                .antMatchers("admin/category/all").authenticated()
