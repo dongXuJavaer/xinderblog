@@ -5,6 +5,7 @@ import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
 import com.xinder.api.enums.QQLoginEnums;
 import com.xinder.api.response.dto.UserDtoResult;
+import com.xinder.api.response.dto.UserDtoSimpleResult;
 import com.xinder.api.response.dto.UserListDtoResult;
 import com.xinder.api.response.dto.qqlogin.IdsDto;
 import com.xinder.api.response.dto.qqlogin.QQUserDto;
@@ -164,6 +165,15 @@ public class UserServiceImpl implements UserService {
 
     public User getUserById(Long id) {
         return userMapper.getUserById(id);
+    }
+
+
+    @Override
+    public UserDtoSimpleResult getUserByIdFront(Long uid) {
+        User user = userMapper.getUserById(uid);
+        UserDtoSimpleResult dtoSimpleResult = DtoResult.dataDtoSuccess(UserDtoSimpleResult.class);
+        BeanUtils.copyProperties(user, dtoSimpleResult);
+        return dtoSimpleResult;
     }
 
     @Override

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinder.user.mapper.FollowMapper">
+
+    <resultMap id="baseMap" type="com.xinder.api.bean.Follow">
+        <id column="id" property="id"/>
+        <result column="uid" property="uid"/>
+        <result column="followed_uid" property="followedUid"/>
+    </resultMap>
+
+    <delete id="deleteByUidAndFoll">
+        delete
+        from follow
+        where uid = #{currUid} and followed_uid = #{followedUid}
+    </delete>
+
+    <select id="selectFollowByUid" resultMap="baseMap">
+        select id, uid, followed_uid
+        from follow
+        where uid = #{uid}
+    </select>
+</mapper>

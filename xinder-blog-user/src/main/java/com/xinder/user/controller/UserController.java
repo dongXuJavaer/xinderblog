@@ -4,6 +4,7 @@ import com.xinder.api.bean.RespBean;
 import com.xinder.api.bean.User;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.UserDtoResult;
+import com.xinder.api.response.dto.UserDtoSimpleResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.common.abstcontroller.AbstractController;
 import com.xinder.api.rest.UserApi;
@@ -110,5 +111,11 @@ public class UserController extends AbstractController implements UserApi {
     public BaseResponse<DtoResult> logout() {
         DtoResult dtoResult = userServiceImpl.logout();
         return buildJson(dtoResult);
+    }
+
+    @Override
+    public BaseResponse<UserDtoSimpleResult> getUserByIdFront(Long uid) {
+        UserDtoSimpleResult simpleResult = userServiceImpl.getUserByIdFront(uid);
+        return buildJson(simpleResult);
     }
 }

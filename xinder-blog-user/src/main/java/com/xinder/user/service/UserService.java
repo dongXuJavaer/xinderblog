@@ -1,6 +1,7 @@
 package com.xinder.user.service;
 
 import com.xinder.api.response.dto.UserDtoResult;
+import com.xinder.api.response.dto.UserDtoSimpleResult;
 import com.xinder.api.response.result.DtoResult;
 
 import javax.servlet.http.HttpServletResponse;
@@ -42,6 +43,14 @@ public interface UserService {
      * @return UserDtoResult
      */
     DtoResult logout();
+
+
+    /**
+     * 前台用户，查询其他人用户信息
+     * @param id
+     * @return
+     */
+    UserDtoSimpleResult getUserByIdFront(Long id);
 
 
 }

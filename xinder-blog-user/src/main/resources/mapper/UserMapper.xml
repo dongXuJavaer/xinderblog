@@ -26,9 +26,10 @@
         </choose>
     </select>
 
-    <select id="getUserById" resultMap="BaseResultMap">
-        SELECT u.*,r.`id` AS rid,r.`name` AS rname FROM user u,roles r,roles_user ru WHERE u.`id`=ru.`uid` AND
-        r.`id`=ru.`rid` AND u.`id`=#{id}
+    <select id="getUserById" resultMap="baseMap">
+        SELECT  id, username, nickname, password, enabled, email, userface, reg_time, openid, gender, create_time
+        FROM user u
+        where id = #{id}
     </select>
 
     <resultMap id="BaseResultMap" type="com.xinder.api.bean.User">
@@ -85,5 +86,39 @@
         SELECT  id, username, nickname, password, enabled, email, userface, reg_time, openid, gender, create_time
         FROM user u
         where openid = #{openid}
+    </select>
+
+    <select id="selectBatchByFollow" resultMap="BaseResultMap">
+        SELECT
+            u.id,
+            u.username,
+            u.nickname,
+            u.password,
+            u.enabled,
+            u.email,
+            u.userface,
+            u.reg_time,
+            u.openid,
+            u.gender,
+            u.create_time
+        FROM user u left join follow f on u.id = f.followed_uid
+        where f.uid = #{uid}
+    </select>
+
+    <select id="selectBatchFans" resultMap="BaseResultMap">
+         SELECT
+            u.id,
+            u.username,
+            u.nickname,
+            u.password,
+            u.enabled,
+            u.email,
+            u.userface,
+            u.reg_time,
+            u.openid,
+            u.gender,
+            u.create_time
+        FROM user u left join follow f on u.id = f.uid
+        where f.followed_uid = #{uid}
     </select>
 </mapper>

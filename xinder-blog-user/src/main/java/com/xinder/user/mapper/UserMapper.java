@@ -40,4 +40,18 @@ public interface UserMapper extends BaseMapper<User> {
      * @return
      */
     User selectByOpenid(String openId);
+
+    /**
+     * 查询关注列表
+     * @param uid
+     * @return
+     */
+    List<User> selectBatchByFollow(@Param("uid") Long uid);
+
+    /**
+     * 查询粉丝列表
+     * @param uid
+     * @return
+     */
+    List<User> selectBatchFans(@Param("uid") Long uid);
 }

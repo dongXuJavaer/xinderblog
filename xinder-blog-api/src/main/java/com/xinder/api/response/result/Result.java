@@ -32,6 +32,10 @@ public class Result implements Serializable {
         return new Result(ResultCode.FAIL.getCode(), ResultCode.FAIL.getDesc());
     }
 
+    public static Result fail(String msg) {
+        return new Result(ResultCode.FAIL.getCode(), ResultCode.FAIL.getDesc());
+    }
+
     public static Result fail(ResultCode resultCode) {
         return new Result(resultCode.getCode(), resultCode.getDesc());
     }

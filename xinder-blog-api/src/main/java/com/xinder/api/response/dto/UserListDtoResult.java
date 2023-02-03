@@ -1,6 +1,5 @@
 package com.xinder.api.response.dto;
 
-import com.xinder.api.bean.Article;
 import com.xinder.api.response.result.DtoResult;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -13,7 +12,7 @@ import java.util.List;
 public class UserListDtoResult extends DtoResult {
     private static final long serialVersionUID = 5742179663559L;
 
-    @ApiModelProperty(name = "list", notes = "文章列表")
+    @ApiModelProperty(name = "list", notes = "管理端查询的用户列表")
     private List<UserDtoResult> list;
 
     public List<UserDtoResult> getList() {

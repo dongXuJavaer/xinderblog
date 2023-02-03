@@ -18,6 +18,13 @@ public enum ResultCode {
     LOGOUT_SUCCESS("退出成功", 20003),
     LOGOUT_FAIL("退出失败", 20004),
 
+    FOLLOW_SUCCESS("关注成功", 20005),
+    FOLLOW_FAIL("关注失败", 20006),
+
+    FOLLOW_CANCEL_SUCCESS("取消关注成功", 20005),
+    FOLLOW_CANCEL_FAILS("取消关注失败", 20006),
+
+
     // 文章
     SENSITIVE_WORD("含有敏感词", 30005),
 
