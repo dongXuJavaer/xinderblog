@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 权限校验
@@ -35,6 +37,7 @@ public class CheckAuth {
     public boolean checkUserAuth() {
         Map<String, Object> userInfo = tokenDecode.getUserInfo();
         List authorities = (JSONArray) userInfo.get(CommonConstant.TOKEN_AUTHORITIES);
+        authorities = Optional.ofNullable(authorities).orElse(new ArrayList());
         boolean contains =
                 authorities.contains("ROLE_" + PermissionsEnums.ADMINISTRATORS.getValue());
         if (!contains) {
