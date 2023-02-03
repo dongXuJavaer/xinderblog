@@ -46,7 +46,7 @@ public interface UserMapper extends BaseMapper<User> {
      * @param uid
      * @return
      */
-    List<User> selectBatchByFollow(@Param("uid") Long uid);
+    List<User> selectBatchFollow(@Param("uid") Long uid);
 
     /**
      * 查询粉丝列表

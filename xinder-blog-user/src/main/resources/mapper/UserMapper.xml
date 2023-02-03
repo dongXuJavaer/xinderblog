@@ -88,7 +88,7 @@
         where openid = #{openid}
     </select>
 
-    <select id="selectBatchByFollow" resultMap="BaseResultMap">
+    <select id="selectBatchFollow" resultMap="BaseResultMap">
         SELECT
             u.id,
             u.username,

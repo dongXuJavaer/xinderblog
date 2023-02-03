@@ -38,7 +38,7 @@ public interface FollowService extends IService<Follow> {
     UserListDtoSimpleResult followList(Long uid);
 
     /**
-     * 某用户的分析列表
+     * 某用户的粉丝列表
      * @param uid
      * @return
      */

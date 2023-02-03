@@ -73,7 +73,7 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
 
     @Override
     public UserListDtoSimpleResult followList(Long uid) {
-        List<User> userList = userMapper.selectBatchByFollow(uid);
+        List<User> userList = userMapper.selectBatchFollow(uid);
 
         List<UserDtoSimpleResult> list = new ArrayList<>(userList.size());
         userList.forEach(user -> {
