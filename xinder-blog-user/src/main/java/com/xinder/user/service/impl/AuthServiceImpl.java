@@ -1,10 +1,14 @@
 package com.xinder.user.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.xinder.api.bean.User;
 import com.xinder.api.enums.QQLoginEnums;
+import com.xinder.api.enums.UserEnums;
 import com.xinder.common.util.AuthToken;
 import com.xinder.user.config.MyPasswordEncoder;
+import com.xinder.user.mapper.UserMapper;
 import com.xinder.user.service.AuthService;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +17,7 @@ import org.springframework.cloud.bootstrap.encrypt.KeyProperties;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +38,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,12 +49,16 @@ import java.util.Map;
  * @date 2023-01-08 11:13
  */
 @Service
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
-    private final static Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
+//    private final static Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private RedisTemplate<String,Object> redisTemplate;
 
     @Autowired
     private LoadBalancerClient loadBalancerClient;
@@ -59,6 +69,9 @@ public class AuthServiceImpl implements AuthService {
     @Resource(name = "KeyProp")
     private KeyProperties keyProperties;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @Override
     public AuthToken login(String username, String password, String clientId, String clientSecret) {
         // 申请令牌
@@ -67,6 +80,10 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("申请令牌失败");
         }
 
+        User user = userMapper.loadUserByUsername(username);
+        redisTemplate.opsForValue().set(UserEnums.USER_ONLINE_PREFIX_KEY.getValue() + user.getUsername(),
+                user, Duration.ofMinutes(30));
+        log.info("用户{}信息存入redis", user.getUsername());
         return authToken;
     }
 
@@ -119,7 +136,7 @@ public class AuthServiceImpl implements AuthService {
                     new HttpEntity<MultiValueMap<String, String>>(formData, header), Map.class);
             // 获取响应结果
             body = responseEntity.getBody();
-            logger.info("请求token的响应结果：{}", body);
+            log.info("请求token的响应结果：{}", body);
             System.out.println(body.get("access_token"));
             try {
                 if (body == null || body.get("access_token") == null ||

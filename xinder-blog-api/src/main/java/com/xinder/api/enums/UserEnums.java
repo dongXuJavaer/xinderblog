@@ -1,30 +1,32 @@
 package com.xinder.api.enums;
 
-import lombok.Data;
-
 /**
  * @author Xinder
  * @date 2023-01-11 11:57
  */
 public enum  UserEnums {
 
-    CURRENT_USER("currentUser","当前用户")
+    CURRENT_USER("currentUser","当前用户"),
+
+    USER_ONLINE_PREFIX_KEY("user:online:","在线用户redis的key前缀"),
+
     ;
 
 
-    private String status;
+    private String value;
     private String desc;
 
-    UserEnums(String status, String desc) {
-
+    UserEnums(String value, String desc) {
+        this.value = value;
+        this.desc = desc;
     }
 
-    public String getStatus() {
-        return status;
+    public String getValue() {
+        return value;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public String getDesc() {
