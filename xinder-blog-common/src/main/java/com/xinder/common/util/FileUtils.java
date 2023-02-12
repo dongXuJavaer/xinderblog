@@ -33,6 +33,10 @@ public class FileUtils {
     public static final String FOLDER_ING = "img";   // 帖子图片文件夹
     public static final String FOLDER_RESOURCE = "resource ";  //资源文件夹
 
+    /*    ================== 用户文件夹============ */
+    public static final String FOLDER_USER_HEAD = "userheadimg";  //用户头像文件夹
+    public static final String FOLDER_GROUP_HEAD = "usergroupimg";  //群头像文件夹
+
 
     /**
      * @param file ...

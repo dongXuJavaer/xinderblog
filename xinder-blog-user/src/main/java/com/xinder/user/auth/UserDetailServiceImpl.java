@@ -55,8 +55,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 //            return new User();
             }
         }
-        redisTemplate.opsForValue().set(user.getUsername(), user, Duration.ofMinutes(30));
-        logger.info("用户{}信息存入redis", user.getUsername());
+
 
         //查询用户的角色信息，并返回存入user中
         List<Role> roles = rolesMapper.getRolesByUid(user.getId());

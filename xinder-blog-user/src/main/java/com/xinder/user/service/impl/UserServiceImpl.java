@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
 import com.xinder.api.enums.QQLoginEnums;
+import com.xinder.api.enums.UserEnums;
+import com.xinder.api.request.UserDtoReq;
 import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.dto.UserDtoSimpleResult;
 import com.xinder.api.response.dto.UserListDtoResult;
@@ -37,6 +39,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +47,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by sang on 2017/12/17.
@@ -129,6 +133,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 【管理端】  查询用户
+     *
      * @param nickname
      * @return
      */
@@ -204,15 +209,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDtoResult qqLogin(String token, HttpServletResponse response) {
-
         if (StringUtils.isEmpty(token) || "null".equals(token)) {
             return DtoResult.dataDtoFail(UserDtoResult.class);
         }
-
         IdsDto idsDto = this.getOpenId(token);
         User user = userMapper.selectByOpenid(idsDto.getOpenId());
         if (user == null) {
-
             // 未注册的用户，QQ登录自动注册
             QQUserDto qqUserDto = this.getUserInfo(idsDto, token);
             user = new User();
@@ -221,7 +223,7 @@ public class UserServiceImpl implements UserService {
                     .setGender(qqUserDto.getGender_type())
                     .setUserface(qqUserDto.getFigureurl_qq_2())
                     .setOpenid(idsDto.getOpenId())
-                    .setUsername(idsDto.getOpenId())
+                    .setUsername(idsDto.getOpenId()) // 使用qq注册，username的默认值为openid
                     .setPassword(new BCryptPasswordEncoder().encode(UUID.randomUUID().toString()))
             ;
             User finalUser = user;
@@ -229,10 +231,7 @@ public class UserServiceImpl implements UserService {
                 int insert = userMapper.insert(finalUser);
                 return insert;
             });
-            System.out.println(count);
         }
-
-        // 使用qq登录，则登录接口传入的username实际值为openid
         UserDtoResult userDtoResult = this.login(user.getUsername(), user.getPassword(), response);
 //        Optional.ofNullable(user).orElse()
         return userDtoResult;
@@ -286,4 +285,25 @@ public class UserServiceImpl implements UserService {
         return DtoResult.success();
     }
 
+    @Override
+    @Transactional
+    public Result updateUserInfo(UserDtoReq userDtoReq) {
+        Long id = userDtoReq.getId();
+        String username = userDtoReq.getUsername();
+        String userKey = UserEnums.USER_ONLINE_PREFIX_KEY.getValue() + username;
+        User user = userMapper.selectById(id);
+        BeanUtils.copyProperties(userDtoReq, user);
+        transactionTemplate.execute(status -> {
+            redisTemplate.opsForValue().set(userKey, user, 30, TimeUnit.MINUTES);
+            int i = userMapper.updateById(user);
+            return i;
+        });
+
+        return Result.success();
+    }
+
+    @Override
+    public Result uploadHeadImg(MultipartFile file) {
+        return null;
+    }
 }

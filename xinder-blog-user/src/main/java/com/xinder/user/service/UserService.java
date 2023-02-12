@@ -1,8 +1,11 @@
 package com.xinder.user.service;
 
+import com.xinder.api.request.UserDtoReq;
 import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.dto.UserDtoSimpleResult;
 import com.xinder.api.response.result.DtoResult;
+import com.xinder.api.response.result.Result;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -47,10 +50,25 @@ public interface UserService {
 
     /**
      * 前台用户，查询其他人用户信息
+     *
      * @param id
      * @return
      */
     UserDtoSimpleResult getUserByIdFront(Long id);
 
+    /**
+     * 修改用户信息
+     *
+     * @param userDtoReq
+     * @return
+     */
+    Result updateUserInfo(UserDtoReq userDtoReq);
 
+    /**
+     * 修改头像
+     *
+     * @param file
+     * @return
+     */
+    Result uploadHeadImg(MultipartFile file);
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinder.user.mapper.GroupMapper">
+
+    <resultMap id="baseMap" type="com.xinder.api.bean.Group">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="desc" property="desc"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="pic" property="pic"/>
+    </resultMap>
+
+    <select id="selectUserAddList" resultMap="baseMap">
+        select g.id, g.`name` , g.`desc`, g.create_user, g.create_time, g.pic
+        from `group` g left join group_user gu
+        on g.id = gu.group_id
+        where gu.uid = #{uid}
+    </select>
+
+    <select id="selectByUserId" resultMap="baseMap">
+        select g.id, g.`name` , g.`desc`, g.create_user, g.create_time, g.pic
+        from `group` g
+        where g.uid = #{uid} and g.id = {groupId}
+    </select>
+</mapper>

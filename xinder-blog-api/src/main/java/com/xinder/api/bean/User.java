@@ -62,12 +62,11 @@ public class User implements Serializable {
 
     @ApiModelProperty(value = "上次修改时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @TableField(value = "regTime")
+    @TableField(value = "reg_time")
     private Date regTime;
 
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @TableField(value = "createTime")
     private Date createTime;
 
     @ApiModelProperty(value = "用户等级")
@@ -82,7 +81,7 @@ public class User implements Serializable {
     @TableField(value = "gender")
     private Integer gender;
 
-
+    @TableField(exist = false)
     @ApiModelProperty(value = "用户权限")
     private List<Role> roles;
 

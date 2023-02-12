@@ -2,12 +2,16 @@ package com.xinder.user.controller;
 
 import com.xinder.api.bean.RespBean;
 import com.xinder.api.bean.User;
+import com.xinder.api.enums.ResultCode;
+import com.xinder.api.request.UserDtoReq;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.dto.UserDtoSimpleResult;
 import com.xinder.api.response.result.DtoResult;
+import com.xinder.api.response.result.Result;
 import com.xinder.common.abstcontroller.AbstractController;
 import com.xinder.api.rest.UserApi;
+import com.xinder.common.util.FileUtils;
 import com.xinder.common.util.TokenDecode;
 import com.xinder.common.util.Util;
 import com.xinder.user.service.impl.UserServiceImpl;
@@ -15,10 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -114,8 +116,26 @@ public class UserController extends AbstractController implements UserApi {
     }
 
     @Override
-    public BaseResponse<UserDtoSimpleResult> getUserByIdFront(Long uid) {
+    public BaseResponse<UserDtoSimpleResult> getUserByIdFront(@PathVariable("uid") Long uid) {
         UserDtoSimpleResult simpleResult = userServiceImpl.getUserByIdFront(uid);
         return buildJson(simpleResult);
+    }
+
+    @Override
+    public BaseResponse<Result> updateUserInfo(@RequestBody UserDtoReq userDtoReq) {
+        Result result = userServiceImpl.updateUserInfo(userDtoReq);
+        return buildJson(result);
+    }
+
+    @Override
+    public BaseResponse<String> uploadHeadImg(@RequestParam("file") MultipartFile file) {
+        String url = null;
+        try {
+            url = FileUtils.upload(file, FileUtils.FOLDER_USER_HEAD);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return buildJson(ResultCode.FAIL.getCode(), ResultCode.FAIL.getDesc());
+        }
+        return buildJson(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getDesc(), url);
     }
 }
