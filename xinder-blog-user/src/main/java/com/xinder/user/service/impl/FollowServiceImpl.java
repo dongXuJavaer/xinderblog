@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +55,9 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
         }
 
         User currentUser = Util.getCurrentUser(tokenDecode, redisTemplate);
+        if (StringUtils.isEmpty(currentUser.getUsername())){
+            return Result.fail("关注失败，未登录");
+        }
         Follow follow = new Follow();
         follow.setUid(currentUser.getId());
         follow.setFollowedUid(user.getId());
