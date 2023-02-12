@@ -167,10 +167,13 @@
 
     <select id="getCount" resultType="java.lang.Long">
         select count(*)
-        from article
+        from article a
         <where>
-            <if test="state!=null">
-                and state = #{state}
+            <if test="req.state!=null">
+                and state = #{req.state}
+            </if>
+            <if test="req.uid != null">
+                and a.uid = #{req.uid}
             </if>
             <if test="keyword != null">
                 AND title LIKE concat('%',#{keyword},'%')
@@ -198,10 +201,13 @@
         <if test="req.state != null">
             and a.state = #{req.state}
         </if>
-
+        <if test="req.uid != null">
+            and a.uid = #{req.uid}
+        </if>
         <if test="keywords != null and keywords != ''">
             AND title LIKE concat('%',#{keywords},'%')
         </if>
-        ORDER BY a.id DESC limit #{offset}, #{req.pageSize};
+        ORDER BY a.id DESC
+        limit #{offset}, #{req.pageSize};
     </select>
 </mapper>

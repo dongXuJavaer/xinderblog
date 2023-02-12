@@ -27,4 +27,10 @@ public interface ArticleService extends IService<Article> {
      */
     DtoResult getById(Long id);
 
+    /**
+     * 通用查询文章
+     * @param articleDtoReq
+     * @return
+     */
+    ArticleListDtoResult getList(ArticleDtoReq articleDtoReq);
 }

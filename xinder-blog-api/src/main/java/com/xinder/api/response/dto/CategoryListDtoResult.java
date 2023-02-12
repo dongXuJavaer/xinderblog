@@ -17,7 +17,7 @@ public class CategoryListDtoResult extends DtoResult {
 
     private static final long serialVersionUID = 574217966803557L;
 
-    @ApiModelProperty(name = "list", notes = "文章列表")
+    @ApiModelProperty(name = "list", notes = "分类列表")
     private List<Category> list;
 
 }

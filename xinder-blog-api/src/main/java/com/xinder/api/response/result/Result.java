@@ -33,7 +33,7 @@ public class Result implements Serializable {
     }
 
     public static Result fail(String msg) {
-        return new Result(ResultCode.FAIL.getCode(), ResultCode.FAIL.getDesc());
+        return new Result(ResultCode.FAIL.getCode(), msg);
     }
 
     public static Result fail(ResultCode resultCode) {

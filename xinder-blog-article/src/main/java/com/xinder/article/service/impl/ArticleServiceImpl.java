@@ -1,5 +1,6 @@
 package com.xinder.article.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinder.api.bean.Article;
 import com.xinder.api.request.ArticleDtoReq;
@@ -10,6 +11,7 @@ import com.xinder.article.mapper.TagsMapper;
 import com.xinder.article.service.ArticleService;
 import com.xinder.common.util.TokenDecode;
 import com.xinder.common.util.Util;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -164,8 +166,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Long currentPage = req.getCurrentPage();
         Long offset = (currentPage - 1) * pageSize;
         req.setState(1);
-        Long rows = articleMapper.getCount(req.getState(), keywords);
+        Long rows = articleMapper.getCount(req, keywords);
         List<Article> articleList = articleMapper.getArticleList(req, offset, keywords);
+
         articleList.forEach(item -> {
             if (StringUtils.isEmpty(item.getHeadPic())) {
                 item.setHeadPic("");
@@ -200,5 +203,16 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private boolean addReadCount(Article article) {
         article.setReadCount(article.getReadCount() + 1);
         return articleMapper.updateById(article) > 0;
+    }
+
+    @Override
+    public ArticleListDtoResult getList(ArticleDtoReq articleDtoReq) {
+        Article article = new Article();
+        BeanUtils.copyProperties(articleDtoReq, article);
+        QueryWrapper<Article> articleQueryWrapper = new QueryWrapper<>(article);
+        List<Article> articleList = articleMapper.selectList(articleQueryWrapper);
+        ArticleListDtoResult articleListDtoResult = DtoResult.dataDtoSuccess(ArticleListDtoResult.class);
+        articleListDtoResult.setList(articleList);
+        return articleListDtoResult;
     }
 }

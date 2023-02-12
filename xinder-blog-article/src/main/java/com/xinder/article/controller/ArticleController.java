@@ -137,7 +137,13 @@ public class ArticleController extends AbstractController implements ArticleApi 
     }
 
     @Override
-    public BaseResponse<String> uploadHeadPic(@RequestParam("file")  MultipartFile file) {
+    public BaseResponse<ArticleListDtoResult> getArticleByUid(@RequestBody ArticleDtoReq articleDtoReq) {
+        ArticleListDtoResult articleListDtoResult = articleService.getList(articleDtoReq);
+        return buildJson(articleListDtoResult);
+    }
+
+    @Override
+    public BaseResponse<String> uploadHeadPic(@RequestParam("file") MultipartFile file) {
         String url = null;
         try {
             url = FileUtils.upload(file, FileUtils.FOLDER_HEADPIC);

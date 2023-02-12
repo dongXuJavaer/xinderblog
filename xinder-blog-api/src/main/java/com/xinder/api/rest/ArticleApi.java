@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @date 2023-01-06 21:50
  */
 @Api(tags = "ArticleController")
+@RequestMapping("/article")
 public interface ArticleApi {
 
 
@@ -39,6 +40,14 @@ public interface ArticleApi {
     @ApiOperation(value = "根据文章aid查询", notes = "根据文章aid查询", tags = {"ArticleController"})
     @RequestMapping(value = "/{aid}", method = RequestMethod.GET)
     BaseResponse<DtoResult> getArticleById(@PathVariable("aid") Long aid);
+
+    /**
+     * 根据用户id查询
+     * @return
+     */
+    @ApiOperation(value = "根据用户uid查询", notes = "根据文章aid查询", tags = {"ArticleController"})
+    @RequestMapping(value = "/u", method = RequestMethod.POST)
+    BaseResponse<ArticleListDtoResult> getArticleByUid(@RequestBody ArticleDtoReq articleDtoReq);
 
 
     /**

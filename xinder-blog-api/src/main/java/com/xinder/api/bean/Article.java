@@ -80,7 +80,7 @@ public class Article implements Serializable {
     @ApiModelProperty(value = "浏览量")
     private Integer readCount;
 
-    @TableField("headPic")
+    @TableField("head_pic")
     @ApiModelProperty(value = "封面图片链接")
     private String headPic;
 
@@ -88,9 +88,10 @@ public class Article implements Serializable {
     @ApiModelProperty(value = "附件链接")
     private Integer attachment;
 
-    @TableField("dynamicTags")
+    @TableField(exist = false)
     @ApiModelProperty(value = "用户新添加的标签")
     private String[] dynamicTags;
 
+    @TableField(exist = false)
     private String stateStr;
 }

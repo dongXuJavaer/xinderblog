@@ -41,7 +41,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
 
     List<Integer> getDataStatistics(Long uid);
 
-    Long getCount(@Param("state") Integer state, @Param("keyword") String keyword);
+    Long getCount(@Param("req") ArticleDtoReq req, @Param("keyword") String keyword);
 
     List<Article> getArticleList(@Param("req") ArticleDtoReq req, @Param("offset") Long offset, @Param("keywords") String keywords);
 }
