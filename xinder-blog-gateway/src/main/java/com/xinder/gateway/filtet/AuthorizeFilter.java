@@ -62,6 +62,7 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         if (path.startsWith("/api/article/")
                 || path.startsWith("/api/user/login")
                 || path.startsWith("/api/tags")
+                || path.startsWith("/api/group/list")
         ) {
             // 放行
             Mono<Void> filter = chain.filter(exchange);

@@ -30,7 +30,7 @@ spring:
         - id: blog_user_router
           uri: lb://user
           predicates:
-            - Path=/api/login,/api/user/**,/api/admin/user/**,/api/follow/**
+            - Path=/api/login,/api/user/**,/api/admin/user/**,/api/follow/**,/api/group/**
           filters: # 符合断言的话，在断言之后，执行过滤（如果配置了过滤的话），那么在执行了过滤之后才去交给微服务
             - StripPrefix=1  # 去掉几层前缀  /api/user/  =>  /user/
 
