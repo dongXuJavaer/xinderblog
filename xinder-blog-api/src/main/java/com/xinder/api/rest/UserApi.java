@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Xinder
  * @date 2023-01-08 10:54
  */
-@Api(tags = "UserController")
+@Api(tags = "UserApi")
 @RequestMapping("/user")
 public interface UserApi {
 

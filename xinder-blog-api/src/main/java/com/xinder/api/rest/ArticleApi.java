@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Xinder
  * @date 2023-01-06 21:50
  */
-@Api(tags = "ArticleController")
+@Api(tags = "ArticleApi")
 @RequestMapping("/article")
 public interface ArticleApi {
 
