@@ -1,7 +1,6 @@
 package com.xinder.user.controller;
 
-import com.xinder.api.bean.RespBean;
-import com.xinder.api.bean.User;
+import com.xinder.api.response.RespBean;
 import com.xinder.api.enums.ResultCode;
 import com.xinder.api.request.UserDtoReq;
 import com.xinder.api.response.base.BaseResponse;
@@ -28,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
  * Created by sang on 2017/12/24.
  */
 @RestController
+@RequestMapping("/user")
 public class UserController extends AbstractController implements UserApi {
 
     @Autowired

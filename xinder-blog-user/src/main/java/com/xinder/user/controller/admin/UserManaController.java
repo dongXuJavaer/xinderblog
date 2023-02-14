@@ -1,17 +1,14 @@
 package com.xinder.user.controller.admin;
 
-import com.xinder.api.bean.RespBean;
+import com.xinder.api.response.RespBean;
 import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
-import com.xinder.api.enums.PermissionsEnums;
 import com.xinder.api.response.base.BaseResponse;
-import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.dto.UserListDtoResult;
 import com.xinder.api.rest.admin.UserManaApi;
 import com.xinder.common.abstcontroller.AbstractController;
 import com.xinder.user.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.PermissionCacheOptimizer;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;

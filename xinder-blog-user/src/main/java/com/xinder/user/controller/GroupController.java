@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @since 2023-02-11
  */
 @RestController
+@RequestMapping("/group")
 public class GroupController extends AbstractController implements GroupApi {
 
     @Autowired

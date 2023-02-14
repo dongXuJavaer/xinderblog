@@ -1,6 +1,6 @@
 package com.xinder.api.rest.admin;
 
-import com.xinder.api.bean.RespBean;
+import com.xinder.api.response.RespBean;
 import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
 import com.xinder.api.response.base.BaseResponse;

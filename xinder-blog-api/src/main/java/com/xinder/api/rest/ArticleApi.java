@@ -1,7 +1,6 @@
 package com.xinder.api.rest;
 
 import com.xinder.api.bean.Article;
-import com.xinder.api.bean.RespBean;
 import com.xinder.api.request.ArticleDtoReq;
 import com.xinder.api.response.dto.ArticleListDtoResult;
 import com.xinder.api.response.base.BaseResponse;

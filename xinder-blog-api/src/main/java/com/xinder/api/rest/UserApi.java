@@ -1,7 +1,6 @@
 package com.xinder.api.rest;
 
-import com.xinder.api.bean.RespBean;
-import com.xinder.api.bean.User;
+import com.xinder.api.response.RespBean;
 import com.xinder.api.request.UserDtoReq;
 import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.base.BaseResponse;
@@ -12,9 +11,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Xinder

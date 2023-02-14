@@ -1,6 +1,6 @@
 package com.xinder.user.controller;
 
-import com.xinder.api.bean.RespBean;
+import com.xinder.api.response.RespBean;
 import com.xinder.api.bean.User;
 import com.xinder.api.rest.LoginReqApi;
 import com.xinder.user.service.impl.UserServiceImpl;
