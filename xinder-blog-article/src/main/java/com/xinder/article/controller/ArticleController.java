@@ -1,7 +1,7 @@
 package com.xinder.article.controller;
 
 import com.xinder.api.bean.Article;
-import com.xinder.api.bean.RespBean;
+import com.xinder.api.response.RespBean;
 import com.xinder.api.enums.ResultCode;
 import com.xinder.api.request.ArticleDtoReq;
 import com.xinder.api.response.dto.ArticleListDtoResult;

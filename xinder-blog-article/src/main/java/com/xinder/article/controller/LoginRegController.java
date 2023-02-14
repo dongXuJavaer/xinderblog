@@ -1,6 +1,6 @@
 package com.xinder.article.controller;
 
-import com.xinder.api.bean.RespBean;
+import com.xinder.api.response.RespBean;
 import com.xinder.api.bean.User;
 import com.xinder.article.feign.LoginReqFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;

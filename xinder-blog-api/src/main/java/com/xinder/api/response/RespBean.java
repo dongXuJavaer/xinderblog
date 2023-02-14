@@ -1,4 +1,4 @@
-package com.xinder.api.bean;
+package com.xinder.api.response;
 
 import lombok.Data;
 

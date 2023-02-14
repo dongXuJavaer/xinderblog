@@ -1,7 +1,7 @@
 package com.xinder.article.controller.admin;
 
 import com.xinder.api.bean.Article;
-import com.xinder.api.bean.RespBean;
+import com.xinder.api.response.RespBean;
 import com.xinder.article.service.impl.ArticleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,6 +1,6 @@
 package com.xinder.article.controller;
 
-import com.xinder.api.bean.RespBean;
+import com.xinder.api.response.RespBean;
 import com.xinder.article.feign.UserFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;

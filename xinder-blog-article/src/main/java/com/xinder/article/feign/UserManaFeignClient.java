@@ -1,6 +1,6 @@
 package com.xinder.article.feign;
 
-import com.xinder.api.bean.RespBean;
+import com.xinder.api.response.RespBean;
 import com.xinder.api.rest.admin.UserManaApi;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
