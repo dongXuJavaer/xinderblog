@@ -26,7 +26,7 @@ public class FileUtils {
     private static final String SECRET_KEY = "tuHYk95xUWWstg7OPVQYDS290CkUA7ubLTUTVgIc";
     private static final String BUCKET = "xinderblog";
     private static final String PATH = "blog";
-    private static final String domain = "http://rogv8l3fv.hn-bkt.clouddn.com/";
+    private static final String domain = "http://img.blog.xinder.top/";
 
     public static final String FOLDER_ATTACHMENT = "attachment";  // 附件文件夹
     public static final String FOLDER_HEADPIC = "headpic"; // 头像文件夹
