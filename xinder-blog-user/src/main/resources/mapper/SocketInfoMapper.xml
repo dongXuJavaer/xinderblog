@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinder.user.mapper.SocketInfoMapper">
+    <resultMap id="baseMap" type="com.xinder.api.bean.SocketInfo">
+        <id column="id" property="id"/>
+        <result column="from_uid" property="fromUid"/>
+        <result column="to_id" property="toId"/>
+        <result column="type" property="type"/>
+        <result column="create_time" property="createTime"/>
+        <result column="name" property="toName"/>
+        <result column="pic" property="pic"/>
+    </resultMap>
+
+    <select id="list" resultMap="baseMap">
+        select
+        s.id,
+        s.from_uid,
+        s.to_id,
+        s.`type`,
+        s.create_time,
+        <if test="req.type==1">
+            u.nickname as name,
+            u.userface as pic
+        </if>
+        <if test="req.type==2">
+            g.name as name,
+            g.pic as pic
+        </if>
+<!--        if(s.type='1', u.nickname,-->
+<!--            if(s.type='2', g.name,'')) as name-->
+        from socket_info s
+        <choose>
+            <when test="req.type == 1">
+                left join `user` u on s.to_id = u.id
+            </when>
+            <when test="req.type == 2">
+                left join `group` g on s.to_id = g.id
+            </when>
+        </choose>
+
+        <where>
+            <if test="req.fromUid != null and req.fromUid != ''">
+                and s.from_uid = #{req.fromUid}
+            </if>
+            <if test="req.toId != null and req.toId != ''">
+                and s.to_id = #{req.toId}
+            </if>
+            <if test="req.type != null and req.type != ''">
+                and s.`type` = #{req.type}
+            </if>
+        </where>
+    </select>
+</mapper>
