@@ -54,9 +54,8 @@ public class SocketInfoServiceImpl extends ServiceImpl<SocketInfoMapper, SocketI
                 .setToId(toId)
                 .setType(type);
         List<SocketInfo> list = socketInfoMapper.list(socketInfoReq);
-        boolean emptyFlag = CollectionUtils.isEmpty(list);
         // 如果不存在这个聊天框则添加
-        if (emptyFlag) {
+        if (CollectionUtils.isEmpty(list)) {
             SocketInfo socketInfo = new SocketInfo();
             BeanUtils.copyProperties(socketInfoReq, socketInfo);
             int i = socketInfoMapper.insert(socketInfo);
@@ -65,5 +64,11 @@ public class SocketInfoServiceImpl extends ServiceImpl<SocketInfoMapper, SocketI
             }
         }
         return Result.success();
+    }
+
+    @Override
+    public Result removeSocket(Long id) {
+        int i = socketInfoMapper.deleteById(id);
+        return i > 0 ? Result.success("关闭成功") : Result.fail("关闭失败");
     }
 }

@@ -44,5 +44,10 @@ public class SocketInfoController extends AbstractController implements SocketIn
         Result result = socketInfoService.addSocket(fromUid, toId, type);
         return buildJson(result);
     }
+
+    @Override
+    public BaseResponse<Result> remove(Long id) {
+        return buildJson(socketInfoService.removeSocket(id));
+    }
 }
 

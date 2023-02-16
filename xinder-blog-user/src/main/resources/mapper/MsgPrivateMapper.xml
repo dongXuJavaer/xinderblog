@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinder.user.mapper.MsgPrivateMapper">
+
+    <resultMap id="baseMap" type="com.xinder.api.bean.MsgPrivate">
+        <id column="id" property="id"/>
+        <result column="from_uid" property="fromUid"/>
+        <result column="to_uid" property="toUid"/>
+        <result column="content" property="content"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="selectSocketMsgList" resultMap="baseMap">
+        select id, from_uid, to_uid, content, create_time
+        from msg_private
+        where
+         (from_uid = #{req.fromUid} and to_uid = #{req.toId})
+         or
+         (to_uid = #{req.fromUid} and from_uid= #{req.toId})
+    </select>
+</mapper>

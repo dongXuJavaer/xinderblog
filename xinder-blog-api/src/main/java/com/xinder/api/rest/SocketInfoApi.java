@@ -6,6 +6,7 @@ import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.SocketInfoListDtoResult;
 import com.xinder.api.response.result.Result;
 import io.swagger.annotations.Api;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,6 +41,8 @@ public interface SocketInfoApi {
     );
 
     /**
-     * 点击某人的聊天框
+     * 移除某人的聊天框
      */
+    @RequestMapping("/remove/{id}")
+    BaseResponse<Result> remove(@PathVariable("id") Long id);
 }

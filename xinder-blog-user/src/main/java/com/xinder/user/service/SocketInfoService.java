@@ -27,4 +27,11 @@ public interface SocketInfoService extends IService<SocketInfo> {
      * @return
      */
     Result addSocket(Integer fromUid, Integer toId, Integer type);
+
+    /**
+     * 关闭某人的私信socket
+     * @param id
+     * @return
+     */
+    Result removeSocket(Long id);
 }
