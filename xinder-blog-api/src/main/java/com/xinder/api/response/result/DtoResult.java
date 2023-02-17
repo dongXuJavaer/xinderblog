@@ -1,6 +1,7 @@
 package com.xinder.api.response.result;
 
 import com.xinder.api.enums.ResultCode;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 
@@ -8,8 +9,11 @@ public class DtoResult implements Serializable {
 
     private static final long serialVersionUID = 745645633555365L;
 
+    @ApiModelProperty(value = "响应状态码")
     private Integer code;
+    @ApiModelProperty(value = "响应状信息")
     private String msg;
+    @ApiModelProperty(value = "响应数据")
     private Object data;
 
     public DtoResult() {
