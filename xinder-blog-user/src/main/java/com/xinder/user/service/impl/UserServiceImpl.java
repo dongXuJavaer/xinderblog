@@ -276,7 +276,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public DtoResult logout() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         HttpSession session = request.getSession();
         session.invalidate();
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
