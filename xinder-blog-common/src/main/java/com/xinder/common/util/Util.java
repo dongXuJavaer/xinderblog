@@ -34,7 +34,7 @@ public class Util {
         String userKey = UserEnums.USER_ONLINE_PREFIX_KEY.getValue() + username;
         User user = (User) redisTemplate.opsForValue().get(userKey);
         if (user != null) {
-            redisTemplate.opsForValue().set(userKey, user, 30, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set(userKey, user, 60, TimeUnit.MINUTES);
         } else {
             user = new User();
         }
