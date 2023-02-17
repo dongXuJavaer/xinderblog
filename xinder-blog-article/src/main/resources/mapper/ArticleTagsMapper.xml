@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinder.article.mapper.ArticleTagsMapper">
+
+    <delete id="deleteByAidAndTid">
+        delete from article_tags
+        where aid=#{aid} and tid=#{tid}
+    </delete>
+</mapper>

@@ -2,11 +2,15 @@ package com.xinder.article.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xinder.api.bean.Tags;
+import com.xinder.api.request.TagsDtoReq;
 import com.xinder.api.response.dto.TagsDtoListResult;
 import com.xinder.api.response.result.DtoResult;
+import com.xinder.api.response.result.Result;
 import com.xinder.article.mapper.TagsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author Xinder
@@ -25,7 +29,7 @@ public interface TagsService extends IService<Tags> {
      * @param tags
      * @return
      */
-    DtoResult addTags(Tags tags);
+    Result addTags(Tags tags);
 
     /**
      * 获取个人博客标签
@@ -33,4 +37,25 @@ public interface TagsService extends IService<Tags> {
      * @return
      */
     TagsDtoListResult myTags(Integer uid);
+
+    /**
+     * 分页获取个人博客标签
+     * @param tagsDtoReq
+     * @return
+     */
+    TagsDtoListResult myTagsPage(TagsDtoReq tagsDtoReq);
+
+    /**
+     * 修改标签
+     * @param tagsDtoReq
+     * @return
+     */
+    Result updateTag(TagsDtoReq tagsDtoReq);
+
+    /**
+     * 批量删除标签
+     * @param ids
+     * @return
+     */
+    Result deleteTag(List<Long> ids);
 }

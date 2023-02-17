@@ -2,6 +2,7 @@ package com.xinder.article.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xinder.api.bean.Tags;
+import com.xinder.api.request.TagsDtoReq;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -22,4 +23,8 @@ public interface TagsMapper extends BaseMapper<Tags> {
     int saveTags2ArticleTags(@Param("tagIds") List<Long> tagIds, @Param("aid") Long aid);
 
     List<Tags> selectByAid(@Param("aid") Long aid);
+
+    Long getCount(@Param("req") TagsDtoReq req, @Param("offset") Long offset);
+
+    List<Tags> getTagsList(@Param("req") TagsDtoReq req, @Param("offset") Long offset);
 }

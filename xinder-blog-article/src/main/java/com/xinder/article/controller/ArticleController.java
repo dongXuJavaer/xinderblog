@@ -7,6 +7,7 @@ import com.xinder.api.request.ArticleDtoReq;
 import com.xinder.api.response.dto.ArticleListDtoResult;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.result.DtoResult;
+import com.xinder.api.response.result.Result;
 import com.xinder.api.rest.ArticleApi;
 import com.xinder.article.service.ArticleService;
 import com.xinder.common.abstcontroller.AbstractController;
@@ -167,9 +168,9 @@ public class ArticleController extends AbstractController implements ArticleApi 
     }
 
     @Override
-    public BaseResponse<String> publish(Article article) {
-
-        return null;
+    public BaseResponse<Result> publish(Article article) {
+        Result result = articleService.publish(article);
+        return buildJson(result);
     }
 
 

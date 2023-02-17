@@ -5,6 +5,7 @@ import com.xinder.api.request.ArticleDtoReq;
 import com.xinder.api.response.dto.ArticleListDtoResult;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.result.DtoResult;
+import com.xinder.api.response.result.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -74,5 +75,5 @@ public interface ArticleApi {
      */
     @ApiOperation(value = "发表/修改 帖子", notes = "发表/修改 帖子----", tags = {"ArticleController"})
     @RequestMapping(value = "/publish", method = RequestMethod.POST)
-    BaseResponse<String> publish(@RequestBody Article article);
+    BaseResponse<Result> publish(@RequestBody Article article);
 }

@@ -28,7 +28,39 @@
     <select id="selectByAid" resultType="com.xinder.api.bean.Tags">
         select t.id, t.tag_name
         from article_tags `at` left join tags t on `at`.tid=t.id
-        where `at`.aid = #{id}
+        where `at`.aid = #{aid}
     </select>
 
+    <select id="getCount" resultType="java.lang.Long">
+        select count(1) from tags t
+        <where>
+            <if test="req.tagName!=null">
+                and t.tag_name = #{req.tagName}
+            </if>
+            <if test="req.uid!=null">
+                and t.uid = #{req.uid}
+            </if>
+        </where>
+    </select>
+
+    <resultMap id="baseMap" type="com.xinder.api.bean.Tags">
+        <id property="id" column="id"/>
+        <result property="tagName" column="tag_name"/>
+        <result property="uid" column="uid"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="getTagsList" resultMap="baseMap">
+        select t.id, t.tag_name, t.uid, t.create_time
+        from tags t
+        <where>
+            <if test="req.tagName!=null">
+                and t.tag_name = #{req.tagName}
+            </if>
+            <if test="req.uid!=null">
+                and t.uid = #{req.uid}
+            </if>
+        </where>
+        limit #{offset}, #{req.pageSize};
+    </select>
 </mapper>

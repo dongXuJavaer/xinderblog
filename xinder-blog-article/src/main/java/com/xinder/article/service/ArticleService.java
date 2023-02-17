@@ -5,6 +5,7 @@ import com.xinder.api.bean.Article;
 import com.xinder.api.request.ArticleDtoReq;
 import com.xinder.api.response.dto.ArticleListDtoResult;
 import com.xinder.api.response.result.DtoResult;
+import com.xinder.api.response.result.Result;
 
 
 /**
@@ -33,4 +34,11 @@ public interface ArticleService extends IService<Article> {
      * @return
      */
     ArticleListDtoResult getList(ArticleDtoReq articleDtoReq);
+
+    /**
+     * 发布帖子
+     * @param article
+     * @return
+     */
+    Result publish(Article article);
 }

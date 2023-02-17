@@ -1,5 +1,6 @@
 package com.xinder.api.bean;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -18,7 +19,7 @@ import java.util.Date;
 @TableName("tags")
 public class Tags implements Serializable {
 
-    @TableId
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     @TableField("tag_name")

@@ -3,10 +3,14 @@ package com.xinder.article.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinder.api.bean.Article;
+import com.xinder.api.bean.ArticleTags;
+import com.xinder.api.bean.Tags;
 import com.xinder.api.request.ArticleDtoReq;
 import com.xinder.api.response.dto.ArticleListDtoResult;
 import com.xinder.api.response.result.DtoResult;
+import com.xinder.api.response.result.Result;
 import com.xinder.article.mapper.ArticleMapper;
+import com.xinder.article.mapper.ArticleTagsMapper;
 import com.xinder.article.mapper.TagsMapper;
 import com.xinder.article.service.ArticleService;
 import com.xinder.common.util.TokenDecode;
@@ -15,11 +19,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StringUtils;
 
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created by Xinder on 2023-1-6 23:07:57.
@@ -28,9 +34,19 @@ import java.util.Optional;
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
 
     @Autowired
-    ArticleMapper articleMapper;
+    private ArticleMapper articleMapper;
+
     @Autowired
-    TagsMapper tagsMapper;
+    private TagsMapper tagsMapper;
+
+    @Autowired
+    private ArticleService articleService;
+
+    @Autowired
+    private ArticleTagsMapper articleTagsMapper;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
 
     @Autowired
     private TokenDecode tokenDecode;
@@ -215,4 +231,47 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleListDtoResult.setList(articleList);
         return articleListDtoResult;
     }
+
+    @Override
+    public Result publish(Article article) {
+        transactionTemplate.executeWithoutResult(status -> {
+            refreshTag(article);
+            article.setEditTime(new Date());
+            articleMapper.updateArticle(article);
+        });
+
+        return Result.success("成功");
+    }
+
+    // 提交的标签与数据库的标签对比
+    // 如果存在，则不添加
+    // 如果提交的标签不存在、数据库存在，则删除
+    // 如果提交的标签存在，数据库不存在，则添加
+    private void refreshTag(Article article) {
+        List<Tags> pushTags = article.getTags(); // 提交的标签
+        Map<Long, Tags> pushTagsHashMap = pushTags.stream().collect(Collectors.toMap(Tags::getId, Function.identity()));
+
+        List<Tags> tagsList = tagsMapper.selectByAid(article.getId());
+        Map<Long, Tags> tagsMap = tagsList.stream().collect(Collectors.toMap(Tags::getId, Function.identity()));
+        // 删除标签
+        tagsList.forEach(tags -> {
+            Tags t = pushTagsHashMap.get(tags.getId());
+            if (t == null) {
+                articleTagsMapper.deleteByAidAndTid(article.getId(), tags.getId());
+            }
+        });
+
+        // 添加标签
+        pushTags.forEach(tags -> {
+            Tags t = tagsMap.get(tags.getId());
+            if (t == null) {
+                ArticleTags articleTags = new ArticleTags()
+                        .setAid(article.getId())
+                        .setTid(tags.getId());
+                articleTagsMapper.insert(articleTags);
+            }
+        });
+    }
+
+
 }

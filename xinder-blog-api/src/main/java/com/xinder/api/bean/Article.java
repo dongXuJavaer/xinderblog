@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -17,7 +19,8 @@ import java.util.List;
  * Created by xinder on 2017/12/20.
  */
 
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @TableName("article")
 public class Article implements Serializable {
@@ -86,7 +89,7 @@ public class Article implements Serializable {
 
     @TableField("attachment")
     @ApiModelProperty(value = "附件链接")
-    private Integer attachment;
+    private String attachment;
 
     @TableField(exist = false)
     @ApiModelProperty(value = "用户新添加的标签")

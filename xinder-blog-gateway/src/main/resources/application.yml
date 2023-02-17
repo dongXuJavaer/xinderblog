@@ -38,7 +38,7 @@ spring:
           #          uri: http://localhost:9001   # 路由对应的微服务的地址
           uri: lb://article   # 写服务的名字，实现负载均衡
           predicates: # 断言
-            - Path=/api/article/**, /**  # 断言规则，配置请求路径， ** 表示多级目录， 这里表示凡是以brand开头的请求，都交给上面配置的对应的微服务去处理
+            - Path=/api/article/**, /api/tags/**,/**  # 断言规则，配置请求路径， ** 表示多级目录， 这里表示凡是以brand开头的请求，都交给上面配置的对应的微服务去处理
           filters: # 符合断言的话，在断言之后，执行过滤（如果配置了过滤的话），那么在执行了过滤之后才去交给微服务
 #            - PrefixPath=/brand   # 前缀过滤规则，在前面加上前缀
             - StripPrefix=1  # 去掉几层前缀  /sellergoods/goods/  =>  /goods/

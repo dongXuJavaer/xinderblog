@@ -10,14 +10,18 @@
     <update id="pvIncrement" parameterType="Long">
         UPDATE article set read_count = read_count+1 WHERE id=#{aid}
     </update>
+
     <update id="updateArticle" parameterType="com.xinder.api.bean.Article">
         UPDATE article SET
         title=#{title},md_content=#{mdContent}, html_content=#{htmlContent},summary=#{summary},cid=#{cid},edit_time=#{editTime}
         <if test="state==1">
             ,state=1
         </if>
-        <if test="createTime!=null">
-            ,create_time=#{createTime}
+        <if test="attachment!=null">
+            ,attachment=#{attachment}
+        </if>
+        <if test="headPic!=null">
+            ,head_pic=#{headPic}
         </if>
         WHERE id=#{id}
     </update>
@@ -38,6 +42,7 @@
         <result column="head_pic" property="headPic"/>
         <result column="nickname" property="nickname"/>
         <result column="cate_name" property="cateName"/>
+        <result column="attachment" property="attachment"/>
 
         <collection column="id" property="tags"  ofType="com.xinder.api.bean.Tags"
                     select="com.xinder.article.mapper.TagsMapper.selectByAid"/>
@@ -119,6 +124,8 @@
         a.`create_time`  as create_time,
         a.uid            as uid,
         a.read_count,
+        a.head_pic,
+        a.attachment,
         u.`nickname`     as nickname,
         c.id             as cid,
         c.`cate_name`    as cate_name
