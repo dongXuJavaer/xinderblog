@@ -1,10 +1,9 @@
 package com.xinder.user.websocket;
 
 import com.alibaba.fastjson.JSON;
-import com.xinder.api.bean.Group;
-import com.xinder.api.bean.MsgGroup;
-import com.xinder.api.bean.MsgPrivate;
-import com.xinder.api.bean.User;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.xinder.api.bean.*;
 import com.xinder.api.request.SocketMsgReq;
 import com.xinder.api.enums.SocketMsgTypeEnums;
 import com.xinder.api.response.dto.MsgDtoResult;
@@ -29,6 +28,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.stream.Collectors;
 
 /**
  * @author Xinder
@@ -60,24 +60,23 @@ public class WebSocketService {
      */
     public static Map<String, Set<String>> conns = new ConcurrentHashMap<>();
 
-    private static ApplicationContext applicationContext;
-
     private static MsgPrivateMapper msgPrivateMapper;
     private static MsgGroupMapper msgGroupMapper;
     private static TransactionTemplate transactionTemplate;
     private static UserMapper userMapper;
     private static GroupMapper groupMapper;
     private static SocketInfoService socketInfoService;
+    private static GroupUserMapper groupUserMapper;
 
 
     public static void initBean(ApplicationContext applicationContext) {
-        WebSocketService.applicationContext = applicationContext;
         msgPrivateMapper = applicationContext.getBean(MsgPrivateMapper.class);
         msgGroupMapper = applicationContext.getBean(MsgGroupMapper.class);
         transactionTemplate = applicationContext.getBean(TransactionTemplate.class);
         userMapper = applicationContext.getBean(UserMapper.class);
         groupMapper = applicationContext.getBean(GroupMapper.class);
         socketInfoService = applicationContext.getBean(SocketInfoService.class);
+        groupUserMapper = applicationContext.getBean(GroupUserMapper.class);
     }
 
 
@@ -130,7 +129,7 @@ public class WebSocketService {
         if (SocketMsgTypeEnums.MSG_PRIVATE.getCode().equals(socketMsgReq.getType())) {
             // ======> 发送私信消息
             sendPrivateMsg(socketMsgReq);
-        } else if (SocketMsgTypeEnums.MSG_PRIVATE.getCode().equals(socketMsgReq.getType())) {
+        } else if (SocketMsgTypeEnums.MSG_GROUP.getCode().equals(socketMsgReq.getType())) {
             // ======> 发送群聊消息
             sendGroupMsg(socketMsgReq);
         }
@@ -157,6 +156,10 @@ public class WebSocketService {
     }
 
     // 发送私信
+    /*
+        1. 信息入库
+        2. 给发送者与接收者都转发消息
+    */
     private void sendPrivateMsg(SocketMsgReq socketMsgReq) {
         MsgPrivate msgPrivate = new MsgPrivate()
                 .setFromUid(socketMsgReq.getFromUid())
@@ -165,7 +168,6 @@ public class WebSocketService {
                 .setCreateTime(LocalDateTime.now());
         transactionTemplate.execute(status -> {
             int insert = msgPrivateMapper.insert(msgPrivate);
-            // 给发送者与接收者都转发消息
             MsgDtoResult msgDtoResult = new MsgDtoResult()
                     .setToId(msgPrivate.getToUid())
                     .setType(SocketMsgTypeEnums.MSG_PRIVATE.getCode());
@@ -180,19 +182,37 @@ public class WebSocketService {
         });
     }
 
+    /*
+        1. 信息入库
+        2. 给所有群成员转发消息
+     */
     private void sendGroupMsg(SocketMsgReq socketMsgReq) {
         MsgGroup msgGroup = new MsgGroup()
                 .setSendUid(socketMsgReq.getFromUid())
                 .setContent(socketMsgReq.getContent())
                 .setGroupId(socketMsgReq.getToId())
                 .setCreateTime(LocalDateTime.now());
+        Group group = groupMapper.selectById(msgGroup.getGroupId());
         transactionTemplate.execute(status -> {
             int insert = msgGroupMapper.insert(msgGroup);
             MsgDtoResult msgDtoResult = new MsgDtoResult()
+                    .setFromUid(msgGroup.getSendUid())
                     .setToId(msgGroup.getGroupId())
-                    .setType(SocketMsgTypeEnums.MSG_PRIVATE.getCode());
+                    .setType(SocketMsgTypeEnums.MSG_PRIVATE.getCode())
+                    .setToName(group.getName());
             BeanUtils.copyProperties(msgGroup, msgDtoResult);
+            // 找到所有群成员，给所有群成员发消息
+            LambdaQueryWrapper<GroupUser> queryWrapper = new LambdaQueryWrapper<GroupUser>()
+                    .eq(GroupUser::getGroupId, msgGroup.getGroupId())
+                    .select(GroupUser::getUid);
+            List<Integer> groupUserIdList = groupUserMapper.selectList(queryWrapper)
+                    .stream()
+                    .map(GroupUser::getUid).collect(Collectors.toList());
+            groupUserIdList.add(group.getCreateUser());
 
+            groupUserIdList.forEach(uid ->
+                    Optional.ofNullable(sessionMap.get(uid))
+                            .ifPresent(session -> sendMsg(session, msgDtoResult)));
             socketInfoService.addSocket(socketMsgReq.getToId(), socketMsgReq.getFromUid(),
                     SocketMsgTypeEnums.MSG_GROUP.getCode());
             return insert > 0;
@@ -206,7 +226,8 @@ public class WebSocketService {
             msgDtoResult.setCreateTimeStr(
                     DateFormatUtils.format(Date.from(msgDtoResult.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()),
                             DateConstant.YYYY_MM_DD_HH_MM_SS))
-                    .setFromNickname(user.getNickname());
+                    .setFromNickname(user.getNickname())
+                    .setFromPic(user.getUserface()); // 这个参数主要是在群聊时使用
             session.getAsyncRemote().sendText(JSON.toJSONString(msgDtoResult));
         });
     }

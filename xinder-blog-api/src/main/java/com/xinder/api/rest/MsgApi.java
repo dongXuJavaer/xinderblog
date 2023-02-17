@@ -9,6 +9,7 @@ import com.xinder.api.response.dto.SocketInfoListDtoResult;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Xinder
@@ -23,6 +24,9 @@ public interface MsgApi {
      * @param socketMsgReq
      * @return
      */
-    @RequestMapping("/list")
+    @RequestMapping(
+            value = "/list",
+            method = RequestMethod.POST
+    )
     BaseResponse<MsgDtoResultList> getMsgList(@RequestBody SocketMsgReq socketMsgReq);
 }

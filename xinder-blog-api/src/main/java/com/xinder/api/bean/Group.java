@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "群聊实体类", description = "")
+@ApiModel(value = "Group", description = "群聊实体类")
 @TableName(value = "`group`")
 public class Group implements Serializable {
 

@@ -3,6 +3,7 @@ package com.xinder.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.xinder.api.bean.MsgGroup;
 import com.xinder.api.bean.MsgPrivate;
+import com.xinder.api.bean.User;
 import com.xinder.api.enums.SocketMsgTypeEnums;
 import com.xinder.api.request.SocketMsgReq;
 import com.xinder.api.response.dto.MsgDtoResult;
@@ -11,6 +12,7 @@ import com.xinder.api.response.result.DtoResult;
 import com.xinder.common.constant.DateConstant;
 import com.xinder.user.mapper.MsgGroupMapper;
 import com.xinder.user.mapper.MsgPrivateMapper;
+import com.xinder.user.mapper.UserMapper;
 import com.xinder.user.service.MsgService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.BeanUtils;
@@ -35,6 +37,9 @@ public class MsgServiceImpl implements MsgService {
     @Autowired
     private MsgGroupMapper msgGroupMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
 
     @Override
     public MsgDtoResultList getMsgList(SocketMsgReq socketMsgReq) {
@@ -49,7 +54,6 @@ public class MsgServiceImpl implements MsgService {
                     .setGroupId(socketMsgReq.getToId());
             BeanUtils.copyProperties(socketMsgReq, msgGroup);
             LambdaUpdateWrapper<MsgGroup> wrapper = new LambdaUpdateWrapper<MsgGroup>()
-                    .eq(MsgGroup::getSendUid, socketMsgReq.getFromUid())
                     .eq(MsgGroup::getGroupId, socketMsgReq.getToId());
             List<MsgGroup> msgGroupList = msgGroupMapper.selectList(wrapper);
             msgDtoResultList.setList(buildMsgGroupDtoList(msgGroupList));
@@ -76,15 +80,19 @@ public class MsgServiceImpl implements MsgService {
     // 构建群聊消息dto列表
     private List<MsgDtoResult> buildMsgGroupDtoList(List<MsgGroup> msgGroupList) {
         List<MsgDtoResult> list = new ArrayList<>(msgGroupList.size());
-        msgGroupList.forEach(item -> {
+        msgGroupList.forEach(msgGroup -> {
             MsgDtoResult msgDtoResult = DtoResult.dataDtoSuccess(MsgDtoResult.class);
-            BeanUtils.copyProperties(item, msgDtoResult);
-            msgDtoResult.setFromUid(item.getSendUid())
-                    .setToId(item.getGroupId());
-            msgDtoResult.setCreateTimeStr(
-                    DateFormatUtils.format(Date.from(msgDtoResult.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()),
-                            DateConstant.YYYY_MM_DD_HH_MM_SS)
-            );
+            BeanUtils.copyProperties(msgGroup, msgDtoResult);
+            User fromUser = userMapper.getUserById(msgGroup.getSendUid().longValue());
+            msgDtoResult
+                    .setFromUid(msgGroup.getSendUid())
+                    .setFromNickname(fromUser.getNickname())
+                    .setFromPic(fromUser.getUserface())
+                    .setToId(msgGroup.getGroupId())
+                    .setCreateTimeStr(
+                            DateFormatUtils.format(Date.from(msgDtoResult.getCreateTime().atZone(ZoneId.systemDefault()).toInstant()),
+                                    DateConstant.YYYY_MM_DD_HH_MM_SS)
+                    );
             list.add(msgDtoResult);
         });
         return list;

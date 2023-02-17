@@ -1,22 +1,19 @@
 package com.xinder.api.response.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.xinder.api.response.result.DtoResult;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
-
 /**
  * @author Xinder
  * @date 2023-02-15 21:04
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 public class MsgDtoResult extends DtoResult {
 
@@ -31,11 +28,14 @@ public class MsgDtoResult extends DtoResult {
     @ApiModelProperty(value = "发送者名称")
     private String fromNickname;
 
+    @ApiModelProperty(value = "发送者头像（群聊时才使用该参数）")
+    private String fromPic;
+
     @ApiModelProperty(value = "接收方id。 如果是群聊，则为群聊id")
     private Integer toId;
 
-//    @ApiModelProperty(value = "接收方名称。 如果是群聊，则为群聊名称")
-//    private String toName;
+    @ApiModelProperty(value = "接收方名称。 如果是群聊，则为群聊名称（实际上在群聊时才使用了该参数）")
+    private String toName;
 
 //    @ApiModelProperty(value = "接收方头像")
 //    private String pic;

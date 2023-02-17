@@ -29,7 +29,6 @@ public class MsgController extends AbstractController implements MsgApi {
     private MsgService msgService;
 
     @Override
-    @RequestMapping("/list")
     public BaseResponse<MsgDtoResultList> getMsgList(SocketMsgReq socketMsgReq) {
         MsgDtoResultList msgList = msgService.getMsgList(socketMsgReq);
         return buildJson(msgList);
