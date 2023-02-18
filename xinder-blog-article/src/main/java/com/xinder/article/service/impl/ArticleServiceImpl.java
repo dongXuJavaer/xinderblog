@@ -234,19 +234,32 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     public Result publish(Article article) {
-        transactionTemplate.executeWithoutResult(status -> {
-            refreshTag(article);
-            article.setEditTime(new Date());
-            articleMapper.updateArticle(article);
-        });
+        // 判断是新发表文章还是修改
+        if (article.getId() == null || article.getId() == -1) {
+            //处理文章摘要
+            if (StringUtils.isEmpty(article.getSummary())) {
+                //直接截取
+                String stripHtml = stripHtml(article.getHtmlContent());
+                article.setSummary(stripHtml.substring(0, Math.min(stripHtml.length(), 50)));
+            }
+            articleMapper.insert(article);
+        } else {
+            transactionTemplate.executeWithoutResult(status -> {
+                refreshTag(article);
+                article.setEditTime(new Date());
+                articleMapper.updateArticle(article);
+            });
+        }
 
         return Result.success("成功");
     }
 
-    // 提交的标签与数据库的标签对比
-    // 如果存在，则不添加
-    // 如果提交的标签不存在、数据库存在，则删除
-    // 如果提交的标签存在，数据库不存在，则添加
+    /*
+        提交的标签与数据库的标签对比
+        1 如果存在，则不添加
+        2.1 如果提交的标签不存在、数据库存在，则删除
+        2.2 如果提交的标签存在，数据库不存在，则添加
+     */
     private void refreshTag(Article article) {
         List<Tags> pushTags = article.getTags(); // 提交的标签
         Map<Long, Tags> pushTagsHashMap = pushTags.stream().collect(Collectors.toMap(Tags::getId, Function.identity()));

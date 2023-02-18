@@ -3,6 +3,7 @@ package com.xinder.api.rest;
 import com.xinder.api.bean.Tags;
 import com.xinder.api.request.TagsDtoReq;
 import com.xinder.api.response.base.BaseResponse;
+import com.xinder.api.response.dto.TagDtoResult;
 import com.xinder.api.response.dto.TagsDtoListResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
@@ -33,7 +34,7 @@ public interface TagsApi {
      */
     @PostMapping("/add")
     @ApiOperation(value = "添加标签", notes = "", tags = {"TagsApi"})
-    BaseResponse<Result> addTags(Tags tags);
+    BaseResponse<DtoResult> addTags(Tags tags);
 
     /**
      * 分页查询个人标签

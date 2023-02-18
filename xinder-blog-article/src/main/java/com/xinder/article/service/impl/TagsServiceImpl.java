@@ -4,14 +4,17 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinder.api.bean.Tags;
 import com.xinder.api.request.TagsDtoReq;
+import com.xinder.api.response.dto.TagDtoResult;
 import com.xinder.api.response.dto.TagsDtoListResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
+import com.xinder.article.mapper.ArticleTagsMapper;
 import com.xinder.article.mapper.TagsMapper;
 import com.xinder.article.service.TagsService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,6 +28,9 @@ public class TagsServiceImpl extends ServiceImpl<TagsMapper, Tags> implements Ta
     @Autowired
     private TagsMapper tagsMapper;
 
+    @Autowired
+    private ArticleTagsMapper articleTagsMapper;
+
     @Override
     public TagsDtoListResult getAll() {
         List<Tags> list = super.list();
@@ -34,9 +40,18 @@ public class TagsServiceImpl extends ServiceImpl<TagsMapper, Tags> implements Ta
     }
 
     @Override
-    public Result addTags(Tags tags) {
+    public DtoResult addTags(Tags tags) {
         int i = tagsMapper.insert(tags);
-        return i > 0 ? Result.success("添加成功") : Result.fail("添加失败");
+        DtoResult dtoResult;
+        if (i > 0) {
+            dtoResult = DtoResult.dataDtoSuccess(DtoResult.class);
+            dtoResult.setMsg("添加成功");
+            dtoResult.setData(tags);
+        } else {
+            dtoResult = DtoResult.dataDtoFail(DtoResult.class);
+            dtoResult.setMsg("添加失败");
+        }
+        return dtoResult;
     }
 
     @Override
@@ -76,8 +91,10 @@ public class TagsServiceImpl extends ServiceImpl<TagsMapper, Tags> implements Ta
     }
 
     @Override
+    @Transactional
     public Result deleteTag(List<Long> ids) {
         int i = tagsMapper.deleteBatchIds(ids);
+        articleTagsMapper.deleteByTid(ids);
         return i > 0 ? Result.success("删除成功") : Result.fail("删除失败");
     }
 }

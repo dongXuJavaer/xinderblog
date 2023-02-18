@@ -3,6 +3,7 @@ package com.xinder.article.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xinder.api.bean.Tags;
 import com.xinder.api.request.TagsDtoReq;
+import com.xinder.api.response.dto.TagDtoResult;
 import com.xinder.api.response.dto.TagsDtoListResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
@@ -29,7 +30,7 @@ public interface TagsService extends IService<Tags> {
      * @param tags
      * @return
      */
-    Result addTags(Tags tags);
+    DtoResult addTags(Tags tags);
 
     /**
      * 获取个人博客标签

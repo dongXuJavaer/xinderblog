@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.api.R;
 import com.xinder.api.bean.Tags;
 import com.xinder.api.request.TagsDtoReq;
 import com.xinder.api.response.base.BaseResponse;
+import com.xinder.api.response.dto.TagDtoResult;
 import com.xinder.api.response.dto.TagsDtoListResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
@@ -36,9 +37,9 @@ public class TagsController extends AbstractController implements TagsApi {
     }
 
     @Override
-    public BaseResponse<Result> addTags(@RequestBody Tags tags) {
-        Result result = tagsService.addTags(tags);
-        return buildJson(result);
+    public BaseResponse<DtoResult> addTags(@RequestBody Tags tags) {
+        DtoResult dtoResult = tagsService.addTags(tags);
+        return buildJson(dtoResult);
     }
 
     @Override

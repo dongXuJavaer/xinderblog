@@ -6,4 +6,12 @@
         delete from article_tags
         where aid=#{aid} and tid=#{tid}
     </delete>
+
+    <delete id="deleteByTid">
+        delete from article_tags
+        where tid in
+        <foreach collection="tIds" item="tid" open="(" close=")">
+            #{tid}
+        </foreach>
+    </delete>
 </mapper>
