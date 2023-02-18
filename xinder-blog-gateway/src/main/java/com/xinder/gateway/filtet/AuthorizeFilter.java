@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Optional;
 
 /**
  * 认证拦截器，实现了全局拦截器（GlobalFilter）接口与可排序接口（Ordered）
@@ -32,7 +33,8 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
     private static final String AUTHORIZE_TOKEN = "Authorization";
 
     // 用户登录地址，未携带令牌则跳转到登录页面
-    private static final String USER_LOGIN_URL = "http://localhost:80/oauth/login";
+//    private static final String USER_LOGIN_URL = "http://localhost:80/oauth/login";
+    private static final String USER_LOGIN_URL = "http://localhost:9000/login";
 
 
     /**
@@ -47,7 +49,6 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
 
-
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpResponse response = exchange.getResponse();
 
@@ -55,7 +56,7 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         //获取请求的URI  api/user/login?username=zhangsan9527&password=123456
         String path = request.getURI().getPath();
 
-        logger.info("请求路径--{}",path);
+        logger.info("请求路径--{}", path);
         System.out.println("请求路径---------" + path);
 
         // 如果请求是blog等开放服务，则直接放行
@@ -63,6 +64,7 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
                 || path.startsWith("/api/user/login")
                 || path.startsWith("/api/tags")
                 || path.startsWith("/api/group/list")
+                || judgeGetUser(path)
         ) {
             // 放行
             Mono<Void> filter = chain.filter(exchange);
@@ -128,6 +130,19 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         return response.setComplete();
     }
 
+    // 判断是否是【根据id获取用户】的请求路径
+    private boolean judgeGetUser(String path) {
+        String rootPath = "/api/user/";
+        try {
+            Optional.ofNullable(path)
+                    .filter(str -> str.startsWith(rootPath))
+                    .map(str -> path.substring(rootPath.length(), path.length() - 1))
+                    .map(Long::parseLong);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * 过滤器执行顺序
