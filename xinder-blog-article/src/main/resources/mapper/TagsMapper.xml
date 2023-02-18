@@ -4,7 +4,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xinder.article.mapper.TagsMapper">
     <delete id="deleteTagsByAid" parameterType="Long">
-      DELETE FROM article_tags WHERE aid=#{aid}
+        DELETE
+        FROM article_tags
+        WHERE aid = #{aid}
     </delete>
     <insert id="saveTags">
         INSERT IGNORE INTO tags(tag_name) VALUES
@@ -12,6 +14,7 @@
             (#{tag})
         </foreach>
     </insert>
+
     <select id="getTagsIdByTagName" resultType="long">
         SELECT id FROM tags WHERE tag_name IN
         <foreach collection="tagNames" item="tagName" separator="," open="(" close=")">
@@ -27,7 +30,8 @@
 
     <select id="selectByAid" resultType="com.xinder.api.bean.Tags">
         select t.id, t.tag_name
-        from article_tags `at` left join tags t on `at`.tid=t.id
+        from article_tags `at`
+                 left join tags t on `at`.tid = t.id
         where `at`.aid = #{aid}
     </select>
 

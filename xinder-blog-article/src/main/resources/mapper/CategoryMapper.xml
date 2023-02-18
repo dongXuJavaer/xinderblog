@@ -4,7 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xinder.article.mapper.CategoryMapper">
     <select id="getAllCategories" resultType="com.xinder.api.bean.Category">
-        SELECT * FROM category
+        SELECT *
+        FROM category
     </select>
     <delete id="deleteCategoryByIds">
         DELETE FROM category WHERE id IN
@@ -13,9 +14,13 @@
         </foreach>
     </delete>
     <update id="updateCategoryById" parameterType="com.xinder.api.bean.Category">
-        UPDATE category SET cate_name=#{cateName} WHERE id=#{id}
+        UPDATE category
+        SET cate_name=#{cateName}
+        WHERE id = #{id}
     </update>
     <insert id="addCategory" parameterType="com.xinder.api.bean.Category">
-        INSERT INTO category SET date=#{date},cate_name=#{cateName}
+        INSERT INTO category
+        SET date=#{date},
+            cate_name=#{cateName}
     </insert>
 </mapper>
