@@ -62,7 +62,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
             return Result.fail("已经加入该群");
         }
         int i = groupUserMapper.insert(groupUser);
-        return Result.success("加入成功");
+        return i > 0 ? Result.success("加入成功") : Result.success("加入失败");
     }
 
     @Override
