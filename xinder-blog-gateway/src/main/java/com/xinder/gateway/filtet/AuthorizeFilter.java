@@ -39,6 +39,10 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
     private static final String USER_LOGIN_URL = "http://localhost:9000/login";
 
 
+    // 手动放行的路径
+    private static final String USERID_PATH = "/api/user/"; // 根据uid查询用户的路径
+    private static final String USER_ADD_GROUP_PATH = "/api/group/user/add/list/"; // 根据uid查询用户加入的群聊路径
+
     /**
      * 全局过滤器，用来验证用户是否有token（这里只判断有无）
      * 然后加上'Bearer '返回给调用者  之后调用者再拿着token访问对应的微服务（也就是资源服务器），由对应的微服务用公钥对token进行验证
@@ -66,7 +70,8 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
                 || path.startsWith("/api/user/login")
                 || path.startsWith("/api/tags")
                 || path.startsWith("/api/group/list")
-                || judgeGetUser(path)
+                || judgeGetUser(USERID_PATH, path)
+                || judgeGetUser(USER_ADD_GROUP_PATH, path)
         ) {
             // 放行
             Mono<Void> filter = chain.filter(exchange);
@@ -133,17 +138,16 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
     }
 
     // 判断是否是【根据id获取用户】的请求路径
-    private boolean judgeGetUser(String path) {
-        String rootPath = "/api/user/";
+    private boolean judgeGetUser(String rootPath, String path) {
+
         try {
-            Optional.of(path)
+            return Optional.of(path)
                     .filter(str -> str.startsWith(rootPath))
-                    .map(str -> path.substring(rootPath.length(), path.length() - 1))
-                    .map(Long::parseLong);
-        } catch (NumberFormatException e) {
+                    .map(str -> path.substring(rootPath.length()))
+                    .map(Long::parseLong).isPresent();
+        } catch (NumberFormatException | NullPointerException e) {
             return false;
         }
-        return true;
     }
 
     /**
