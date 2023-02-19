@@ -1,5 +1,6 @@
 package com.xinder.gateway.filtet;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -25,6 +26,7 @@ import java.util.Optional;
  * @since 2022-09-05 14:10
  */
 @Component
+@Slf4j
 public class AuthorizeFilter implements GlobalFilter, Ordered {
 
     private final static Logger logger = LoggerFactory.getLogger(AuthorizeFilter.class);
@@ -56,8 +58,8 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         //获取请求的URI  api/user/login?username=zhangsan9527&password=123456
         String path = request.getURI().getPath();
 
-        logger.info("请求路径--{}", path);
-        System.out.println("请求路径---------" + path);
+        log.info("请求路径--{}", path);
+//        System.out.println("请求路径---------" + path);
 
         // 如果请求是blog等开放服务，则直接放行
         if (path.startsWith("/api/article/")
@@ -134,7 +136,7 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
     private boolean judgeGetUser(String path) {
         String rootPath = "/api/user/";
         try {
-            Optional.ofNullable(path)
+            Optional.of(path)
                     .filter(str -> str.startsWith(rootPath))
                     .map(str -> path.substring(rootPath.length(), path.length() - 1))
                     .map(Long::parseLong);
