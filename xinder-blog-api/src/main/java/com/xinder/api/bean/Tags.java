@@ -7,6 +7,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -28,10 +31,12 @@ public class Tags implements Serializable {
 
     @TableField("uid")
     @ApiModelProperty(value = "创建者id")
+    @Field(type = FieldType.Integer)
     private Integer uid;
 
     @TableField("create_time")
     @ApiModelProperty(value = "创建时间")
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second)
     private Date createTime;
 
 }

@@ -218,30 +218,36 @@
 
     <select id="getArticleList" resultMap="articleMap">
         SELECT
-            a.id as id,
-            a.`title` as title,
-            a.summary as summary,
-            a.`edit_time` as edit_time,
-            a.`page_view` as page_view,
-            a.`state` as state ,
-            a.`create_time` as create_time ,
-            a.`read_count` as read_count,
-            a.uid as uid,
-            a.head_pic as head_pic,
-            u.`nickname` as nickname,
-            c.`cate_name` as cate_name
+        a.id as id,
+        a.`title` as title,
+        a.summary as summary,
+        a.`edit_time` as edit_time,
+        a.`page_view` as page_view,
+        a.`state` as state ,
+        a.`create_time` as create_time ,
+        a.`read_count` as read_count,
+        a.uid as uid,
+        a.cid as cid,
+        a.head_pic as head_pic,
+        u.`nickname` as nickname,
+        c.`cate_name` as cate_name
         FROM article a, `user` u, category c
         WHERE a.`cid`=c.`id` AND a.`uid`=u.`id`
-        <if test="req.state != null">
-            and a.state = #{req.state}
+        <if test="req != null">
+            <if test="req.state != null">
+                and a.state = #{req.state}
+            </if>
+            <if test="req.uid != null">
+                and a.uid = #{req.uid}
+            </if>
         </if>
-        <if test="req.uid != null">
-            and a.uid = #{req.uid}
-        </if>
+
         <if test="keywords != null and keywords != ''">
             AND title LIKE concat('%',#{keywords},'%')
         </if>
         ORDER BY a.id DESC
-        limit #{offset}, #{req.pageSize};
+        <if test="offset != null and req.pageSize != null">
+            limit #{offset}, #{req.pageSize};
+        </if>
     </select>
 </mapper>

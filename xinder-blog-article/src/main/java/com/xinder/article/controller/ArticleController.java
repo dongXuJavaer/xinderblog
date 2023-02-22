@@ -37,7 +37,7 @@ public class ArticleController extends AbstractController implements ArticleApi 
     String bucket = "xinderblog";
 
     @Autowired
-    ArticleServiceImpl articleServiceImpl;
+    ArticleServiceImpl articleServiceImpl; // 有些方法父类没有 用该service
 
     @Autowired
     ArticleService articleService;
@@ -173,5 +173,9 @@ public class ArticleController extends AbstractController implements ArticleApi 
         return buildJson(result);
     }
 
-
+    @Override
+    public BaseResponse<Result> importArticle() {
+        Result result = articleService.importArticle();
+        return buildJson(result);
+    }
 }

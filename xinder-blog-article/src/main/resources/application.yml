@@ -18,9 +18,15 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+  elasticsearch:
+    rest:
+      uris: http://192.168.222.44:9200  #此处配置elasticsearch的访问地址
 
 mybatis:
-  config-location: classpath:/mybatis-config.xml
+  config-location: classpath:mybatis-config.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.log4j2.Log4j2Impl
+
 
 server:
   port: 8082
@@ -39,12 +45,12 @@ mybatis-plus:
 
 
 
-auth:
-  ttl: 3600000  #token过期时间
-  clientId: dongyimai  #客户端账号
-  clientSecret: 123 #客户端密码
-  cookieDomain: localhost #cookie域名
-  cookieMaxAge: -1     #cookie有效期
+#auth:
+#  ttl: 3600000  #token过期时间
+#  clientId: dongyimai  #客户端账号
+#  clientSecret: 123 #客户端密码
+#  cookieDomain: localhost #cookie域名
+#  cookieMaxAge: -1     #cookie有效期
 
 
 # hystrix:

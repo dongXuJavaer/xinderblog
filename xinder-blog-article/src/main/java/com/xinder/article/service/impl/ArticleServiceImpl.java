@@ -9,19 +9,30 @@ import com.xinder.api.request.ArticleDtoReq;
 import com.xinder.api.response.dto.ArticleListDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
+import com.xinder.article.mapper.ArticleESMapper;
 import com.xinder.article.mapper.ArticleMapper;
 import com.xinder.article.mapper.ArticleTagsMapper;
 import com.xinder.article.mapper.TagsMapper;
 import com.xinder.article.service.ArticleService;
 import com.xinder.common.util.TokenDecode;
 import com.xinder.common.util.Util;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.core.*;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Function;
@@ -54,6 +65,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private ArticleESMapper articleESMapper;
+
+    @Autowired
+    private ElasticsearchRestTemplate elasticsearchRestTemplate;
+
     public int addNewArticle(Article article) {
         //处理文章摘要
         if (article.getSummary() == null || "".equals(article.getSummary())) {
@@ -80,6 +97,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                     return tags;
                 }
             }
+            articleESMapper.save(article);
             return i;
         } else {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -98,6 +116,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                     return tags;
                 }
             }
+            articleESMapper.save(article);
             return i;
         }
     }
@@ -182,8 +201,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Long currentPage = req.getCurrentPage();
         Long offset = (currentPage - 1) * pageSize;
         req.setState(1);
-        Long rows = articleMapper.getCount(req, keywords);
-        List<Article> articleList = articleMapper.getArticleList(req, offset, keywords);
+
+        // ES搜索
+        NativeSearchQuery query = buildNativeSearchQuery(currentPage, pageSize, keywords);
+        SearchHits<Article> searchHits = getSearchHits(query);
+        List<Article> articleList = queryByES(query, searchHits);
 
         articleList.forEach(item -> {
             if (StringUtils.isEmpty(item.getHeadPic())) {
@@ -193,6 +215,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
 
         ArticleListDtoResult dtoResult = DtoResult.dataDtoSuccess(ArticleListDtoResult.class);
+        Long rows = searchHits.getTotalHits();
         long totalPage = Double.valueOf(Math.ceil((float) rows / (float) pageSize)).longValue();
         dtoResult.setTotalCount(rows);
         dtoResult.setTotalPage(totalPage);
@@ -217,6 +240,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      * @return
      */
     private boolean addReadCount(Article article) {
+        articleESMapper.save(article);
         article.setReadCount(article.getReadCount() + 1);
         return articleMapper.updateById(article) > 0;
     }
@@ -233,6 +257,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     @Override
+    @Transactional
     public Result publish(Article article) {
         // 判断是新发表文章还是修改
         if (article.getId() == null || article.getId() == -1) {
@@ -251,6 +276,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             });
         }
 
+        articleESMapper.save(article);
         return Result.success("成功");
     }
 
@@ -286,5 +312,101 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         });
     }
 
+    private NativeSearchQuery buildNativeSearchQuery(Long currentPage, Integer pageSize, String keywords) {
+        // 1. 创建 查询对象的构建对象 NativeSearchQueryBuilder
+        NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
+        // 2. 设置查询的条件
+        //使用：QueryBuilders.matchQuery("title", keywords) ，搜索华为 ---> 华    为 二字可以拆分查询，
+        //使用：QueryBuilders.matchPhraseQuery("title", keywords) 华为二字不拆分查询
+//        nativeSearchQueryBuilder.withQuery(QueryBuilders.matchQuery("title", keywords));
+        if (StringUtils.isEmpty(keywords)) {
+            builder.withQuery(QueryBuilders.matchAllQuery());
+        } else {
+            builder.withQuery(QueryBuilders.multiMatchQuery(keywords, "title", "summary"));
+        }
 
+        builder.withPageable(PageRequest.of(currentPage.intValue() - 1, pageSize))//   分页
+                .withSort(SortBuilders.fieldSort("readCount").order(SortOrder.DESC)) // 排序
+                .withHighlightFields(new HighlightBuilder.Field("title"), new HighlightBuilder.Field("summary"))  // 设置高亮属性
+                .withHighlightBuilder(new HighlightBuilder().preTags("<span style=\"color:red\">").postTags("</span>")) // 高亮标识
+        ;
+
+        //4.构建查询对象
+        NativeSearchQuery query = builder.build();
+        return query;
+    }
+
+    private SearchHits<Article> getSearchHits(NativeSearchQuery query) {
+        //5.执行查询
+        SearchHits<Article> searchHits = elasticsearchRestTemplate.search(query, Article.class);
+        return searchHits;
+    }
+
+    // ES搜索
+    private List<Article> queryByES(NativeSearchQuery query, SearchHits<Article> searchHits) {
+
+        //对搜索searchHits集合进行分页封装
+        SearchPage<Article> searchPage = SearchHitSupport.searchPageFor(searchHits, query.getPageable());
+
+        // 获取命中的列
+        List<SearchHit<Article>> hitList = searchPage.getContent();
+        List<Article> articleList = new ArrayList<>(hitList.size());
+        // 获取命中的每行数据
+        hitList.forEach(searchHit -> {
+            Article content = searchHit.getContent();
+            Article article = new Article();
+            // 进行复制，目的的为了释放空间
+            BeanUtils.copyProperties(content, article);
+
+            // 获取设置了高亮的属性与其对应值
+            Map<String, List<String>> highlightFieldsMap = searchHit.getHighlightFields();
+            highlightFieldsMap.forEach((key, fragments) -> setHighlight(article, "title", key, fragments));
+            highlightFieldsMap.forEach((key, fragments) -> setHighlight(article, "summary", key, fragments));
+            articleList.add(article);
+
+        });
+        return articleList;
+    }
+
+    /**
+     * @param article
+     * @param fieldName 需要高亮的字段
+     * @param key       已经获取了的 设置了高亮的属性字段名
+     * @param fragments 获取的已经获取了的 设置了高亮的值
+     */
+    private void setHighlight(Article article, String fieldName, String key, List<String> fragments) {
+        // 判断是否是需要设置的字段
+        if (!key.equals(fieldName)) {
+            return;
+        }
+        Class<? extends Article> cls = article.getClass();
+        Field[] fields = cls.getDeclaredFields();
+        Arrays.stream(fields).forEach(field -> {
+            if (field.getName().equals(fieldName)) {
+                StringBuffer sb = new StringBuffer();
+                for (String s : fragments) {
+                    sb.append(s);
+                }
+                try {
+                    Field instanceField = cls.getDeclaredField(fieldName);
+                    instanceField.setAccessible(true);
+                    instanceField.set(article, sb.toString());
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    @Override
+    public Result importArticle() {
+        try {
+            List<Article> articleList = articleMapper.getArticleList(null, null, null);
+            articleESMapper.saveAll(articleList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.fail("导入失败");
+        }
+        return Result.success("导入成功");
+    }
 }

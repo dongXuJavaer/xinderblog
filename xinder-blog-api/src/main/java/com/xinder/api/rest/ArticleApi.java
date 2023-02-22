@@ -73,7 +73,17 @@ public interface ArticleApi {
      * @param article ..
      * @return
      */
-    @ApiOperation(value = "发表/修改 帖子", notes = "发表/修改 帖子----", tags = {"ArticleController"})
+    @ApiOperation(value = "发表/修改 帖子", notes = "发表/修改 帖子", tags = {"ArticleController"})
     @RequestMapping(value = "/publish", method = RequestMethod.POST)
     BaseResponse<Result> publish(@RequestBody Article article);
+
+    /**
+     * 导入数据
+     * @return
+     */
+    @ApiOperation(value = "导入数据", notes = "导入数据", tags = {"ArticleController"})
+    @RequestMapping(value = "/import", method = RequestMethod.GET)
+    BaseResponse<Result> importArticle();
+
+
 }

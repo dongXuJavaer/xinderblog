@@ -41,4 +41,10 @@ public interface ArticleService extends IService<Article> {
      * @return
      */
     Result publish(Article article);
+
+    /**
+     * 数据导入es
+     * @return
+     */
+    Result importArticle();
 }
