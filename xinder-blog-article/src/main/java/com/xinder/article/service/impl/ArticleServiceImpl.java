@@ -1,6 +1,7 @@
 package com.xinder.article.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinder.api.bean.Article;
 import com.xinder.api.bean.ArticleTags;
@@ -14,6 +15,8 @@ import com.xinder.article.mapper.ArticleMapper;
 import com.xinder.article.mapper.ArticleTagsMapper;
 import com.xinder.article.mapper.TagsMapper;
 import com.xinder.article.service.ArticleService;
+import com.xinder.common.util.SFunction;
+import com.xinder.common.util.SerializedLambdaUtil;
 import com.xinder.common.util.TokenDecode;
 import com.xinder.common.util.Util;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -206,6 +209,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         NativeSearchQuery query = buildNativeSearchQuery(currentPage, pageSize, keywords);
         SearchHits<Article> searchHits = getSearchHits(query);
         List<Article> articleList = queryByES(query, searchHits);
+        Long rows = searchHits.getTotalHits();
 
         articleList.forEach(item -> {
             if (StringUtils.isEmpty(item.getHeadPic())) {
@@ -213,9 +217,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             }
         });
 
-
         ArticleListDtoResult dtoResult = DtoResult.dataDtoSuccess(ArticleListDtoResult.class);
-        Long rows = searchHits.getTotalHits();
         long totalPage = Double.valueOf(Math.ceil((float) rows / (float) pageSize)).longValue();
         dtoResult.setTotalCount(rows);
         dtoResult.setTotalPage(totalPage);
@@ -327,7 +329,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         builder.withPageable(PageRequest.of(currentPage.intValue() - 1, pageSize))//   分页
                 .withSort(SortBuilders.fieldSort("readCount").order(SortOrder.DESC)) // 排序
-                .withHighlightFields(new HighlightBuilder.Field("title"), new HighlightBuilder.Field("summary"))  // 设置高亮属性
+                .withHighlightFields(
+                        new HighlightBuilder.Field(SerializedLambdaUtil.getFieldName(Article::getTitle)),
+                        new HighlightBuilder.Field(SerializedLambdaUtil.getFieldName(Article::getSummary)))  // 设置高亮属性
                 .withHighlightBuilder(new HighlightBuilder().preTags("<span style=\"color:red\">").postTags("</span>")) // 高亮标识
         ;
 
@@ -360,8 +364,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
             // 获取设置了高亮的属性与其对应值
             Map<String, List<String>> highlightFieldsMap = searchHit.getHighlightFields();
-            highlightFieldsMap.forEach((key, fragments) -> setHighlight(article, "title", key, fragments));
-            highlightFieldsMap.forEach((key, fragments) -> setHighlight(article, "summary", key, fragments));
+            highlightFieldsMap.forEach((key, fragments) -> setHighlight(article, Article::getTitle, key, fragments));
+            highlightFieldsMap.forEach((key, fragments) -> setHighlight(article, Article::getSummary, key, fragments));
             articleList.add(article);
 
         });
@@ -370,11 +374,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     /**
      * @param article
-     * @param fieldName 需要高亮的字段
+     * @param sFunction 需要高亮的字段的geeter方法引用
      * @param key       已经获取了的 设置了高亮的属性字段名
      * @param fragments 获取的已经获取了的 设置了高亮的值
      */
-    private void setHighlight(Article article, String fieldName, String key, List<String> fragments) {
+    private <T, R> void setHighlight(Article article, SFunction<T, R> sFunction, String key, List<String> fragments) {
+
+        String fieldName = SerializedLambdaUtil.getFieldName(sFunction);
         // 判断是否是需要设置的字段
         if (!key.equals(fieldName)) {
             return;
