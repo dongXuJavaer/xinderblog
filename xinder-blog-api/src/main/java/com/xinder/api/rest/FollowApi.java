@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author Xinder
  * @date 2023-02-03 18:20
  */
-@Api(tags = "CategoryApi")
+@Api(tags = "FollowApi")
 @RequestMapping("/follow")
 public interface FollowApi {
 

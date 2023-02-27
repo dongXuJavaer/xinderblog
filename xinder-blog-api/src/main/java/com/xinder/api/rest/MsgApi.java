@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author Xinder
  * @date 2023-02-16 15:48
  */
-@Api(tags = "SocketInfoApi")
+@Api(tags = "MsgApi")
 @RequestMapping("/msg")
 public interface MsgApi {
 

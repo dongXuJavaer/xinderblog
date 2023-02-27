@@ -210,11 +210,13 @@ public class WebSocketService {
                     .map(GroupUser::getUid).collect(Collectors.toList());
             groupUserIdList.add(group.getCreateUser());
 
-            groupUserIdList.forEach(uid ->
-                    Optional.ofNullable(sessionMap.get(uid))
-                            .ifPresent(session -> sendMsg(session, msgDtoResult)));
-            socketInfoService.addSocket(socketMsgReq.getToId(), socketMsgReq.getFromUid(),
-                    SocketMsgTypeEnums.MSG_GROUP.getCode());
+            groupUserIdList.forEach(uid -> {
+                Optional.ofNullable(sessionMap.get(uid))
+                        .ifPresent(session -> sendMsg(session, msgDtoResult));
+                socketInfoService.addSocket(uid, socketMsgReq.getToId(),
+                        SocketMsgTypeEnums.MSG_GROUP.getCode());
+            });
+
             return insert > 0;
         });
     }
