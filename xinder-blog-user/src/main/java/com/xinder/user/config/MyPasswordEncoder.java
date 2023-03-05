@@ -8,13 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 
 /**
- * @作者 江南一点雨
- * @微信公众号 江南一点雨
- * @网站 http://www.itboyhub.com
- * @国际站 http://www.javaboy.org
- * @微信 a_java_boy
- * @GitHub https://github.com/lenve
- * @Gitee https://gitee.com/lenve
+ * Created by xinder on 2023-01-05
  */
 @Component
 public class MyPasswordEncoder extends BCryptPasswordEncoder {
@@ -40,7 +34,7 @@ public class MyPasswordEncoder extends BCryptPasswordEncoder {
         logger.info("[MyPasswordEncoder.matches]后端校验  加密密码:" + encodedPassword);
 
         // 传来密码如果与加密密码一样，则是qq登录
-        if (pwd.equals(encodedPassword)){
+        if (pwd.equals(encodedPassword)) {
             return true;
         }
         return super.matches(rawPassword, encodedPassword);
