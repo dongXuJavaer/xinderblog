@@ -44,7 +44,6 @@
         <result column="html_content" property="htmlContent"/>
         <result column="summary" property="summary"/>
         <result column="edit_time" property="editTime"/>
-        <result column="page_view" property="pageView"/>
         <result column="state" property="state"/>
         <result column="read_count" property="readCount"/>
         <result column="create_time" property="createTime"/>
@@ -65,7 +64,7 @@
         a.`title` as title,
         a.summary as summary,
         a.`edit_time` as edit_time,
-        a.`page_view` as page_view,
+<!--        a.`page_view` as page_view,-->
         a.`state` as state ,
         a.`create_time` as create_time ,
         a.uid as uid,
@@ -141,7 +140,7 @@
                a.html_content,
                a.summary       as summary,
                a.`edit_time`   as edit_time,
-               a.`page_view`   as page_view,
+<!--               a.`page_view`   as page_view,-->
                a.`state`       as state,
                a.`create_time` as create_time,
                a.uid           as uid,
@@ -222,7 +221,7 @@
         a.`title` as title,
         a.summary as summary,
         a.`edit_time` as edit_time,
-        a.`page_view` as page_view,
+<!--        a.`page_view` as page_view,-->
         a.`state` as state ,
         a.`create_time` as create_time ,
         a.`read_count` as read_count,

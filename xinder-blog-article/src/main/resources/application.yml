@@ -8,10 +8,10 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
-  redis:
-    host: 39.105.106.135
-    port: 6379
-    password: 123456789PP
+#  redis:
+#    host: 39.105.106.135
+#    port: 6379
+#    password: 123456789PP
   main:
     allow-bean-definition-overriding: true
   servlet:
@@ -20,7 +20,7 @@ spring:
       max-request-size: 50MB
   elasticsearch:
     rest:
-      uris: http://192.168.222.44:9200  #此处配置elasticsearch的访问地址
+      uris: http://140.210.209.238:9200  #此处配置elasticsearch的访问地址
 
 mybatis:
   config-location: classpath:mybatis-config.xml
