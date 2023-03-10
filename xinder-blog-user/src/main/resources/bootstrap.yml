@@ -4,10 +4,10 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: http://39.105.106.135:8848
+        server-addr: http://140.210.209.238:8848
         namespace: 84c90b39-8826-48bc-bef4-d66ae40e1c73
       config:
-        server-addr: http://39.105.106.135:8848
+        server-addr: http://140.210.209.238:8848
         file-extension: yml
         namespace: 84c90b39-8826-48bc-bef4-d66ae40e1c73
         extension-configs[0]:  # 配置
