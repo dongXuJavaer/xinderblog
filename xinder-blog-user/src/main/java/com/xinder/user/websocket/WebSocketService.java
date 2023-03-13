@@ -30,6 +30,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
+import static com.xinder.api.enums.SocketMsgTypeEnums.MSG_PRIVATE;
+
 /**
  * @author Xinder
  * @date 2023-02-14 17:37
@@ -126,12 +128,14 @@ public class WebSocketService {
         SocketMsgReq socketMsgReq = JSON.parseObject(message, SocketMsgReq.class);
         // 过滤
         socketMsgReq.setContent(ContentFilterUtils.filter(socketMsgReq.getContent()));
-        if (SocketMsgTypeEnums.MSG_PRIVATE.getCode().equals(socketMsgReq.getType())) {
-            // ======> 发送私信消息
-            sendPrivateMsg(socketMsgReq);
-        } else if (SocketMsgTypeEnums.MSG_GROUP.getCode().equals(socketMsgReq.getType())) {
-            // ======> 发送群聊消息
-            sendGroupMsg(socketMsgReq);
+        SocketMsgTypeEnums msgType = SocketMsgTypeEnums.getMsgType(socketMsgReq.getType());
+        switch (msgType) {
+            case MSG_PRIVATE:  // ======> 发送私信消息
+                sendPrivateMsg(socketMsgReq);
+                break;
+            case MSG_GROUP:   // ======> 发送群聊消息
+                sendGroupMsg(socketMsgReq);
+                break;
         }
     }
 

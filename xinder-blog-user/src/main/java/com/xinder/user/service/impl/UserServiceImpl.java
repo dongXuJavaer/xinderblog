@@ -296,6 +296,7 @@ public class UserServiceImpl implements UserService {
         transactionTemplate.execute(status -> {
             redisTemplate.opsForValue().set(userKey, user, 30, TimeUnit.MINUTES);
             int i = userMapper.updateById(user);
+            // TODO: 2023-03-10 修改个人账号后，token里面的username要同步修改
             return i;
         });
 

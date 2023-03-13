@@ -1,10 +1,10 @@
 spring:
-  datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql:///vueblog2?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    username: root
-    password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
+#  datasource:
+#    type: com.alibaba.druid.pool.DruidDataSource
+#    url: jdbc:mysql:///vueblog2?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+#    username: root
+#    password: root
+#    driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
@@ -12,6 +12,8 @@ spring:
 #    host: 39.105.106.135
 #    port: 6379
 #    password: 123456789PP
+  security:
+    strategy: MODE_GLOBAL
 
 mybatis:
   config-location: classpath:/mybatis-config.xml
@@ -28,6 +30,9 @@ logging:
 
 mybatis-plus:
   mapper-locations: classpath:mapper/*Mapper.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
 
 auth:
   ttl: 3600000  #token过期时间

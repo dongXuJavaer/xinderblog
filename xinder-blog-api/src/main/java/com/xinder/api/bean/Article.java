@@ -91,8 +91,8 @@ public class Article implements Serializable {
     @Field(type = FieldType.Keyword)
     private String cateName;
 
-    @TableField(value = "page_view")
-    private Integer pageView;
+//    @TableField(value = "page_view")
+//    private Integer pageView;
 
     @TableField(exist = false)
     @ApiModelProperty(value = "包含的标签")

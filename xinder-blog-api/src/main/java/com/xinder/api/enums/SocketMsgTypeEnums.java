@@ -31,4 +31,14 @@ public enum SocketMsgTypeEnums {
     public void setDesc(String desc) {
         this.desc = desc;
     }
+
+    public static SocketMsgTypeEnums getMsgType(Integer msgType) {
+        for (SocketMsgTypeEnums value : SocketMsgTypeEnums.values()) {
+            if (value.getCode().equals(msgType)) {
+                return value;
+            }
+        }
+        // 理论上不会走进这里
+        throw new IllegalArgumentException("unknown msgType:" + msgType);
+    }
 }

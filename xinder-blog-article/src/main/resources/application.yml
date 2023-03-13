@@ -24,8 +24,6 @@ spring:
 
 mybatis:
   config-location: classpath:mybatis-config.xml
-  configuration:
-    log-impl: org.apache.ibatis.logging.log4j2.Log4j2Impl
 
 
 server:
@@ -41,6 +39,7 @@ logging:
 mybatis-plus:
   mapper-locations: classpath:mapper/*Mapper.xml
   configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     map-underscore-to-camel-case: true
 
 
