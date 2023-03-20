@@ -16,7 +16,7 @@
 
         <dependency>
             <groupId>com.xinder.blog</groupId>
-            <artifactId>xinder-blog-comm</artifactId>
+            <artifactId>xinder-blog-common</artifactId>
             <version>1.0</version>
             <exclusions>
                 <exclusion>
