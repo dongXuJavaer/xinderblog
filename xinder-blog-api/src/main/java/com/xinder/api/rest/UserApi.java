@@ -79,4 +79,15 @@ public interface UserApi {
     @ApiOperation(value = "上传头像", notes = "上传头像", tags = {"UserApi"})
     @PostMapping("/upload/head")
     BaseResponse<String> uploadHeadImg(@RequestParam("file") MultipartFile file);
+
+    /**
+     * 获取用户总数
+     *
+     * @return
+     */
+    @ApiOperation(value = "获取用户总数", notes = "获取用户总数", tags = {"UserApi"})
+    @PostMapping("/num")
+    BaseResponse<DtoResult> userCount();
+
+
 }

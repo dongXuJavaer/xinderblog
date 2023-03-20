@@ -8,8 +8,10 @@ import com.xinder.api.bean.ArticleTags;
 import com.xinder.api.bean.Tags;
 import com.xinder.api.request.ArticleDtoReq;
 import com.xinder.api.response.dto.ArticleListDtoResult;
+import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
+import com.xinder.article.feign.UserFeignClient;
 import com.xinder.article.mapper.ArticleESMapper;
 import com.xinder.article.mapper.ArticleMapper;
 import com.xinder.article.mapper.ArticleTagsMapper;
@@ -73,6 +75,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Autowired
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
+
+    @Autowired
+    private UserFeignClient userFeignClient;
 
     public int addNewArticle(Article article) {
         //处理文章摘要
@@ -263,6 +268,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public Result publish(Article article) {
         // 判断是新发表文章还是修改
         if (article.getId() == null || article.getId() == -1) {
+
+            UserDtoResult userDtoResult = userFeignClient.currentUser().getData();
+            System.out.println(userDtoResult);
+            article.setUid(userDtoResult.getId());
+
             //处理文章摘要
             if (StringUtils.isEmpty(article.getSummary())) {
                 //直接截取
@@ -414,5 +424,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             return Result.fail("导入失败");
         }
         return Result.success("导入成功");
+    }
+
+    @Override
+    public DtoResult getCount() {
+        long count = articleESMapper.count();
+        DtoResult success = DtoResult.success();
+        success.setData(count);
+        return success;
     }
 }

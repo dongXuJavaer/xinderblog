@@ -85,5 +85,12 @@ public interface ArticleApi {
     @RequestMapping(value = "/import", method = RequestMethod.GET)
     BaseResponse<Result> importArticle();
 
+    /**
+     * 统计帖子数量
+     * @return
+     */
+    @ApiOperation(value = "统计帖子数量", notes = "统计帖子数量", tags = {"ArticleController"})
+    @RequestMapping(value = "/num", method = RequestMethod.POST)
+    BaseResponse<DtoResult> initNum();
 
 }

@@ -47,4 +47,10 @@ public interface ArticleService extends IService<Article> {
      * @return
      */
     Result importArticle();
+
+    /**
+     * 统计所有帖子总数
+     * @return
+     */
+    DtoResult getCount();
 }

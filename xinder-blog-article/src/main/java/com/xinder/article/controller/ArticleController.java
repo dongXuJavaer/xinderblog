@@ -178,4 +178,10 @@ public class ArticleController extends AbstractController implements ArticleApi 
         Result result = articleService.importArticle();
         return buildJson(result);
     }
+
+    @Override
+    public BaseResponse<DtoResult> initNum() {
+        DtoResult result = articleServiceImpl.getCount();
+        return buildJson(result);
+    }
 }

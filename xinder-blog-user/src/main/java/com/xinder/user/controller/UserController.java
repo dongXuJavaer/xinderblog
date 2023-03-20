@@ -110,6 +110,7 @@ public class UserController extends AbstractController implements UserApi {
         return buildJson(userDtoResult);
     }
 
+    @Override
     public BaseResponse<DtoResult> logout() {
         DtoResult dtoResult = userServiceImpl.logout();
         return buildJson(dtoResult);
@@ -137,5 +138,11 @@ public class UserController extends AbstractController implements UserApi {
             return buildJson(ResultCode.FAIL.getCode(), ResultCode.FAIL.getDesc());
         }
         return buildJson(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getDesc(), url);
+    }
+
+    @Override
+    public BaseResponse<DtoResult> userCount() {
+        DtoResult dtoResult = userServiceImpl.getUserCount();
+        return buildJson(dtoResult);
     }
 }

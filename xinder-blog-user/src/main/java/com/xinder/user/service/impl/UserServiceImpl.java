@@ -1,6 +1,7 @@
 package com.xinder.user.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
 import com.xinder.api.enums.QQLoginEnums;
@@ -53,7 +54,7 @@ import java.util.concurrent.TimeUnit;
  * Created by sang on 2017/12/17.
  */
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     private final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -306,5 +307,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public Result uploadHeadImg(MultipartFile file) {
         return null;
+    }
+
+    @Override
+    public DtoResult getUserCount() {
+        int count = count();
+        DtoResult result = DtoResult.success();
+        result.setData(count);
+        return result;
     }
 }
