@@ -17,7 +17,9 @@ import reactor.core.publisher.Mono;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 认证拦截器，实现了全局拦截器（GlobalFilter）接口与可排序接口（Ordered）
@@ -39,9 +41,16 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
     private static final String USER_LOGIN_URL = "http://localhost:9000/login";
 
 
-    // 手动放行的路径
+    /*
+        手动放行的路径
+     */
     private static final String USERID_PATH = "/api/user/"; // 根据uid查询用户的路径
     private static final String USER_ADD_GROUP_PATH = "/api/group/user/add/list/"; // 根据uid查询用户加入的群聊路径
+    // 访问用户Api下，无需令牌的路径
+    private static final ArrayList<String> THROUGH_USER_PATH = new ArrayList<String>() {{
+        add("/api/user/num");
+        add("/api/user/login");
+    }};
 
     /**
      * 全局过滤器，用来验证用户是否有token（这里只判断有无）
@@ -65,11 +74,20 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         log.info("请求路径--{}", path);
 //        System.out.println("请求路径---------" + path);
 
+
+        AtomicBoolean throughFlag = new AtomicBoolean(false);  // 直接放行的标志
+        THROUGH_USER_PATH.forEach(item -> {
+            if (path.startsWith(item)) {
+                throughFlag.set(true);
+            }
+        });
+
         // 如果请求是blog等开放服务，则直接放行
         if (path.startsWith("/api/article/")
-                || path.startsWith("/api/user/login")
+                || throughFlag.get()
                 || path.startsWith("/api/tags")
                 || path.startsWith("/api/group/list")
+                || path.startsWith("/api/comment/num")
                 || judgeGetUser(USERID_PATH, path)
                 || judgeGetUser(USER_ADD_GROUP_PATH, path)
         ) {
