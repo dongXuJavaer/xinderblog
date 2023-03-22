@@ -21,6 +21,7 @@ import com.xinder.common.util.SFunction;
 import com.xinder.common.util.SerializedLambdaUtil;
 import com.xinder.common.util.TokenDecode;
 import com.xinder.common.util.Util;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -211,7 +212,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         req.setState(1);
 
         // ES搜索
-        NativeSearchQuery query = buildNativeSearchQuery(currentPage, pageSize, keywords);
+        NativeSearchQuery query = buildNativeSearchQuery(currentPage, pageSize, keywords, req.getCid());
         SearchHits<Article> searchHits = getSearchHits(query);
         List<Article> articleList = queryByES(query, searchHits);
         Long rows = searchHits.getTotalHits();
@@ -324,7 +325,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         });
     }
 
-    private NativeSearchQuery buildNativeSearchQuery(Long currentPage, Integer pageSize, String keywords) {
+    private NativeSearchQuery buildNativeSearchQuery(Long currentPage, Integer pageSize, String keywords, Long cid) {
         // 1. 创建 查询对象的构建对象 NativeSearchQueryBuilder
         NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
         // 2. 设置查询的条件
@@ -344,6 +345,15 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                         new HighlightBuilder.Field(SerializedLambdaUtil.getFieldName(Article::getSummary)))  // 设置高亮属性
                 .withHighlightBuilder(new HighlightBuilder().preTags("<span style=\"color:red\">").postTags("</span>")) // 高亮标识
         ;
+
+        // 3. 封装分类过滤(布尔检索)
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        if (cid != null && cid != -1L) {
+            boolQueryBuilder.filter(QueryBuilders.termQuery("cid", cid));
+        }
+
+        // 关联过滤
+        builder.withFilter(boolQueryBuilder);
 
         //4.构建查询对象
         NativeSearchQuery query = builder.build();

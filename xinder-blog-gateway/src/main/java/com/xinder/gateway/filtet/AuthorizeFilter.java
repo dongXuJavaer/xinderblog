@@ -88,6 +88,8 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
                 || path.startsWith("/api/tags")
                 || path.startsWith("/api/group/list")
                 || path.startsWith("/api/comment/num")
+                || path.startsWith("/api/tags/all")
+                || path.startsWith("/api/category/all")
                 || judgeGetUser(USERID_PATH, path)
                 || judgeGetUser(USER_ADD_GROUP_PATH, path)
         ) {
@@ -121,7 +123,6 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
                 e.printStackTrace();
             }
             return needAuthorization(USER_LOGIN_URL + "?from=" + url, exchange);
-
         }
 
         try {
