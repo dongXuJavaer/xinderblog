@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Created by sang on 2017/12/17.
+ * Created by xinder on 2022/12/17.
  */
 @TableName("user")
 @Data
@@ -72,6 +72,10 @@ public class User implements Serializable {
     @ApiModelProperty(value = "用户等级")
     @TableField(value = "level")
     private Integer level;
+
+    @ApiModelProperty(value = "用户积分")
+    @TableField(value = "point")
+    private Integer point;
 
     @ApiModelProperty(value = "openid（qq登录的对应的）")
     @TableField(value = "openid")
