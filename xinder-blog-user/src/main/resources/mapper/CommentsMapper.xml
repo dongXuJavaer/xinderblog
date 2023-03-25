@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinder.user.mapper.CommentsMapper">
+    <resultMap id="baseMap" type="com.xinder.api.bean.Comments">
+        <id column="id" property="id"/>
+        <result column="aid" property="aid"/>
+        <result column="content" property="content"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="up" property="up"/>
+        <result column="uid" property="uid"/>
+        <result column="create_time1" property="createTime"/>
+        <result column="uid" property="user.id"/>
+        <result column="userface" property="user.userface"/>
+        <result column="nickname" property="user.nickname"/>
+        <result column="create_time2" property="user.createTime"/>
+    </resultMap>
+
+    <select id="getRootListByAid" resultMap="baseMap">
+        select c.id,
+               c.aid,
+               c.content,
+               c.parent_id,
+               c.up,
+               c.uid,
+               c.create_time as create_time1,
+               u.userface,
+               u.nickname,
+               u.create_time as create_time2
+        from comments as c
+                 left join `user` as u on c.uid = u.id
+        where parent_id is null
+          and aid = #{aid}
+        order by c.id
+    </select>
+
+    <select id="getListByParentId" resultMap="baseMap">
+        select c.id,
+               c.aid,
+               c.content,
+               c.parent_id,
+               c.up,
+               c.uid,
+               c.create_time as create_time1,
+               u.userface,
+               u.nickname,
+               u.create_time as create_time2
+        from comments as c
+                 left join `user` as u on c.uid = u.id
+        where aid = #{aid}
+          and parent_id = #{parentId}
+        order by c.id
+    </select>
+</mapper>

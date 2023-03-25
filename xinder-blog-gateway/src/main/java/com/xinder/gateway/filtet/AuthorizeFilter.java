@@ -46,6 +46,7 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
      */
     private static final String USERID_PATH = "/api/user/"; // 根据uid查询用户的路径
     private static final String USER_ADD_GROUP_PATH = "/api/group/user/add/list/"; // 根据uid查询用户加入的群聊路径
+    private static final String ARTICLE_COMMENT_LIST = "/api/comments/list/"; // 查询帖子的评论
     // 访问用户Api下，无需令牌的路径
     private static final ArrayList<String> THROUGH_USER_PATH = new ArrayList<String>() {{
         add("/api/user/num");
@@ -90,8 +91,9 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
                 || path.startsWith("/api/comment/num")
                 || path.startsWith("/api/tags/all")
                 || path.startsWith("/api/category/all")
-                || judgeGetUser(USERID_PATH, path)
-                || judgeGetUser(USER_ADD_GROUP_PATH, path)
+                || judgeRestGet(USERID_PATH, path)
+                || judgeRestGet(USER_ADD_GROUP_PATH, path)
+                || judgeRestGet(ARTICLE_COMMENT_LIST, path)
         ) {
             // 放行
             Mono<Void> filter = chain.filter(exchange);
@@ -156,8 +158,8 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         return response.setComplete();
     }
 
-    // 判断是否是【根据id获取用户】的请求路径
-    private boolean judgeGetUser(String rootPath, String path) {
+    // 判断是否是【根据id获取】的rest请求风格的请求路径
+    private boolean judgeRestGet(String rootPath, String path) {
 
         try {
             return Optional.of(path)

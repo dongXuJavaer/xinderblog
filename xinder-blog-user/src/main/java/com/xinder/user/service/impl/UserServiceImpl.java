@@ -197,7 +197,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         AuthToken authToken = authService.login(username, password, clientId, clientSecret);
-
+        response.addHeader("Token", authToken.getAccessToken());
         CookieUtils.addCookie(response, cookieDomain,
                 "/", "Authorization", authToken.getAccessToken(), cookieMaxAge, false);
 
