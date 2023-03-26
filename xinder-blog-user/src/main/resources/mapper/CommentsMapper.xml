@@ -32,7 +32,7 @@
                  left join `user` as u on c.uid = u.id
         where parent_id is null
           and aid = #{aid}
-        order by c.id
+        order by c.id desc
     </select>
 
     <select id="getListByParentId" resultMap="baseMap">
@@ -50,6 +50,6 @@
                  left join `user` as u on c.uid = u.id
         where aid = #{aid}
           and parent_id = #{parentId}
-        order by c.id
+        order by c.id desc
     </select>
 </mapper>

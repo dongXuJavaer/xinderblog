@@ -44,7 +44,7 @@ public class Comments implements Serializable {
     private Long parentId;
 
     @ApiModelProperty(value = "用户id")
-    private Integer uid;
+    private Long uid;
 
     @ApiModelProperty(value = "被赞次数")
     private Long up = 0L;
@@ -56,7 +56,7 @@ public class Comments implements Serializable {
     @TableField(exist = false)
     private UserDtoResult user;
 
-    @ApiModelProperty(name = "subComments", notes = "当前评论的子评论(某些人对我评论的回复)")
+    @ApiModelProperty(name = "subComments", notes = "当前评论的直接子评论(某些人对我评论的回复)")
     @TableField(exist = false)
     private List<Comments> subComments;
 
@@ -64,5 +64,8 @@ public class Comments implements Serializable {
     @TableField(exist = false)
     private Comments parentComments;
 
+    @ApiModelProperty(name = "allSubComments", notes = "当前评论的所有子评论；根评论是才用该属性")
+    @TableField(exist = false)
+    private List<Comments> allSubComments;
 
 }
