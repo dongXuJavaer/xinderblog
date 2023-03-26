@@ -30,7 +30,7 @@ public interface ArticleApi {
             value = "/list",
             method = RequestMethod.POST
     )
-    BaseResponse<ArticleListDtoResult> articleList(ArticleDtoReq articleDtoReq, String keywords);
+    BaseResponse<ArticleListDtoResult> articleList(@RequestBody ArticleDtoReq articleDtoReq, @RequestParam("keywords") String keywords);
 
     /**
      * 根据博客id查询
