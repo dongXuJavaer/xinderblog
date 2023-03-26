@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -46,11 +47,16 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
      */
     private static final String USERID_PATH = "/api/user/"; // 根据uid查询用户的路径
     private static final String USER_ADD_GROUP_PATH = "/api/group/user/add/list/"; // 根据uid查询用户加入的群聊路径
-    private static final String ARTICLE_COMMENT_LIST = "/api/comments/list/"; // 查询帖子的评论
+
     // 访问用户Api下，无需令牌的路径
     private static final ArrayList<String> THROUGH_USER_PATH = new ArrayList<String>() {{
         add("/api/user/num");
         add("/api/user/login");
+    }};
+    // 访问评论Api下，无需令牌的路径
+    private static final ArrayList<String> THROUGH_COMMENTS_PATH = new ArrayList<String>() {{
+        add("/api/comments/num");
+        add("/api/comments/list");
     }};
 
     /**
@@ -77,23 +83,17 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
 
 
         AtomicBoolean throughFlag = new AtomicBoolean(false);  // 直接放行的标志
-        THROUGH_USER_PATH.forEach(item -> {
-            if (path.startsWith(item)) {
-                throughFlag.set(true);
-            }
-        });
 
         // 如果请求是blog等开放服务，则直接放行
         if (path.startsWith("/api/article/")
-                || throughFlag.get()
+                || judgeThroughFlag(THROUGH_USER_PATH, path)
+                || judgeThroughFlag(THROUGH_COMMENTS_PATH, path)
                 || path.startsWith("/api/tags")
                 || path.startsWith("/api/group/list")
-                || path.startsWith("/api/comment/num")
                 || path.startsWith("/api/tags/all")
                 || path.startsWith("/api/category/all")
                 || judgeRestGet(USERID_PATH, path)
                 || judgeRestGet(USER_ADD_GROUP_PATH, path)
-                || judgeRestGet(ARTICLE_COMMENT_LIST, path)
         ) {
             // 放行
             Mono<Void> filter = chain.filter(exchange);
@@ -158,6 +158,16 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         return response.setComplete();
     }
 
+    // 判断是否是 可以直接放行的路径
+    private boolean judgeThroughFlag(List<String> list, String path) {
+        for (String s : list) {
+            if (path.startsWith(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // 判断是否是【根据id获取】的rest请求风格的请求路径
     private boolean judgeRestGet(String rootPath, String path) {
 
@@ -170,6 +180,7 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
             return false;
         }
     }
+
 
     /**
      * 过滤器执行顺序
