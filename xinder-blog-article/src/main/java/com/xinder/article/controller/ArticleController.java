@@ -6,9 +6,12 @@ import com.xinder.api.enums.ResultCode;
 import com.xinder.api.request.ArticleDtoReq;
 import com.xinder.api.response.dto.ArticleListDtoResult;
 import com.xinder.api.response.base.BaseResponse;
+import com.xinder.api.response.dto.UserDtoResult;
+import com.xinder.api.response.dto.ZanStateDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
 import com.xinder.api.rest.ArticleApi;
+import com.xinder.article.feign.UserFeignClient;
 import com.xinder.article.service.ArticleService;
 import com.xinder.common.abstcontroller.AbstractController;
 import com.xinder.common.util.FileUtils;
@@ -47,6 +50,9 @@ public class ArticleController extends AbstractController implements ArticleApi 
 
     @Autowired
     private TokenDecode tokenDecode;
+
+    @Autowired
+    private UserFeignClient userFeignClient;
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public RespBean addNewArticle(Article article) {
@@ -183,5 +189,18 @@ public class ArticleController extends AbstractController implements ArticleApi 
     public BaseResponse<DtoResult> initNum() {
         DtoResult result = articleServiceImpl.getCount();
         return buildJson(result);
+    }
+
+
+    @Override
+    public BaseResponse<Result> zan(Long aid) {
+        Result result = articleServiceImpl.zan(aid);
+        return buildJson(result);
+    }
+
+    @Override
+    public BaseResponse<ZanStateDtoResult> zanState(Long aid) {
+        ZanStateDtoResult dtoResult =  articleServiceImpl.zanState(aid);
+        return buildJson(dtoResult);
     }
 }

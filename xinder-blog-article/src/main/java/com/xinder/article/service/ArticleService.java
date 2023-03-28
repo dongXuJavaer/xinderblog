@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.xinder.api.bean.Article;
 import com.xinder.api.request.ArticleDtoReq;
 import com.xinder.api.response.dto.ArticleListDtoResult;
+import com.xinder.api.response.dto.ZanStateDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
 
@@ -53,4 +54,17 @@ public interface ArticleService extends IService<Article> {
      * @return
      */
     DtoResult getCount();
+
+    /**
+     * 帖子点赞
+     * @return
+     */
+    Result zan(Long aid);
+
+    /**
+     * 当前文章的点赞状态: 包括 总点赞数、当前用户是否点赞
+     * @param aid
+     * @return
+     */
+    ZanStateDtoResult zanState(Long aid);
 }

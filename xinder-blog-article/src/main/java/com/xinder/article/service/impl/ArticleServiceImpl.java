@@ -1,21 +1,22 @@
 package com.xinder.article.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinder.api.bean.Article;
 import com.xinder.api.bean.ArticleTags;
 import com.xinder.api.bean.Tags;
+import com.xinder.api.bean.Zan;
+import com.xinder.api.enums.ZanTypeEnums;
 import com.xinder.api.request.ArticleDtoReq;
+import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.ArticleListDtoResult;
 import com.xinder.api.response.dto.UserDtoResult;
+import com.xinder.api.response.dto.ZanStateDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
 import com.xinder.article.feign.UserFeignClient;
-import com.xinder.article.mapper.ArticleESMapper;
-import com.xinder.article.mapper.ArticleMapper;
-import com.xinder.article.mapper.ArticleTagsMapper;
-import com.xinder.article.mapper.TagsMapper;
+import com.xinder.article.mapper.*;
 import com.xinder.article.service.ArticleService;
 import com.xinder.common.util.SFunction;
 import com.xinder.common.util.SerializedLambdaUtil;
@@ -32,6 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.*;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,6 +81,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Autowired
     private UserFeignClient userFeignClient;
+
+    @Autowired
+    private ZanMapper zanMapper;
 
     public int addNewArticle(Article article) {
         //处理文章摘要
@@ -221,6 +226,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             if (StringUtils.isEmpty(item.getHeadPic())) {
                 item.setHeadPic("");
             }
+//            Long readCount = (Long) redisTemplate.opsForHash().get(CommonConstant.REDIS_KEY_ARTICLE, item.getId());
+//            item.setReadCount(readCount);
         });
 
         ArticleListDtoResult dtoResult = DtoResult.dataDtoSuccess(ArticleListDtoResult.class);
@@ -248,6 +255,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      * @return
      */
     private boolean addReadCount(Article article) {
+//        HashOperations hashOperations = redisTemplate.opsForHash();
+//        Long readCount = (Long) hashOperations.get(CommonConstant.REDIS_KEY_ARTICLE, article.getAttachment());
+//        if (readCount != null) {
+//            hashOperations.increment(CommonConstant.REDIS_KEY_ARTICLE, article.getAttachment(), 1L);
+//        } else {
+//            hashOperations.putIfAbsent(CommonConstant.REDIS_KEY_ARTICLE, article.getAttachment(), 1L);
+//        }
+        articleESMapper.delete(article);
         articleESMapper.save(article);
         article.setReadCount(article.getReadCount() + 1);
         return articleMapper.updateById(article) > 0;
@@ -442,5 +457,50 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         DtoResult success = DtoResult.success();
         success.setData(count);
         return success;
+    }
+
+    @Override
+    public Result zan(Long aid) {
+        BaseResponse<UserDtoResult> currentUser = userFeignClient.currentUser();
+        if (currentUser.getData().getId() == null) {
+            return Result.fail("未登录");
+        }
+
+        Zan zan = zanMapper.getByAidAndUid(aid, currentUser.getData().getId());
+        if (zan != null) {
+            if (ZanTypeEnums.ZAN.getCode().equals(zan.getType())) {
+                zan.setType(ZanTypeEnums.CANCEL.getCode());
+            } else {
+                zan.setType(ZanTypeEnums.ZAN.getCode());
+            }
+            zanMapper.updateById(zan);
+        } else {
+            Zan entity = new Zan()
+                    .setAid(aid)
+                    .setUid(currentUser.getData().getId())
+                    .setType(ZanTypeEnums.ZAN.getCode());
+            int insert = zanMapper.insert(entity);
+            if (insert < 0) {
+                return Result.fail("失败");
+            }
+        }
+
+        return Result.success("成功");
+    }
+
+    @Override
+    public ZanStateDtoResult zanState(Long aid) {
+        BaseResponse<UserDtoResult> currentUser = userFeignClient.currentUser();
+        ZanStateDtoResult dtoResult = DtoResult.dataDtoSuccess(ZanStateDtoResult.class);
+        // 未登录 点赞按钮是【未点赞状态】
+        if (currentUser.getData().getId() == null) {
+            dtoResult.setType(ZanTypeEnums.CANCEL.getCode());
+        }else {
+            Zan zan = zanMapper.getByAidAndUid(aid, currentUser.getData().getId());
+            dtoResult.setType(zan.getType());
+        }
+        Long count = zanMapper.getCountByAid(aid);
+        dtoResult.setCount(count);
+        return dtoResult;
     }
 }
