@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinder.article.mapper.ZanMapper">
+    <select id="getByAidAndUid" resultType="com.xinder.api.bean.Zan">
+        select * from zan where aid = #{aid} and uid = #{uid}
+    </select>
+
+    <select id="getCountByAid" resultType="java.lang.Long">
+        select count(*) from zan where aid = #{aid}
+    </select>
+</mapper>

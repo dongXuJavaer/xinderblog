@@ -4,6 +4,7 @@ import com.xinder.api.bean.Article;
 import com.xinder.api.request.ArticleDtoReq;
 import com.xinder.api.response.dto.ArticleListDtoResult;
 import com.xinder.api.response.base.BaseResponse;
+import com.xinder.api.response.dto.ZanStateDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
 import io.swagger.annotations.Api;
@@ -92,5 +93,13 @@ public interface ArticleApi {
     @ApiOperation(value = "统计帖子数量", notes = "统计帖子数量", tags = {"ArticleController"})
     @RequestMapping(value = "/num", method = RequestMethod.POST)
     BaseResponse<DtoResult> initNum();
+
+    @ApiOperation(value = "点赞", notes = "点赞", tags = {"ArticleController"})
+    @RequestMapping(value = "/zan/{aid}", method = RequestMethod.GET)
+    BaseResponse<Result> zan(@PathVariable("aid") Long aid);
+
+    @ApiOperation(value = "当前文章的点赞状态", notes = "当前文章的点赞状态", tags = {"ArticleController"})
+    @RequestMapping(value = "/zan/state/{aid}", method = RequestMethod.GET)
+    BaseResponse<ZanStateDtoResult> zanState(@PathVariable("aid") Long aid);
 
 }

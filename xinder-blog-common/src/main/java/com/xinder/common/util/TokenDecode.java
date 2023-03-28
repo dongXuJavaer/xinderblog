@@ -11,6 +11,7 @@ import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.RsaVerifier;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -69,6 +71,10 @@ public class TokenDecode {
     public Map<String, Object> getUserInfo() {
 
         String token = getToken();
+        // 如果token为空，新建一个map返回(防止NPE)
+        if (StringUtils.isEmpty(token)){
+            return new HashMap<>();
+        }
         //令牌解码
         Map<String, Object> map = dcodeToken(token);
         return map;
