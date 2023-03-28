@@ -101,7 +101,7 @@ public class Article implements Serializable {
 
     @TableField("read_count")
     @ApiModelProperty(value = "浏览量")
-    private Integer readCount;
+    private Long readCount;
 
     @TableField("head_pic")
     @ApiModelProperty(value = "封面图片链接")

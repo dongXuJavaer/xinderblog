@@ -2,6 +2,7 @@ package com.xinder.api.bean;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.xinder.api.response.dto.UserDtoResult;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -37,6 +39,9 @@ public class Notification implements Serializable {
     @ApiModelProperty(value = "通知类型:  1:系统通知  2:关注消息  3:帖子评论通知   4: 帖子点赞通知 ")
     private Integer type;
 
+    @ApiModelProperty(value = "帖子id")
+    private Long Aid;
+
     @ApiModelProperty(value = "发送的用户id")
     private Long fromUid;
 
@@ -44,10 +49,13 @@ public class Notification implements Serializable {
     private Long toUid;
 
     @ApiModelProperty(value = "创建时间")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @ApiModelProperty(value = "0: 未读,    1:已读")
     private Integer readFlag = 0;
 
+
+    @ApiModelProperty(value = "发送的用户信息")
+    private UserDtoResult fromUser;
 
 }
