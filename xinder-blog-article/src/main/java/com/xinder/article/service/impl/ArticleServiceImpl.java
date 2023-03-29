@@ -1,12 +1,9 @@
 package com.xinder.article.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.xinder.api.bean.Article;
-import com.xinder.api.bean.ArticleTags;
-import com.xinder.api.bean.Tags;
-import com.xinder.api.bean.Zan;
+import com.xinder.api.bean.*;
+import com.xinder.api.enums.NotificationEnums;
 import com.xinder.api.enums.ZanTypeEnums;
 import com.xinder.api.request.ArticleDtoReq;
 import com.xinder.api.response.base.BaseResponse;
@@ -15,6 +12,7 @@ import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.dto.ZanStateDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
+import com.xinder.article.feign.NotificationFeignClient;
 import com.xinder.article.feign.UserFeignClient;
 import com.xinder.article.mapper.*;
 import com.xinder.article.service.ArticleService;
@@ -33,7 +31,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.*;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +40,8 @@ import org.springframework.util.StringUtils;
 import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -81,6 +80,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Autowired
     private UserFeignClient userFeignClient;
+
+    @Autowired
+    private NotificationFeignClient notificationFeignClient;
+
 
     @Autowired
     private ZanMapper zanMapper;
@@ -366,7 +369,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (cid != null && cid != -1L) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("cid", cid));
         }
-        if (uid!= null){
+        if (uid != null) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("uid", uid));
         }
 
@@ -462,6 +465,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         return success;
     }
 
+    /*
+        1. 如果用户存在点赞信息，
+            1.1 判断点赞状态，
+                a. 如果为【点赞】状态，修改点赞状态为【取消点赞】同时删除通知
+                b. 如果为【取消点赞】状态，修改为点赞状态为【点赞】状态同时发送通知
+        2. 如果用户不存在点赞信息，添加点赞信息与通知
+     */
     @Override
     public Result zan(Long aid) {
         BaseResponse<UserDtoResult> currentUser = userFeignClient.currentUser();
@@ -470,25 +480,43 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
 
         Zan zan = zanMapper.getByAidAndUid(aid, currentUser.getData().getId());
-        if (zan != null) {
-            if (ZanTypeEnums.ZAN.getCode().equals(zan.getType())) {
-                zan.setType(ZanTypeEnums.CANCEL.getCode());
-            } else {
-                zan.setType(ZanTypeEnums.ZAN.getCode());
-            }
-            zanMapper.updateById(zan);
-        } else {
-            Zan entity = new Zan()
-                    .setAid(aid)
-                    .setUid(currentUser.getData().getId())
-                    .setType(ZanTypeEnums.ZAN.getCode());
-            int insert = zanMapper.insert(entity);
-            if (insert < 0) {
-                return Result.fail("失败");
-            }
-        }
+        Article article = articleMapper.getArticleById(aid);
+        Notification notification = new Notification()
+                .setType(NotificationEnums.ZAN.getCode())
+                .setFromUid(currentUser.getData().getId())
+                .setToUid(article.getUid())
+                .setAid(aid);
 
-        return Result.success("成功");
+        AtomicInteger i = new AtomicInteger(); //点赞是否入库成功表示
+        AtomicReference<BaseResponse<Result>> dtoResult = new AtomicReference<>();
+        Boolean bool = transactionTemplate.execute(status -> {
+            // zan不为null说明存在点赞信息
+            if (zan != null) {
+                if (ZanTypeEnums.ZAN.getCode().equals(zan.getType())) {
+                    // 取消点赞，删除给帖子的作者发的通知
+                    zan.setType(ZanTypeEnums.CANCEL.getCode());
+                    dtoResult.set(notificationFeignClient.remove(notification));
+                } else {
+                    // 改为点赞状态，给帖子的作者发的通知
+                    zan.setType(ZanTypeEnums.ZAN.getCode());
+                    notification.setContent("赞");
+                    dtoResult.set(notificationFeignClient.add(notification));
+                }
+                i.set(zanMapper.updateById(zan));
+            } else {
+                // 第一次点赞，插入数据，发送通知
+                Zan entity = new Zan()
+                        .setAid(aid)
+                        .setUid(currentUser.getData().getId())
+                        .setType(ZanTypeEnums.ZAN.getCode());
+                i.set(zanMapper.insert(entity));
+                notification.setContent("赞");
+                dtoResult.set(notificationFeignClient.add(notification));
+            }
+            return i.get() > 0 && dtoResult.get().isSuccess();
+        });
+
+        return bool != null && bool ? Result.success("成功") : Result.success("失败");
     }
 
     @Override
@@ -498,7 +526,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 未登录 点赞按钮是【未点赞状态】
         if (currentUser.getData().getId() == null) {
             dtoResult.setType(ZanTypeEnums.CANCEL.getCode());
-        }else {
+        } else {
             Zan zan = zanMapper.getByAidAndUid(aid, currentUser.getData().getId());
             dtoResult.setType(zan.getType());
         }

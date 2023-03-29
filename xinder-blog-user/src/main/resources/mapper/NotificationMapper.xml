@@ -11,6 +11,7 @@
         <result column="u_id" property="fromUser.id"/>
         <result column="u_nickname" property="fromUser.nickname"/>
         <result column="uuserface" property="fromUser.userface"/>
+        <result column="title" property="article.title"/>
     </resultMap>
 
     <select id="getByToUid" resultMap="baseMap">
@@ -23,8 +24,10 @@
         n.create_time,
         u.id as u_id,
         u.nickname as u_nickname,
-        u.userface as uuserface
+        u.userface as uuserface,
+        a.title as title
         from notification n left join user u on n.from_uid = u.id
+        left join article a on n.aid = a.id
         <where>
             <if test="uid!=null">
                 n.to_uid = #{uid}
@@ -34,5 +37,17 @@
             </if>
         </where>
         order by n.id desc
+    </select>
+
+    <select id="getCount" resultType="java.lang.Long">
+        select count(*) from notification n
+        <where>
+            <if test="uid!=null">
+                n.to_uid = #{uid}
+            </if>
+            <if test="type!=null">
+                and n.type = #{type}
+            </if>
+        </where>
     </select>
 </mapper>

@@ -1,6 +1,7 @@
 package com.xinder.api.bean;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.xinder.api.response.dto.UserDtoResult;
 import io.swagger.annotations.ApiModel;
@@ -56,6 +57,11 @@ public class Notification implements Serializable {
 
 
     @ApiModelProperty(value = "发送的用户信息")
+    @TableField(exist = false)
     private UserDtoResult fromUser;
+
+    @ApiModelProperty(value = "如果是帖子消息，则有帖子信息")
+    @TableField(exist = false)
+    private Article article;
 
 }

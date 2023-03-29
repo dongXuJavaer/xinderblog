@@ -1,8 +1,12 @@
 package com.xinder.user.controller;
 
 
+import com.xinder.api.bean.Notification;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.NotificationDtoListResult;
+import com.xinder.api.response.result.DtoResult;
+import com.xinder.api.response.result.PageDtoResult;
+import com.xinder.api.response.result.Result;
 import com.xinder.api.rest.NotificationApi;
 import com.xinder.common.abstcontroller.AbstractController;
 import com.xinder.user.service.NotificationService;
@@ -27,9 +31,14 @@ public class NotificationController extends AbstractController implements Notifi
     private NotificationService notificationService;
 
     @Override
-    @RequestMapping(value = "/comments/list", method = RequestMethod.POST)
-    public BaseResponse<NotificationDtoListResult> commentsList() {
-        NotificationDtoListResult listResult = notificationService.commentsList();
+    public BaseResponse<DtoResult> getCount(Integer type) {
+        DtoResult dtoResult = notificationService.getCount(type);
+        return buildJson(dtoResult);
+    }
+
+    @Override
+    public BaseResponse<NotificationDtoListResult> commentsList(PageDtoResult pageDtoResult) {
+        NotificationDtoListResult listResult = notificationService.commentsList(pageDtoResult);
         return buildJson(listResult);
     }
 
@@ -49,6 +58,18 @@ public class NotificationController extends AbstractController implements Notifi
     public BaseResponse<NotificationDtoListResult> followList() {
         NotificationDtoListResult listResult = notificationService.followList();
         return buildJson(listResult);
+    }
+
+    @Override
+    public BaseResponse<Result> add(Notification notification) {
+        Result result = notificationService.add(notification);
+        return buildJson(result);
+    }
+
+    @Override
+    public BaseResponse<Result> remove(Notification notification) {
+        Result result = notificationService.delete(notification);
+        return buildJson(result);
     }
 }
 

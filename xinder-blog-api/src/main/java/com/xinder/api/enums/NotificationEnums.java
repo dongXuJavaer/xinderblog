@@ -1,24 +1,26 @@
 package com.xinder.api.enums;
 
+import java.util.EnumSet;
+
 public enum NotificationEnums {
 
     SYSTEM(1, "系统通知"),
     FOLLOW(2, "关注通知"),
     COMMENTS(3, "帖子评论通知"),
-    UP(4, "帖子点赞通知"),
+    ZAN(4, "帖子点赞通知"),
 
     ;
 
-    private int code;
+    private Integer code;
     private String desc;
 
 
-    NotificationEnums(int code, String desc) {
+    NotificationEnums(Integer code, String desc) {
         this.code = code;
         this.desc = desc;
     }
 
-    public int getCode() {
+    public Integer getCode() {
         return code;
     }
 
@@ -32,5 +34,10 @@ public enum NotificationEnums {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public static boolean judgeType(Integer type) {
+        EnumSet<NotificationEnums> notificationEnumsEnumSet = EnumSet.allOf(NotificationEnums.class);
+        return notificationEnumsEnumSet.stream().anyMatch(item -> item.getCode().equals(type));
     }
 }

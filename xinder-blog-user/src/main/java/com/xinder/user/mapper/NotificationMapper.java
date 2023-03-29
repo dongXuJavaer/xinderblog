@@ -26,4 +26,14 @@ public interface NotificationMapper extends BaseMapper<Notification> {
      * @return {@link List}<{@link Notification}>
      */
     List<Notification> getByToUid(@Param("uid") Long uid, @Param("type") Integer type);
+
+
+    /**
+     * 获取该通知类型的总数
+     *
+     * @param uid   用户id
+     * @param type 类型
+     * @return {@link Long}
+     */
+    Long getCount(@Param("uid") Long uid, @Param("type") Integer type);
 }

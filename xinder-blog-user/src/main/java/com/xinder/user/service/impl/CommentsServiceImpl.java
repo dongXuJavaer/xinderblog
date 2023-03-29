@@ -141,7 +141,9 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
                     .setType(NotificationEnums.COMMENTS.getCode())
                     .setContent(comments.getContent())
                     .setFromUid(currentUser.getId())
-                    .setToUid(article.getUid());
+                    .setToUid(article.getUid())
+                    .setAid(comments.getAid())
+                    ;
             notificationMapper.insert(notification);
 
             // 如果不是根评论，那么被回复的那个人也要被通知到
