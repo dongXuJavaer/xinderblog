@@ -58,7 +58,7 @@ public class AuthServiceImpl implements AuthService {
     private RestTemplate restTemplate;
 
     @Autowired
-    private RedisTemplate<String,Object> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     private LoadBalancerClient loadBalancerClient;
@@ -76,14 +76,6 @@ public class AuthServiceImpl implements AuthService {
     public AuthToken login(String username, String password, String clientId, String clientSecret) {
         // 申请令牌
         AuthToken authToken = this.applyToken(username, password, clientId, clientSecret);
-        if (authToken == null) {
-            throw new RuntimeException("申请令牌失败");
-        }
-
-        User user = userMapper.loadUserByUsername(username);
-        redisTemplate.opsForValue().set(UserEnums.USER_ONLINE_PREFIX_KEY.getValue() + user.getUsername(),
-                user, Duration.ofMinutes(30));
-        log.info("用户{}信息存入redis", user.getUsername());
         return authToken;
     }
 
@@ -154,9 +146,17 @@ public class AuthServiceImpl implements AuthService {
 
         // 将响应数据封装成AuthToken
         AuthToken authToken = new AuthToken();
-        authToken.setAccessToken(body.get("access_token").toString());
-        authToken.setRefreshToken(body.get("refresh_token").toString());
-        authToken.setJti(body.get("jti").toString());
+        if (body.get("access_token") != null) {
+            authToken.setAccessToken(body.get("access_token").toString());
+            authToken.setRefreshToken(body.get("refresh_token").toString());
+            authToken.setJti(body.get("jti").toString());
+        } else {
+            // 密码错误
+            authToken.setError(body.get("error").toString());
+            authToken.setErrorDescription(body.get("error_description").toString());
+        }
+
+
         return authToken;
     }
 

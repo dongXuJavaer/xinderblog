@@ -1,42 +1,38 @@
 package com.xinder.common.util;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
 /**
  * @author dong
  * @since 2022-09-07 09:19
  */
+@Data
 public class AuthToken implements Serializable {
-    //令牌信息
+    /**
+     * 令牌信息
+     */
     String accessToken;
-    //刷新token(refresh_token)
+
+    /**
+     * 刷新token(refresh_token)
+     */
     String refreshToken;
-    //jwt短令牌
+
+    /**
+     * jwt短令牌
+     */
+    //
     String jti;
 
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
-    public String getJti() {
-        return jti;
-    }
-
-    public void setJti(String jti) {
-        this.jti = jti;
-    }
-
+    /**
+     * 登录失败时的错误类型
+     */
+    String error;
+    /**
+     * 错误描述
+     */
+    String errorDescription;
 
 }

@@ -23,6 +23,7 @@ import com.xinder.common.util.CookieUtils;
 import com.xinder.common.util.Util;
 import com.xinder.user.service.AuthService;
 import com.xinder.user.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -51,9 +52,10 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by sang on 2017/12/17.
+ * Created by xinder on 2022/01/17.
  */
 @Service
+@Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     private final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -197,13 +199,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         AuthToken authToken = authService.login(username, password, clientId, clientSecret);
-        response.addHeader("Token", authToken.getAccessToken());
-        CookieUtils.addCookie(response, cookieDomain,
-                "/", "Authorization", authToken.getAccessToken(), cookieMaxAge, false);
 
-        User user = userMapper.loadUserByUsername(username);
-        userDtoResult = DtoResult.dataDtoSuccess(UserDtoResult.class);
-        BeanUtils.copyProperties(user, userDtoResult);
+        if (authToken.getError() == null) {
+            User user = userMapper.loadUserByUsername(username);
+            redisTemplate.opsForValue().set(UserEnums.USER_ONLINE_PREFIX_KEY.getValue() + user.getUsername(),
+                    user, Duration.ofMinutes(30));
+            log.info("登录用户 {} 信息存入redis", user.getUsername());
+            userDtoResult = DtoResult.dataDtoSuccess(UserDtoResult.class);
+            BeanUtils.copyProperties(user, userDtoResult);
+
+            response.addHeader("Token", authToken.getAccessToken());
+            CookieUtils.addCookie(response, cookieDomain,
+                    "/", "Authorization", authToken.getAccessToken(), cookieMaxAge, false);
+        } else {
+            log.info("登录用户 {} 密码错误", username);
+            userDtoResult.setMsg(authToken.getErrorDescription());
+        }
+
 
         return userDtoResult;
     }
