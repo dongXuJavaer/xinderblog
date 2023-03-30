@@ -2,6 +2,7 @@ package com.xinder.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xinder.api.bean.Notification;
+import com.xinder.api.request.comm.PageDtoReq;
 import com.xinder.api.response.dto.NotificationDtoListResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.PageDtoResult;
@@ -28,17 +29,18 @@ public interface NotificationService extends IService<Notification> {
     /**
      * 评论通知列表
      *
-     * @param pageDtoResult 页面dto结果
+     * @param pageDtoReq 分页请求参数
      * @return {@link NotificationDtoListResult}
      */
-    NotificationDtoListResult commentsList(PageDtoResult pageDtoResult);
+    NotificationDtoListResult commentsList(PageDtoReq pageDtoReq);
 
     /**
      * 点赞通知列表
      *
-     * @return
+     * @param pageDtoReq 页面dto点播
+     * @return {@link NotificationDtoListResult}
      */
-    NotificationDtoListResult zanList();
+    NotificationDtoListResult zanList(PageDtoReq pageDtoReq);
 
     /**
      * sys列表

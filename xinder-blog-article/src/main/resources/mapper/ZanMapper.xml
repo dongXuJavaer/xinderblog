@@ -5,7 +5,7 @@
         select * from zan where aid = #{aid} and uid = #{uid}
     </select>
 
-    <select id="getCountByAid" resultType="java.lang.Long">
-        select count(*) from zan where aid = #{aid}
+    <select id="getCountByAidAndType" resultType="java.lang.Long">
+        select count(*) from zan where aid = #{aid} and type = #{type}
     </select>
 </mapper>

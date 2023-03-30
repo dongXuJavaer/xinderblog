@@ -16,5 +16,11 @@ public interface ZanMapper extends BaseMapper<Zan> {
 
     Zan getByAidAndUid(@Param("aid") Long aid, @Param("uid") Long uid);
 
-    Long getCountByAid(@Param("aid") Long aid);
+    /**
+     * 获取文章的点赞总数
+     * @param aid
+     * @param type
+     * @return
+     */
+    Long getCountByAidAndType(@Param("aid") Long aid, @Param("type") Integer type);
 }

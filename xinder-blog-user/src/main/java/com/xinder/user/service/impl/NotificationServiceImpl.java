@@ -4,16 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinder.api.bean.Notification;
 import com.xinder.api.enums.NotificationEnums;
+import com.xinder.api.request.comm.PageDtoReq;
 import com.xinder.api.response.dto.NotificationDtoListResult;
 import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.result.DtoResult;
-import com.xinder.api.response.result.PageDtoResult;
 import com.xinder.api.response.result.Result;
 import com.xinder.user.mapper.NotificationMapper;
 import com.xinder.user.service.NotificationService;
 import com.xinder.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,7 +58,7 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
     }
 
     @Override
-    public NotificationDtoListResult commentsList(PageDtoResult pageDtoResult) {
+    public NotificationDtoListResult commentsList(PageDtoReq pageDtoReq) {
         UserDtoResult currentUser = userService.getCurrentUser();
         NotificationDtoListResult dtoListResult = null;
         if (currentUser.getId() == null) {
@@ -68,31 +67,38 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
             return dtoListResult;
         }
 
-        Long count = notificationMapper.getCount(currentUser.getId(), NotificationEnums.ZAN.getCode());
-        PageDtoResult pageResult = DtoResult.dataDtoFail(PageDtoResult.class);
-        pageDtoResult.setTotalCount(count);
-
-
-        List<Notification> notificationList = notificationMapper.getByToUid(currentUser.getId(), NotificationEnums.COMMENTS.getCode());
+        Long count = notificationMapper.getCount(currentUser.getId(), NotificationEnums.COMMENTS.getCode());
         dtoListResult = DtoResult.dataDtoSuccess(NotificationDtoListResult.class);
+        dtoListResult.setTotalCount(count);
+
+        Integer pageSize = pageDtoReq.getPageSize();
+        Long currentPage = pageDtoReq.getCurrentPage();
+        Long offset = (currentPage - 1) * pageSize;
+        List<Notification> notificationList = notificationMapper.getByToUid(currentUser.getId(), NotificationEnums.COMMENTS.getCode(), offset, pageSize);
         dtoListResult.setList(notificationList);
 
         return dtoListResult;
     }
 
     @Override
-    public NotificationDtoListResult zanList() {
+    public NotificationDtoListResult zanList(PageDtoReq pageDtoReq) {
         UserDtoResult currentUser = userService.getCurrentUser();
         NotificationDtoListResult dtoListResult = DtoResult.dataDtoSuccess(NotificationDtoListResult.class);
         if (currentUser.getId() == null) {
             dtoListResult.setMsg("未登录");
             return dtoListResult;
         }
-        Long count = notificationMapper.getCount(currentUser.getId(), NotificationEnums.ZAN.getCode());
 
-        List<Notification> notificationList = notificationMapper.getByToUid(currentUser.getId(), NotificationEnums.ZAN.getCode());
+        Long count = notificationMapper.getCount(currentUser.getId(), NotificationEnums.ZAN.getCode());
         dtoListResult = DtoResult.dataDtoSuccess(NotificationDtoListResult.class);
+        dtoListResult.setTotalCount(count);
+
+        Integer pageSize = pageDtoReq.getPageSize();
+        Long currentPage = pageDtoReq.getCurrentPage();
+        Long offset = (currentPage - 1) * pageSize;
+        List<Notification> notificationList = notificationMapper.getByToUid(currentUser.getId(), NotificationEnums.ZAN.getCode(), offset, pageSize);
         dtoListResult.setList(notificationList);
+
         return dtoListResult;
     }
 

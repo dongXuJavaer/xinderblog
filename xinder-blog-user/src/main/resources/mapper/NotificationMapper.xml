@@ -37,6 +37,7 @@
             </if>
         </where>
         order by n.id desc
+        limit #{offset}, #{pageSize};
     </select>
 
     <select id="getCount" resultType="java.lang.Long">

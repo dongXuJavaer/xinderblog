@@ -1,6 +1,7 @@
 package com.xinder.api.rest;
 
 import com.xinder.api.bean.Notification;
+import com.xinder.api.request.comm.PageDtoReq;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.NotificationDtoListResult;
 import com.xinder.api.response.result.DtoResult;
@@ -8,6 +9,7 @@ import com.xinder.api.response.result.PageDtoResult;
 import com.xinder.api.response.result.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -24,11 +26,11 @@ public interface NotificationApi {
 
     @ApiOperation(value = "查看评论通知列表", notes = "查看评论通知列表", tags = {"NotificationApi"})
     @RequestMapping(value = "/comments/list", method = RequestMethod.POST)
-    BaseResponse<NotificationDtoListResult> commentsList(@RequestBody PageDtoResult pageDtoResult);
+    BaseResponse<NotificationDtoListResult> commentsList(@RequestBody PageDtoReq pageDtoReq);
 
     @ApiOperation(value = "查看点赞通知列表", notes = "查看评论通知列表", tags = {"NotificationApi"})
     @RequestMapping(value = "/zan/list", method = RequestMethod.POST)
-    BaseResponse<NotificationDtoListResult> zanList();
+    BaseResponse<NotificationDtoListResult> zanList(@RequestBody PageDtoReq pageDtoReq);
 
     @ApiOperation(value = "查看系统通知列表", notes = "查看系统通知列表", tags = {"NotificationApi"})
     @RequestMapping(value = "/sys/list", method = RequestMethod.POST)

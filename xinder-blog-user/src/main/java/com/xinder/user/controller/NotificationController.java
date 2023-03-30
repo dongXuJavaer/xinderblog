@@ -2,6 +2,7 @@ package com.xinder.user.controller;
 
 
 import com.xinder.api.bean.Notification;
+import com.xinder.api.request.comm.PageDtoReq;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.NotificationDtoListResult;
 import com.xinder.api.response.result.DtoResult;
@@ -37,14 +38,14 @@ public class NotificationController extends AbstractController implements Notifi
     }
 
     @Override
-    public BaseResponse<NotificationDtoListResult> commentsList(PageDtoResult pageDtoResult) {
-        NotificationDtoListResult listResult = notificationService.commentsList(pageDtoResult);
+    public BaseResponse<NotificationDtoListResult> commentsList(PageDtoReq pageDtoReq) {
+        NotificationDtoListResult listResult = notificationService.commentsList(pageDtoReq);
         return buildJson(listResult);
     }
 
     @Override
-    public BaseResponse<NotificationDtoListResult> zanList() {
-        NotificationDtoListResult listResult = notificationService.zanList();
+    public BaseResponse<NotificationDtoListResult> zanList(PageDtoReq pageDtoReq) {
+        NotificationDtoListResult listResult = notificationService.zanList(pageDtoReq);
         return buildJson(listResult);
     }
 

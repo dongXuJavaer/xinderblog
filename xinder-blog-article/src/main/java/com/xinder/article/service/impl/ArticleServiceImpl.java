@@ -530,7 +530,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             Zan zan = zanMapper.getByAidAndUid(aid, currentUser.getData().getId());
             dtoResult.setType(zan.getType());
         }
-        Long count = zanMapper.getCountByAid(aid);
+        Long count = zanMapper.getCountByAidAndType(aid, ZanTypeEnums.ZAN.getCode());
         dtoResult.setCount(count);
         return dtoResult;
     }
