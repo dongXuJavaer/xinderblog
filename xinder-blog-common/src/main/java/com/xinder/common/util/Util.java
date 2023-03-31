@@ -1,5 +1,7 @@
 package com.xinder.common.util;
 
+import com.alibaba.fastjson.JSON;
+import com.xinder.api.bean.History;
 import com.xinder.api.bean.User;
 import com.xinder.api.enums.UserEnums;
 import com.xinder.common.constant.CommonConstant;
@@ -9,10 +11,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,5 +48,34 @@ public class Util {
 
     }
 
+    /**
+     * 从cookie中获取用户的浏览历史记录
+     *
+     * @return {@link List}<{@link History}>
+     */
+    public static List<History> getHistoryListByCookie() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        Cookie[] cookies = request.getCookies();
+        String name = CommonConstant.HTTP_HEADER_HISTORY;
 
+        List<History> historyList = new ArrayList<>();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (name.equals(cookie.getName())) {
+                    String value = cookie.getValue();
+                    String decode = null;
+                    try {
+                        decode = URLDecoder.decode(value, "utf-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    List<History> list = JSON.parseArray(decode, History.class);
+                    if (list != null) {
+                        historyList.addAll(list);
+                    }
+                }
+            }
+        }
+        return historyList;
+    }
 }

@@ -1,5 +1,7 @@
 package com.xinder.article.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinder.api.bean.*;
@@ -16,10 +18,10 @@ import com.xinder.article.feign.NotificationFeignClient;
 import com.xinder.article.feign.UserFeignClient;
 import com.xinder.article.mapper.*;
 import com.xinder.article.service.ArticleService;
-import com.xinder.common.util.SFunction;
-import com.xinder.common.util.SerializedLambdaUtil;
-import com.xinder.common.util.TokenDecode;
-import com.xinder.common.util.Util;
+import com.xinder.article.service.HistoryService;
+import com.xinder.common.constant.CommonConstant;
+import com.xinder.common.util.*;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
@@ -35,9 +37,18 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -49,6 +60,7 @@ import java.util.stream.Collectors;
  * Created by Xinder on 2023-1-6 23:07:57.
  */
 @Service
+@Slf4j
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
 
     @Autowired
@@ -56,9 +68,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Autowired
     private TagsMapper tagsMapper;
-
-    @Autowired
-    private ArticleService articleService;
 
     @Autowired
     private ArticleTagsMapper articleTagsMapper;
@@ -83,6 +92,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Autowired
     private NotificationFeignClient notificationFeignClient;
+
+    @Autowired
+    private HistoryMapper historyMapper;
+
+    @Autowired
+    private HistoryService historyService;
 
 
     @Autowired
@@ -245,11 +260,42 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     public DtoResult getById(Long id) {
         Article article = articleMapper.getArticleById(id);
+        // 给帖子添加浏览量
         this.addReadCount(article);
+        String cookieDomain = userFeignClient.getCookieDomain();
+
+        // 给未登录用户添加浏览记录到cookie，用户登录后信息入库同时删除cookie中的浏览记录
+        if (userFeignClient.currentUser().getData().getId() == null) {
+            historyService.addHistoryToFront(article, cookieDomain);
+        } else {
+            // 登录用户直接将浏览记录入库
+            History history = new History()
+                    .setAid(id)
+                    .setUid(userFeignClient.currentUser().getData().getId());
+            LambdaQueryWrapper<History> wrapper = new LambdaQueryWrapper<History>()
+                    .eq(History::getAid, history.getAid())
+                    .eq(History::getUid, history.getUid());
+            History one = historyMapper.selectOne(wrapper);
+            if (one == null) {
+                historyMapper.insert(history);
+            } else {
+                historyMapper.updateById(one.setCreateTime(new Date()));
+            }
+        }
         DtoResult result = DtoResult.success();
         result.setData(article);
         return result;
     }
+
+    /**
+     * 向客户端浏览器添加浏览记录
+     * 1. 检查是否已经浏览了该帖子，如果浏览了，则只更新时间;  如果为第一次浏览，则添加
+     *
+     * @param article 文章
+     */
+    private void addHistoryToFront(Article article, String cookieDomain) {
+    }
+
 
     /**
      * 浏览数+1
@@ -480,7 +526,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
 
         Zan zan = zanMapper.getByAidAndUid(aid, currentUser.getData().getId());
-        Article article = articleMapper.getArticleById(aid);
+        Article article = articleMapper.selectById(aid);
         Notification notification = new Notification()
                 .setType(NotificationEnums.ZAN.getCode())
                 .setFromUid(currentUser.getData().getId())
@@ -523,11 +569,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public ZanStateDtoResult zanState(Long aid) {
         BaseResponse<UserDtoResult> currentUser = userFeignClient.currentUser();
         ZanStateDtoResult dtoResult = DtoResult.dataDtoSuccess(ZanStateDtoResult.class);
-        // 未登录 点赞按钮是【未点赞状态】
-        if (currentUser.getData().getId() == null) {
+        Zan zan = zanMapper.getByAidAndUid(aid, currentUser.getData().getId());
+        // 未登录或从未对当前帖子点赞   点赞按钮是【未点赞状态】
+        if (currentUser.getData().getId() == null || zan == null) {
             dtoResult.setType(ZanTypeEnums.CANCEL.getCode());
         } else {
-            Zan zan = zanMapper.getByAidAndUid(aid, currentUser.getData().getId());
             dtoResult.setType(zan.getType());
         }
         Long count = zanMapper.getCountByAidAndType(aid, ZanTypeEnums.ZAN.getCode());

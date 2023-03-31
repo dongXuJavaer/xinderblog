@@ -1,5 +1,6 @@
 package com.xinder.article.config;
 
+import com.xinder.common.constant.CommonConstant;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.springframework.context.annotation.Bean;
@@ -27,8 +28,10 @@ public class FeignConfig {
                 HttpServletRequest request = attributes.getRequest();
                 // 获取原请求中携带的Cookie请求头
                 String cookie = request.getHeader("Cookie");
+                String token = request.getHeader(CommonConstant.HTTP_HEADER_TOKEN);
                 // 将cookie 同步到新的请求的请求头中
                 template.header("Cookie", cookie);
+                template.header(CommonConstant.HTTP_HEADER_TOKEN, token);
             }
         };
     }

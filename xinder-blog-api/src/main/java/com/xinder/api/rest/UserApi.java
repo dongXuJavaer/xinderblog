@@ -89,5 +89,9 @@ public interface UserApi {
     @PostMapping("/num")
     BaseResponse<DtoResult> userCount();
 
+    @ApiOperation(value = "获取当前响应的domain", notes = "获取当前响应的domain", tags = {"UserApi"})
+    @RequestMapping(value = "/domain", method = RequestMethod.GET)
+    String getCookieDomain();
+
 
 }
