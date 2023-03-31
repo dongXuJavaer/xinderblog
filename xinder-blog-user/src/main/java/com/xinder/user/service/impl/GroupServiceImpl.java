@@ -5,16 +5,24 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinder.api.bean.Group;
 import com.xinder.api.bean.GroupUser;
+import com.xinder.api.bean.User;
 import com.xinder.api.response.dto.GroupDtoListResult;
+import com.xinder.api.response.dto.UserDtoResult;
+import com.xinder.api.response.dto.UserDtoSimpleResult;
+import com.xinder.api.response.dto.UserListDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
 import com.xinder.user.mapper.GroupMapper;
 import com.xinder.user.mapper.GroupUserMapper;
+import com.xinder.user.mapper.UserMapper;
 import com.xinder.user.service.GroupService;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,6 +42,9 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
 
     @Resource
     private GroupUserMapper groupUserMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
     public GroupDtoListResult getList(Group group) {
@@ -117,5 +128,33 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         int i = groupMapper.deleteById(id);
         // TODO: 2023-02-12  解散的同时给所有用户发送通知
         return i > 0 ? Result.success("解散成功") : Result.fail("解散失败");
+    }
+
+    @Override
+    public UserListDtoResult userList(Integer id) {
+        Group group = groupMapper.selectById(id);
+        UserListDtoResult dtoResult = null;
+        if (group == null) {
+            dtoResult = DtoResult.dataDtoFail(UserListDtoResult.class);
+            dtoResult.setMsg("群聊已解散");
+            return dtoResult;
+        }
+        User creator = userMapper.selectById(group.getCreateUser());
+        UserDtoResult createDto = new UserDtoResult();
+        BeanUtils.copyProperties(creator, createDto);
+        createDto.setCreateTime(group.getCreateTime()); // 设置时间为用户加入群聊的时间
+        List<User> userList = groupUserMapper.getUserByGroupId(id);
+
+        List<UserDtoResult> dtoList = new ArrayList<>(userList.size() + 1);
+        dtoList.add(createDto);
+        userList.forEach(user -> {
+            UserDtoResult userDtoResult = new UserDtoResult();
+            BeanUtils.copyProperties(user, userDtoResult);
+            dtoList.add(userDtoResult);
+        });
+
+        dtoResult = DtoResult.dataDtoSuccess(UserListDtoResult.class);
+        dtoResult.setList(dtoList);
+        return dtoResult;
     }
 }

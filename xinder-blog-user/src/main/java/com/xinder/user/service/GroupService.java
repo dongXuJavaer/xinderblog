@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.xinder.api.bean.Group;
 import com.xinder.api.bean.GroupUser;
 import com.xinder.api.response.dto.GroupDtoListResult;
+import com.xinder.api.response.dto.UserDtoSimpleResult;
+import com.xinder.api.response.dto.UserListDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
 import org.apache.ibatis.annotations.Param;
@@ -81,4 +83,12 @@ public interface GroupService extends IService<Group> {
      * @return
      */
     Result disband(Integer id);
+
+
+    /**
+     * 获取群聊成员列表
+     * @param id
+     * @return
+     */
+    UserListDtoResult userList(Integer id);
 }

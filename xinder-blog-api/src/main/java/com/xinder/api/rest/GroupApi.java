@@ -4,6 +4,8 @@ import com.xinder.api.bean.Group;
 import com.xinder.api.bean.GroupUser;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.GroupDtoListResult;
+import com.xinder.api.response.dto.UserDtoSimpleResult;
+import com.xinder.api.response.dto.UserListDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
 import io.swagger.annotations.Api;
@@ -93,4 +95,8 @@ public interface GroupApi {
     @RequestMapping("/disband/{id}")
     @ApiOperation(value = "解散群聊", notes = "解散群聊", tags = {"GroupApi"})
     BaseResponse<Result> disband(@PathVariable("id") Integer id);
+
+    @RequestMapping("/user/list/{id}")
+    @ApiOperation(value = "成员列表", notes = "成员列表", tags = {"GroupApi"})
+    BaseResponse<UserListDtoResult> userList(@PathVariable("id") Integer id);
 }

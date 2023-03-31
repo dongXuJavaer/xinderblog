@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xinder.user.mapper.GroupUserMapper">
-
     <resultMap id="baseMap" type="com.xinder.api.bean.GroupUser">
         <id column="id" property="id"/>
         <result column="group_id" property="groupId"/>
@@ -10,14 +9,34 @@
     </resultMap>
 
     <select id="selectByUid" resultMap="baseMap">
-        select id , group_id, uid, create_time
+        select id, group_id, uid, create_time
         from group_user
         where uid = #{uid}
     </select>
 
     <select id="selectByUidAndGroupId" resultType="com.xinder.api.bean.Group">
-        select id , group_id, uid, create_time
+        select id, group_id, uid, create_time
         from group_user
-        where uid = #{uid} and group_id = #{groupId}
+        where uid = #{uid}
+          and group_id = #{groupId}
+    </select>
+
+    <resultMap id="userMap" type="com.xinder.api.bean.User">
+        <id column="id" property="id"/>
+        <result column="nickname" property="nickname"/>
+        <result column="userface" property="userface"/>
+        <result column="gender" property="gender"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="getUserByGroupId" resultMap="userMap">
+        select u.id           as id,
+               u.nickname     as nickname,
+               u.userface     as userface,
+               u.gender       as gender,
+               gu.create_time as create_time
+        from group_user gu
+                 left join `user` u on gu.uid = u.id
+        where gu.group_id = #{id}
     </select>
 </mapper>

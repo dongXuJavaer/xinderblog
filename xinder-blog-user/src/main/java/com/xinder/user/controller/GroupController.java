@@ -6,6 +6,8 @@ import com.xinder.api.bean.GroupUser;
 import com.xinder.api.enums.ResultCode;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.GroupDtoListResult;
+import com.xinder.api.response.dto.UserDtoSimpleResult;
+import com.xinder.api.response.dto.UserListDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
 import com.xinder.api.rest.FollowApi;
@@ -87,6 +89,11 @@ public class GroupController extends AbstractController implements GroupApi {
     public BaseResponse<Result> disband(Integer id) {
         Result result = groupService.disband(id);
         return buildJson(result);
+    }
+
+    @Override
+    public BaseResponse<UserListDtoResult> userList(Integer id) {
+        return buildJson(groupService.userList(id));
     }
 }
 
