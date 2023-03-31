@@ -2,11 +2,14 @@ package com.xinder.user.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.xinder.api.bean.History;
 import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
 import com.xinder.api.enums.QQLoginEnums;
 import com.xinder.api.enums.UserEnums;
 import com.xinder.api.request.UserDtoReq;
+import com.xinder.api.response.base.BaseResponse;
+import com.xinder.api.response.dto.HistoryListDtoResult;
 import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.dto.UserDtoSimpleResult;
 import com.xinder.api.response.dto.UserListDtoResult;
@@ -14,8 +17,9 @@ import com.xinder.api.response.dto.qqlogin.IdsDto;
 import com.xinder.api.response.dto.qqlogin.QQUserDto;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
+import com.xinder.common.constant.CommonConstant;
 import com.xinder.common.util.TokenDecode;
-import com.xinder.user.auth.UserDetailServiceImpl;
+import com.xinder.user.feign.HistoryFeignClient;
 import com.xinder.user.mapper.RolesMapper;
 import com.xinder.user.mapper.UserMapper;
 import com.xinder.common.util.AuthToken;
@@ -32,24 +36,24 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.provider.token.AbstractTokenGranter;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created by xinder on 2022/01/17.
@@ -83,6 +87,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private TransactionTemplate transactionTemplate;
+
+    @Autowired
+    private HistoryFeignClient historyFeignClient;
 
     //客户端ID
     @Value("${auth.clientId}")
@@ -208,6 +215,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             userDtoResult = DtoResult.dataDtoSuccess(UserDtoResult.class);
             BeanUtils.copyProperties(user, userDtoResult);
 
+            syncHistoryList(response, user.getId());
+
             response.addHeader("Token", authToken.getAccessToken());
             CookieUtils.addCookie(response, cookieDomain,
                     "/", "Authorization", authToken.getAccessToken(), cookieMaxAge, false);
@@ -327,5 +336,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         DtoResult result = DtoResult.success();
         result.setData(count);
         return result;
+    }
+
+    @Override
+    public String getCookieDomain() {
+        return cookieDomain;
+    }
+
+
+    /**
+     * 同步浏览历史记录
+     *
+     * @param response 响应
+     */
+    private void syncHistoryList(HttpServletResponse response, Long uid) {
+        List<History> historyList = Util.getHistoryListByCookie();
+        if (!CollectionUtils.isEmpty(historyList)){
+            historyFeignClient.batchSave(historyList, uid);
+            CookieUtils.deleteCookie(response, cookieDomain, "/", CommonConstant.HTTP_HEADER_HISTORY, false);
+        }
     }
 }

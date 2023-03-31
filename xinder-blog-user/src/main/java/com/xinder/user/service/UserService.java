@@ -79,4 +79,13 @@ public interface UserService extends IService<User> {
      * @return
      */
     DtoResult getUserCount();
+
+    /**
+     * 获取domain
+     */
+    /**
+     * 获取用户总数
+     * @return
+     */
+    String getCookieDomain();
 }

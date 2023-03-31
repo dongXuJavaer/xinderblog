@@ -145,4 +145,9 @@ public class UserController extends AbstractController implements UserApi {
         DtoResult dtoResult = userServiceImpl.getUserCount();
         return buildJson(dtoResult);
     }
+
+    @Override
+    public String getCookieDomain() {
+        return userServiceImpl.getCookieDomain();
+    }
 }
