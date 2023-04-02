@@ -150,4 +150,10 @@ public class UserController extends AbstractController implements UserApi {
     public String getCookieDomain() {
         return userServiceImpl.getCookieDomain();
     }
+
+    @Override
+    public BaseResponse<Result> register(UserDtoReq userDtoReq) {
+        Result result = userServiceImpl.register(userDtoReq);
+        return buildJson(result);
+    }
 }

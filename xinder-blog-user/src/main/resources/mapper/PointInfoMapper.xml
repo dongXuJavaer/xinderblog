@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xinder.user.mapper.PointInfoMapper">
+
+    <select id="getCount" resultType="java.lang.Long">
+        select count(*)
+        from point_info pt
+        <where>
+            <if test="uid!=null">
+                and pt.uid = #{uid}
+            </if>
+        </where>
+    </select>
+
+    <select id="getPointInfoList" resultType="com.xinder.api.bean.PointInfo">
+        select *
+        from point_info pt
+        <where>
+            <if test="uid!=null">
+                and pt.uid = #{uid}
+            </if>
+        </where>
+        order by pt.id desc
+        limit #{offset}, #{req.pageSize}
+    </select>
+
+
+</mapper>

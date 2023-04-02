@@ -88,4 +88,12 @@ public interface UserService extends IService<User> {
      * @return
      */
     String getCookieDomain();
+
+    /**
+     * 注册
+     *
+     * @param userDtoReq 用户dto请求
+     * @return {@link Result}
+     */
+    Result register(UserDtoReq userDtoReq);
 }

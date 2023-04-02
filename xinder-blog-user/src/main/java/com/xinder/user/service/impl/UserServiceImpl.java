@@ -3,8 +3,10 @@ package com.xinder.user.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinder.api.bean.History;
+import com.xinder.api.bean.PointInfo;
 import com.xinder.api.bean.Role;
 import com.xinder.api.bean.User;
+import com.xinder.api.enums.PointEnums;
 import com.xinder.api.enums.QQLoginEnums;
 import com.xinder.api.enums.UserEnums;
 import com.xinder.api.request.UserDtoReq;
@@ -20,6 +22,7 @@ import com.xinder.api.response.result.Result;
 import com.xinder.common.constant.CommonConstant;
 import com.xinder.common.util.TokenDecode;
 import com.xinder.user.feign.HistoryFeignClient;
+import com.xinder.user.mapper.PointInfoMapper;
 import com.xinder.user.mapper.RolesMapper;
 import com.xinder.user.mapper.UserMapper;
 import com.xinder.common.util.AuthToken;
@@ -90,6 +93,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private HistoryFeignClient historyFeignClient;
+
+    @Autowired
+    private PointInfoMapper pointInfoMapper;
+
 
     //客户端ID
     @Value("${auth.clientId}")
@@ -351,9 +358,39 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     private void syncHistoryList(HttpServletResponse response, Long uid) {
         List<History> historyList = Util.getHistoryListByCookie();
-        if (!CollectionUtils.isEmpty(historyList)){
+        if (!CollectionUtils.isEmpty(historyList)) {
             historyFeignClient.batchSave(historyList, uid);
             CookieUtils.deleteCookie(response, cookieDomain, "/", CommonConstant.HTTP_HEADER_HISTORY, false);
         }
+    }
+
+    @Override
+    public Result register(UserDtoReq userDtoReq) {
+        if (userDtoReq == null) {
+            return Result.fail("数据为空");
+        }
+        if (userDtoReq.getUsername() == null) {
+            return Result.fail("用户名不能为空");
+        }
+        if (userDtoReq.getNickname() == null) {
+            return Result.fail("昵称不能为空");
+        }
+        if (userDtoReq.getPassword() == null) {
+            return Result.fail("密码不能为空");
+        }
+        String encode = new BCryptPasswordEncoder().encode(userDtoReq.getPassword());
+        User user = new User()
+                .setUsername(userDtoReq.getUsername())
+                .setPassword(encode)
+                .setNickname(userDtoReq.getNickname())
+                .setEnabled(1)
+                .setGender(1);
+
+
+        userMapper.insert(user);
+        PointInfo pointInfo = new PointInfo().setContent("注册赠送").setPoint(30).setType(PointEnums.ADD.getCode()).setUid(user.getId());
+        pointInfoMapper.insert(pointInfo);
+
+        return Result.success("注册成功");
     }
 }

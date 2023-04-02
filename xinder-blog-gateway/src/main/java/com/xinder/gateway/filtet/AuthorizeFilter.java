@@ -93,6 +93,7 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
                 || path.startsWith("/api/tags/all")
                 || path.startsWith("/api/category/all")
                 || path.startsWith("/api/history")
+                || path.startsWith("/api/user/register")
                 || judgeRestGet(USERID_PATH, path)
                 || judgeRestGet(USER_ADD_GROUP_PATH, path)
         ) {

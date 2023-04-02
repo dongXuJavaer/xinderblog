@@ -14,6 +14,18 @@
         <result column="title" property="article.title"/>
     </resultMap>
 
+    <resultMap id="sysMap" type="com.xinder.api.bean.Notification">
+        <id column="id" property="id"/>
+        <result column="from_uid" property="fromUid"/>
+        <result column="to_uid" property="toUid"/>
+        <result column="content" property="content"/>
+        <result column="aid" property="aid"/>
+        <result column="create_time" property="createTime"/>
+        <result column="u_id" property="fromUser.id"/>
+        <result column="u_nickname" property="fromUser.nickname"/>
+        <result column="uuserface" property="fromUser.userface"/>
+    </resultMap>
+
     <select id="getByToUid" resultMap="baseMap">
         select
         n.id,
@@ -50,5 +62,26 @@
                 and n.type = #{type}
             </if>
         </where>
+    </select>
+
+    <select id="getSystemNotifi" resultMap="sysMap">
+        select
+        n.id,
+        n.from_uid,
+        n.to_uid,
+        n.content,
+        n.aid,
+        n.create_time,
+        u.id as u_id,
+        u.nickname as u_nickname,
+        u.userface as uuserface
+        from notification n left join user u on n.from_uid = u.id
+        <where>
+            <if test="type!=null">
+                and n.type = #{type}
+            </if>
+        </where>
+        order by n.id desc
+        limit #{offset}, #{pageSize};
     </select>
 </mapper>

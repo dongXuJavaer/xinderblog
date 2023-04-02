@@ -34,7 +34,7 @@ public interface NotificationApi {
 
     @ApiOperation(value = "查看系统通知列表", notes = "查看系统通知列表", tags = {"NotificationApi"})
     @RequestMapping(value = "/sys/list", method = RequestMethod.POST)
-    BaseResponse<NotificationDtoListResult> sysList();
+    BaseResponse<NotificationDtoListResult> sysList(@RequestBody PageDtoReq pageDtoReq);
 
     @ApiOperation(value = "查看关注通知列表", notes = "查看关注通知列表", tags = {"NotificationApi"})
     @RequestMapping(value = "/follow/list", method = RequestMethod.POST)

@@ -48,7 +48,7 @@ public interface NotificationService extends IService<Notification> {
      *
      * @return {@link NotificationDtoListResult}
      */
-    NotificationDtoListResult sysList();
+    NotificationDtoListResult sysList(PageDtoReq pageDtoReq);
 
     /**
      * 关注通知列表

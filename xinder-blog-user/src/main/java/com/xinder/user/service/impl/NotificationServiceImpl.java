@@ -103,16 +103,20 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
     }
 
     @Override
-    public NotificationDtoListResult sysList() {
-        UserDtoResult currentUser = userService.getCurrentUser();
+    public NotificationDtoListResult sysList(PageDtoReq pageDtoReq) {
         NotificationDtoListResult dtoListResult = DtoResult.dataDtoSuccess(NotificationDtoListResult.class);
-        if (currentUser.getId() == null) {
-            dtoListResult.setMsg("未登录");
-            return dtoListResult;
-        }
 
+        Long count = notificationMapper.getCount(null, NotificationEnums.SYSTEM.getCode());
+        dtoListResult = DtoResult.dataDtoSuccess(NotificationDtoListResult.class);
+        dtoListResult.setTotalCount(count);
 
-        return null;
+        Integer pageSize = pageDtoReq.getPageSize();
+        Long currentPage = pageDtoReq.getCurrentPage();
+        Long offset = (currentPage - 1) * pageSize;
+        List<Notification> notificationList = notificationMapper.getSystemNotifi(NotificationEnums.SYSTEM.getCode(), offset, pageSize);
+        dtoListResult.setList(notificationList);
+
+        return dtoListResult;
     }
 
     @Override
@@ -123,6 +127,7 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
             dtoListResult.setMsg("未登录");
             return dtoListResult;
         }
+
         return null;
     }
 

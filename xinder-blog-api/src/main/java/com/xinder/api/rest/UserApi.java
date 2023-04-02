@@ -93,5 +93,9 @@ public interface UserApi {
     @RequestMapping(value = "/domain", method = RequestMethod.GET)
     String getCookieDomain();
 
+    @ApiOperation(value = "注册", notes = "注册", tags = {"UserApi"})
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    BaseResponse<Result> register(@RequestBody UserDtoReq userDtoReq);
+
 
 }

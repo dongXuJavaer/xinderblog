@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author Xinder
@@ -50,8 +50,8 @@ public class NotificationController extends AbstractController implements Notifi
     }
 
     @Override
-    public BaseResponse<NotificationDtoListResult> sysList() {
-        NotificationDtoListResult listResult = notificationService.sysList();
+    public BaseResponse<NotificationDtoListResult> sysList(PageDtoReq pageDtoReq) {
+        NotificationDtoListResult listResult = notificationService.sysList(pageDtoReq);
         return buildJson(listResult);
     }
 
