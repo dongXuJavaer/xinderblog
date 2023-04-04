@@ -10,6 +10,7 @@ import com.xinder.api.response.result.Result;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /**
  * @author Xinder
@@ -76,6 +77,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 获取用户总数
+     *
      * @return
      */
     DtoResult getUserCount();
@@ -85,6 +87,7 @@ public interface UserService extends IService<User> {
      */
     /**
      * 获取用户总数
+     *
      * @return
      */
     String getCookieDomain();
@@ -96,4 +99,29 @@ public interface UserService extends IService<User> {
      * @return {@link Result}
      */
     Result register(UserDtoReq userDtoReq);
+
+    /**
+     * 绑定qq
+     *
+     * @return {@link Result}
+     */
+    Result bindQQ(String token);
+
+    /**
+     * 取消qq绑定
+     *
+     * @param uid uid
+     * @return {@link Result}
+     */
+    Result cancelQQ(Long uid);
+
+    /**
+     * 更新密码
+     *
+     * @param map oldPassword
+     *            newPassword1
+     *            newPassword2
+     * @return {@link Result}
+     */
+    Result updatePwd(Map map);
 }

@@ -94,6 +94,8 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
                 || path.startsWith("/api/category/all")
                 || path.startsWith("/api/history")
                 || path.startsWith("/api/user/register")
+                || path.startsWith("/api/user/bind/qq")
+                || path.startsWith("/api/user/cancel/qq")
                 || judgeRestGet(USERID_PATH, path)
                 || judgeRestGet(USER_ADD_GROUP_PATH, path)
         ) {
@@ -126,7 +128,7 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            return needAuthorization(USER_LOGIN_URL + "?from=" + url, exchange);
+//            return needAuthorization(USER_LOGIN_URL + "?from=" + url, exchange);
         }
 
         try {

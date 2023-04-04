@@ -1,6 +1,7 @@
 package com.xinder.user.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinder.api.bean.History;
 import com.xinder.api.bean.PointInfo;
@@ -37,6 +38,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -392,5 +394,78 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         pointInfoMapper.insert(pointInfo);
 
         return Result.success("注册成功");
+    }
+
+    @Override
+    public Result bindQQ(String token) {
+        IdsDto idsDto = this.getOpenId(token);
+        String openId = idsDto.getOpenId();
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<User>()
+                .eq(User::getOpenid, openId);
+        User user = userMapper.selectOne(wrapper);
+        if (user != null) {
+            return Result.fail("该QQ已绑定用户");
+        } else {
+            User currentUser = Util.getCurrentUser(tokenDecode, redisTemplate);
+            System.out.println(currentUser);
+            User oldUser = userMapper.selectById(currentUser.getId());
+            oldUser.setOpenid(openId);
+            userMapper.updateById(oldUser);
+            String userKey = UserEnums.USER_ONLINE_PREFIX_KEY.getValue() + oldUser.getUsername();
+            redisTemplate.opsForValue().set(userKey, oldUser);
+        }
+        return Result.success("绑定成功");
+    }
+
+    @Override
+    public Result cancelQQ(Long uid) {
+        if (uid != null) {
+            User user = userMapper.selectById(uid);
+            user.setOpenid(null);
+            int i = userMapper.cancelBindQQ(user);
+            String userKey = UserEnums.USER_ONLINE_PREFIX_KEY.getValue() + user.getUsername();
+            redisTemplate.opsForValue().set(userKey, user);
+
+            return Result.success("取消成功");
+        }
+        return Result.fail("取消失败");
+    }
+
+    @Override
+    public Result updatePwd(Map map) {
+        /*
+            oldPassword
+            newPassword1
+            newPassword2
+         */
+
+        // 进行密码加密
+        User currentUser = Util.getCurrentUser(tokenDecode, redisTemplate);
+
+        if (currentUser.getId() == null) {
+            return Result.fail("未登录，请刷新页面");
+        }
+
+        User user = userMapper.getUserById(currentUser.getId());
+
+        if (!map.get("newPassword1").equals(map.get("newPassword2"))) {
+            return Result.fail("两次密码不能一致");
+        }
+
+
+        String oldPwd = map.get("oldPassword").toString();
+        String newPwd = map.get("newPassword1").toString();
+        String hashpw = BCrypt.hashpw(oldPwd, user.getPassword());  // 用输入的明文旧密码  与 数据库中的密码密码  用这个方法校验
+        log.info("hashPwd: {}", oldPwd);
+        log.info("newPwd: {}", newPwd);
+        log.info("hashpw: {}", hashpw);
+        if (!user.getPassword().equals(hashpw)) {
+            return Result.fail("密码错误");
+        }
+
+        user.setPassword(new BCryptPasswordEncoder().encode(newPwd));
+        userMapper.updateById(user);
+
+        return Result.success("修改成功");
     }
 }

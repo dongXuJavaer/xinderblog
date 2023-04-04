@@ -54,4 +54,12 @@ public interface UserMapper extends BaseMapper<User> {
      * @return
      */
     List<User> selectBatchFans(@Param("uid") Long uid);
+
+    /**
+     * 取消绑定qq
+     *
+     * @param user 用户
+     * @return int
+     */
+    int cancelBindQQ(User user);
 }

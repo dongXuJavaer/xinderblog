@@ -121,4 +121,8 @@
         FROM user u left join follow f on u.id = f.uid
         where f.followed_uid = #{uid}
     </select>
+
+    <update id="cancelBindQQ">
+        update  `user` set openid = null where id = #{id}
+    </update>
 </mapper>

@@ -12,6 +12,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 /**
  * @author Xinder
  * @date 2023-01-08 10:54
@@ -97,5 +99,16 @@ public interface UserApi {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     BaseResponse<Result> register(@RequestBody UserDtoReq userDtoReq);
 
+    @ApiOperation(value = "绑定QQ", notes = "绑定QQ", tags = {"UserApi"})
+    @RequestMapping(value = "/bind/qq", method = RequestMethod.GET)
+    BaseResponse<Result> bindQQ(@RequestParam(value = "access_token", required = false) String accessToken);
+
+    @ApiOperation(value = "取消绑定QQ", notes = "取消绑定QQ", tags = {"UserApi"})
+    @RequestMapping(value = "/cancel/qq/{uid}", method = RequestMethod.POST)
+    BaseResponse<Result> cancelQQ(@PathVariable("uid") Long uid);
+
+    @ApiOperation(value = "修改密码", notes = "修改密码", tags = {"ArticleController"})
+    @RequestMapping(value = "/update-pwd", method = RequestMethod.POST)
+    BaseResponse<Result> updatePwd(@RequestBody Map map);
 
 }

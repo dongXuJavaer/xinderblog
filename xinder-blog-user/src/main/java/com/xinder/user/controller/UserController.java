@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /**
  * Created by sang on 2017/12/24.
@@ -154,6 +155,24 @@ public class UserController extends AbstractController implements UserApi {
     @Override
     public BaseResponse<Result> register(UserDtoReq userDtoReq) {
         Result result = userServiceImpl.register(userDtoReq);
+        return buildJson(result);
+    }
+
+    @Override
+    public BaseResponse<Result> bindQQ(String token) {
+        Result result = userServiceImpl.bindQQ(token);
+        return buildJson(result);
+    }
+
+    @Override
+    public BaseResponse<Result> cancelQQ(Long uid) {
+        Result result = userServiceImpl.cancelQQ(uid);
+        return buildJson(result);
+    }
+
+    @Override
+    public BaseResponse<Result> updatePwd(Map map) {
+        Result result = userServiceImpl.updatePwd(map);
         return buildJson(result);
     }
 }

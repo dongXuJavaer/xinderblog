@@ -1,5 +1,6 @@
 package com.xinder.api.response.dto;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.xinder.api.bean.Role;
 import com.xinder.api.response.result.DtoResult;
@@ -51,5 +52,10 @@ public class UserDtoResult extends DtoResult {
 
     @ApiModelProperty(value = "性别" , notes = "1:女    2:男")
     private Integer gender;
+
+    @ApiModelProperty(value = "openid（qq登录的对应的）")
+    @TableField(value = "openid")
+    private String openid;
+
 
 }
