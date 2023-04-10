@@ -42,6 +42,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -102,6 +103,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Autowired
     private ZanMapper zanMapper;
+
+    @PostConstruct
+    public void init() {
+        this.importArticle();
+    }
 
     public int addNewArticle(Article article) {
         //处理文章摘要
@@ -346,13 +352,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             }
             articleMapper.insert(article);
         } else {
-            transactionTemplate.executeWithoutResult(status -> {
-                refreshTag(article);
-                article.setEditTime(new Date());
-                articleMapper.updateArticle(article);
-            });
+            refreshTag(article);
+            article.setEditTime(new Date());
+            articleMapper.updateArticle(article);
         }
 
+        articleESMapper.delete(article);
         articleESMapper.save(article);
         return Result.success("成功");
     }
@@ -493,6 +498,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     public Result importArticle() {
+        log.info("=============== 导入帖子到ES ============");
         try {
             List<Article> articleList = articleMapper.getArticleList(null, null, null);
             articleESMapper.saveAll(articleList);
@@ -500,6 +506,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             e.printStackTrace();
             return Result.fail("导入失败");
         }
+        System.out.println("=============== 导入完成 ============");
         return Result.success("导入成功");
     }
 

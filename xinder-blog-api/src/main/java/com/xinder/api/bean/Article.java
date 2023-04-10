@@ -119,7 +119,7 @@ public class Article implements Serializable {
 
     @TableField("comment_flag")
     @ApiModelProperty(value = "是否能被评论，0: 不能   1: 能")
-    private Byte commentFlag;
+    private Integer commentFlag;
 
 
     @TableField(exist = false)

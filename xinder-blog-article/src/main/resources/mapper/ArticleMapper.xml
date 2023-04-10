@@ -34,6 +34,9 @@
         <if test="headPic!=null">
             ,head_pic=#{headPic}
         </if>
+        <if test="commentFlag!=null">
+            ,comment_flag=#{commentFlag}
+        </if>
         WHERE id=#{id}
     </update>
 
@@ -147,6 +150,7 @@
                a.read_count,
                a.head_pic,
                a.attachment,
+               a.comment_flag,
                u.`nickname`    as nickname,
                c.id            as cid,
                c.`cate_name`   as cate_name
