@@ -10,10 +10,11 @@ import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
 import com.xinder.user.mapper.PointInfoMapper;
 import com.xinder.user.service.PointInfoService;
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,6 +33,44 @@ public class PointInfoServiceImpl extends ServiceImpl<PointInfoMapper, PointInfo
 
     @Override
     public Result add(PointInfo pointInfo) {
+        PointInfo now = pointInfoMapper.selectNow(pointInfo);
+        if (now != null) {
+            return Result.fail("当日已签到");
+        }
+
+        // 近七天的签到记录
+        List<PointInfo> pointInfoList = null;
+        // 从近1天开始查询，判断是否连续签到
+        for (int i = 1; i <= 7; i++) {
+            List<PointInfo> list = pointInfoMapper.selectNearDay(pointInfo, i);
+            // 前一天没有签到时，查询为空的情况
+            if (list == null) {
+                break;
+            }
+            // 查询到的签到记录不是连续时
+            if (list.size() != i) {
+                break;
+            }
+            // 记录上一次的循环结果
+            pointInfoList = list;
+        }
+        // 是连续签到
+        if (!CollectionUtils.isEmpty(pointInfoList)) {
+            PointInfo info = pointInfoList.get(pointInfoList.size() - 1);
+            String str = info.getContent();
+            String day = str.substring(2, 3);
+            int dayInt = Integer.parseInt(day);
+            pointInfo.setContent("签到" + (dayInt + 1) + "天");
+            if (dayInt >= 7) {
+                pointInfo.setPoint(7);
+            } else {
+                pointInfo.setPoint(dayInt + 1);
+            }
+        } else {
+            // 不是连续签到
+            pointInfo.setContent("签到1天");
+            pointInfo.setPoint(1);
+        }
         int i = pointInfoMapper.insert(pointInfo);
         return i > 0 ? Result.success("成功") : Result.fail("失败");
     }
