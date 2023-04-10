@@ -30,6 +30,7 @@
         <if test="pointInfo.uid != null">
             and uid = #{pointInfo.uid}
         </if>
+        and content != '注册赠送'
     </select>
 
     <select id="selectNearDay" resultType="com.xinder.api.bean.PointInfo">

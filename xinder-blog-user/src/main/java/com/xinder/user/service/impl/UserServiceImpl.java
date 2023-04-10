@@ -260,6 +260,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             User finalUser = user;
             int count = transactionTemplate.execute(status -> {
                 int insert = userMapper.insert(finalUser);
+                PointInfo pointInfo = new PointInfo().setContent("注册赠送").setPoint(30).setType(PointEnums.ADD.getCode()).setUid(finalUser.getId());
+                pointInfoMapper.insert(pointInfo);
                 return insert;
             });
         }
