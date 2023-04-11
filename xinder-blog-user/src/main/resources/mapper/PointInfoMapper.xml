@@ -39,4 +39,8 @@
         and uid = #{pointInfo.uid}
         and content != '注册赠送'
     </select>
+
+    <select id="getPointInfoByUid" resultType="com.xinder.api.bean.PointInfo">
+        select * from point_info where uid = #{uid};
+    </select>
 </mapper>

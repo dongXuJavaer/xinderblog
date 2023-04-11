@@ -6,6 +6,7 @@ import com.xinder.api.request.UserDtoReq;
 import com.xinder.api.request.comm.PageDtoReq;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.PointInfoListDtoResult;
+import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
 import com.xinder.api.rest.PointInfoApi;
 import com.xinder.common.abstcontroller.AbstractController;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author Xinder
@@ -37,17 +38,27 @@ public class PointInfoController extends AbstractController implements PointInfo
     }
 
     @Override
+    public BaseResponse<DtoResult> getPointCount(Long uid) {
+        DtoResult dtoResult = pointInfoService.getPointCount(uid);
+        return buildJson(dtoResult);
+    }
+
+    @Override
     public BaseResponse<Result> add(PointInfo pointInfo) {
-        Result result =pointInfoService.add(pointInfo);
+        Result result = pointInfoService.add(pointInfo);
         return buildJson(result);
     }
 
     @Override
     public BaseResponse<Result> reduce(PointInfo pointInfo) {
-        Result result =pointInfoService.reduce(pointInfo);
+        Result result = pointInfoService.reduce(pointInfo);
         return buildJson(result);
     }
 
-
+    @Override
+    public BaseResponse<DtoResult> getByUidAndRid(Long uid, Long rid) {
+        DtoResult dtoResult = pointInfoService.getByUidAndRid(uid, rid);
+        return buildJson(dtoResult);
+    }
 }
 

@@ -37,4 +37,12 @@ public interface PointInfoMapper extends BaseMapper<PointInfo> {
      * @return {@link List}<{@link PointInfo}>
      */
     List<PointInfo> selectNearDay(@Param("pointInfo") PointInfo pointInfo, @Param("count") Integer count);
+
+    /**
+     * 根据uid获取积分信息
+     *
+     * @param uid uid
+     * @return {@link List}<{@link PointInfo}>
+     */
+    List<PointInfo> getPointInfoByUid(Long uid);
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinder.api.bean.PointInfo;
 import com.xinder.api.enums.PointEnums;
+import com.xinder.api.enums.ResultCode;
 import com.xinder.api.request.comm.PageDtoReq;
 import com.xinder.api.response.dto.PointInfoListDtoResult;
 import com.xinder.api.response.result.DtoResult;
@@ -108,5 +109,40 @@ public class PointInfoServiceImpl extends ServiceImpl<PointInfoMapper, PointInfo
         pointInfo.setType(PointEnums.RETUCE.getCode());
         pointInfoMapper.insert(pointInfo);
         return Result.success("成功");
+    }
+
+    @Override
+    public DtoResult getByUidAndRid(Long uid, Long rid) {
+
+        LambdaQueryWrapper<PointInfo> wrapper = new LambdaQueryWrapper<PointInfo>()
+                .eq(PointInfo::getUid, uid)
+                .eq(PointInfo::getRid, rid);
+
+        PointInfo pointInfo = pointInfoMapper.selectOne(wrapper);
+        DtoResult dtoResult = null;
+        if (pointInfo != null) {
+            dtoResult = DtoResult.success();
+            dtoResult.setData(pointInfo);
+        } else {
+            // 未查询到，则返回失败
+            dtoResult = DtoResult.fail(ResultCode.FAIL);
+        }
+        return dtoResult;
+    }
+
+    @Override
+    public DtoResult getPointCount(Long uid) {
+        List<PointInfo> pointInfoList = pointInfoMapper.getPointInfoByUid(uid);
+        int count = 0;
+        for (PointInfo pointInfo : pointInfoList) {
+            if (PointEnums.ADD.getCode() == pointInfo.getType()) {
+                count += pointInfo.getPoint();
+            } else {
+                count -= pointInfo.getPoint();
+            }
+        }
+        DtoResult dtoResult = DtoResult.success();
+        dtoResult.setData(count);
+        return dtoResult;
     }
 }

@@ -28,6 +28,10 @@ public interface PointInfoApi {
     @RequestMapping(value = "/list/{uid}", method = RequestMethod.POST)
     BaseResponse<PointInfoListDtoResult> getListByUid(@PathVariable("uid") Long uid, @RequestBody PageDtoReq pageDtoReq);
 
+    @ApiOperation(value = "获取某人总积分", notes = "积分明细", tags = {"PointApi"})
+    @RequestMapping(value = "/count/{uid}", method = RequestMethod.GET)
+    BaseResponse<DtoResult> getPointCount(@PathVariable("uid") Long uid);
+
     @ApiOperation(value = "增加积分", notes = "积分明细", tags = {"PointApi"})
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     BaseResponse<Result> add(@RequestBody PointInfo pointInfo);
@@ -36,5 +40,8 @@ public interface PointInfoApi {
     @RequestMapping(value = "/reduce", method = RequestMethod.POST)
     BaseResponse<Result> reduce(@RequestBody PointInfo pointInfo);
 
+    @ApiOperation(value = "查询用户对某资源是否下载过", notes = "查询用户对某资源是否下载过", tags = {"PointApi"})
+    @RequestMapping(value = "/judge", method = RequestMethod.POST)
+    BaseResponse<DtoResult> getByUidAndRid(@RequestParam("uid") Long uid,@RequestParam("rid") Long rid);
 
 }

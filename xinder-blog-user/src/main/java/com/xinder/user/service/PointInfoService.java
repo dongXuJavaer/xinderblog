@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.xinder.api.bean.PointInfo;
 import com.xinder.api.request.comm.PageDtoReq;
 import com.xinder.api.response.dto.PointInfoListDtoResult;
+import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
 
 /**
@@ -39,4 +40,21 @@ public interface PointInfoService extends IService<PointInfo> {
      * @return {@link Result}
      */
     Result reduce(PointInfo pointInfo);
+
+    /**
+     * 查询用户对某资源是否下载
+     *
+     * @param uid uid
+     * @param rid 掉
+     * @return {@link DtoResult}
+     */
+    DtoResult getByUidAndRid(Long uid, Long rid);
+
+    /**
+     * 获取某人的积分总数
+     *
+     * @param uid uid
+     * @return {@link DtoResult}
+     */
+    DtoResult getPointCount(Long uid);
 }
