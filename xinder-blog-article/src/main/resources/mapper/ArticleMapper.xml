@@ -25,8 +25,8 @@
         UPDATE article SET
         title=#{title},md_content=#{mdContent},
         html_content=#{htmlContent},summary=#{summary},cid=#{cid},edit_time=#{editTime}
-        <if test="state==1">
-            ,state=1
+        <if test="state!=null">
+            ,state=#{state}
         </if>
         <if test="attachment!=null">
             ,attachment=#{attachment}
@@ -67,7 +67,7 @@
         a.`title` as title,
         a.summary as summary,
         a.`edit_time` as edit_time,
-<!--        a.`page_view` as page_view,-->
+        <!--        a.`page_view` as page_view,-->
         a.`state` as state ,
         a.`create_time` as create_time ,
         a.uid as uid,
@@ -137,26 +137,26 @@
     </delete>
 
     <select id="getArticleById" parameterType="Long" resultMap="articleMap">
-        select a.id            as id,
-               a.`title`       as title,
-               a.md_content,
-               a.html_content,
-               a.summary       as summary,
-               a.`edit_time`   as edit_time,
-<!--               a.`page_view`   as page_view,-->
-               a.`state`       as state,
-               a.`create_time` as create_time,
-               a.uid           as uid,
-               a.read_count,
-               a.head_pic,
-               a.attachment,
-               a.comment_flag,
-               u.`nickname`    as nickname,
-               c.id            as cid,
-               c.`cate_name`   as cate_name
+        select a.id as id,
+        a.`title` as title,
+        a.md_content,
+        a.html_content,
+        a.summary as summary,
+        a.`edit_time` as edit_time,
+        <!--               a.`page_view`   as page_view,-->
+        a.`state` as state,
+        a.`create_time` as create_time,
+        a.uid as uid,
+        a.read_count,
+        a.head_pic,
+        a.attachment,
+        a.comment_flag,
+        u.`nickname` as nickname,
+        c.id as cid,
+        c.`cate_name` as cate_name
         FROM article a
-                 LEFT JOIN `user` u ON a.`uid` = u.`id`
-                 LEFT JOIN category c ON a.`cid` = c.`id`
+        LEFT JOIN `user` u ON a.`uid` = u.`id`
+        LEFT JOIN category c ON a.`cid` = c.`id`
         WHERE a.id = #{aid}
     </select>
 
@@ -225,7 +225,7 @@
         a.`title` as title,
         a.summary as summary,
         a.`edit_time` as edit_time,
-<!--        a.`page_view` as page_view,-->
+        <!--        a.`page_view` as page_view,-->
         a.`state` as state ,
         a.`create_time` as create_time ,
         a.`read_count` as read_count,

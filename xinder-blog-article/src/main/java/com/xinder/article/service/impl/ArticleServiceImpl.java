@@ -238,10 +238,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Integer pageSize = req.getPageSize();
         Long currentPage = req.getCurrentPage();
         Long offset = (currentPage - 1) * pageSize;
-        req.setState(1);
+//        req.setState(1);
 
         // ES搜索
-        NativeSearchQuery query = buildNativeSearchQuery(currentPage, pageSize, keywords, req.getCid(), req.getUid());
+        NativeSearchQuery query = buildNativeSearchQuery(currentPage, pageSize, keywords, req.getCid(), req.getUid(), req.getState());
         SearchHits<Article> searchHits = getSearchHits(query);
         List<Article> articleList = queryByES(query, searchHits);
         Long rows = searchHits.getTotalHits();
@@ -394,7 +394,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         });
     }
 
-    private NativeSearchQuery buildNativeSearchQuery(Long currentPage, Integer pageSize, String keywords, Long cid, Long uid) {
+    private NativeSearchQuery buildNativeSearchQuery(Long currentPage, Integer pageSize, String keywords, Long cid, Long uid, Integer state) {
         // 1. 创建 查询对象的构建对象 NativeSearchQueryBuilder
         NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
         // 2. 设置查询的条件
@@ -422,6 +422,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
         if (uid != null) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("uid", uid));
+        }
+        if (state != null) {
+            boolQueryBuilder.filter(QueryBuilders.termQuery("state", state));
         }
 
         // 关联过滤

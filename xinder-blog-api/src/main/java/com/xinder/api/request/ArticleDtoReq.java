@@ -46,7 +46,7 @@ public class ArticleDtoReq extends PageDtoReq {
     private Long cid;
 
     @TableField(value = "state")
-    @ApiModelProperty(value = "博客状态", notes = "0表示草稿箱，1表示已发表，2表示已删除")
+    @ApiModelProperty(value = "博客状态", notes = "0表示草稿箱，1表示已发表，2表示已删除, 3表示自己可见")
     private Integer state;
 
     @ApiModelProperty(value = "创建时间")
