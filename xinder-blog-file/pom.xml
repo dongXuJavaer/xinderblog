@@ -21,6 +21,12 @@
             <groupId>com.xinder.blog</groupId>
             <artifactId>xinder-blog-common</artifactId>
             <version>1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
 

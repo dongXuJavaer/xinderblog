@@ -1,0 +1,19 @@
+spring:
+  profiles:
+    active: dev  #   ${prefix}-${spring.profile.active}.${file-extension}
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://140.210.209.238:8848
+        namespace: 84c90b39-8826-48bc-bef4-d66ae40e1c73
+      config:
+        server-addr: http://140.210.209.238:8848
+        file-extension: yml
+        namespace: 84c90b39-8826-48bc-bef4-d66ae40e1c73
+        extension-configs[0]:
+          data-id: global.yml
+          refresh: true
+  application:
+    name: file # 配置中心的文件名默认为这个
+
+
