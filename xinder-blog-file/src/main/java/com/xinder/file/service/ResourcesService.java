@@ -40,5 +40,5 @@ public interface ResourcesService extends IService<Resources> {
      * @param pageDtoReq 页面dto点播
      * @return {@link ResourcesListDtoResult}
      */
-    ResourcesListDtoResult getPageList(PageDtoReq pageDtoReq);
+    ResourcesListDtoResult getPageList(PageDtoReq pageDtoReq, String uid);
 }

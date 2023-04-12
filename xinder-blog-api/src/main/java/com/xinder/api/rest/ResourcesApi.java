@@ -18,23 +18,23 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/resources")
 public interface ResourcesApi {
 
-    @ApiOperation(value = "上传资源", notes = "积分明细", tags = {"PointApi"})
+    @ApiOperation(value = "上传资源", notes = "上传资源", tags = {"PointApi"})
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     BaseResponse<String> uploadResources(MultipartFile file);
 
     @ApiOperation(value = "查看资源列表", notes = "查看资源列表", tags = {"PointApi"})
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    BaseResponse<ResourcesListDtoResult> list(@RequestBody PageDtoReq pageDtoReq);
+    BaseResponse<ResourcesListDtoResult> list(@RequestBody PageDtoReq pageDtoReq, @RequestParam("uid") String uid);
 
-    @ApiOperation(value = "上传资源", notes = "积分明细", tags = {"PointApi"})
+    @ApiOperation(value = "下载资源", notes = "下载资源", tags = {"PointApi"})
     @RequestMapping(value = "/download/{rid}", method = RequestMethod.GET)
     void downloadResources(@PathVariable("rid") Long rid, @RequestParam("uid") Long uid);
 
-    @ApiOperation(value = "提交资源信息", notes = "积分明细", tags = {"PointApi"})
+    @ApiOperation(value = "提交资源信息", notes = "提交资源信息", tags = {"PointApi"})
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     BaseResponse<Result> add(@RequestBody Resources resources);
 
-    @ApiOperation(value = "删除资源信息", notes = "积分明细", tags = {"PointApi"})
+    @ApiOperation(value = "删除资源信息", notes = "删除资源信息", tags = {"PointApi"})
     @RequestMapping(value = "/delete/{rid}", method = RequestMethod.POST)
     BaseResponse<Result> delete(@PathVariable("rid") Long rid);
 

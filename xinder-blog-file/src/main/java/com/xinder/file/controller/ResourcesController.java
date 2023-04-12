@@ -52,8 +52,8 @@ public class ResourcesController extends AbstractController implements Resources
     }
 
     @Override
-    public BaseResponse<ResourcesListDtoResult> list(PageDtoReq pageDtoReq) {
-        ResourcesListDtoResult listDtoResult = resourcesService.getPageList(pageDtoReq);
+    public BaseResponse<ResourcesListDtoResult> list(PageDtoReq pageDtoReq, String uid) {
+        ResourcesListDtoResult listDtoResult = resourcesService.getPageList(pageDtoReq, uid);
         return buildJson(listDtoResult);
     }
 

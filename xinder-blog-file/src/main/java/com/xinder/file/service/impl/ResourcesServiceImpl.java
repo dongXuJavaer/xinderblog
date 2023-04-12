@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 
@@ -56,20 +57,20 @@ public class ResourcesServiceImpl extends ServiceImpl<ResourcesMapper, Resources
     public void downloadResources(Long rid, Long uid) {
         Resources resources = resourcesMapper.selectById(rid);
 
-        // 查询用户是否下载过
-        BaseResponse<DtoResult> dtoResultBaseResponse = pointInfoFeignClient.getByUidAndRid(uid, rid);
-        if (!dtoResultBaseResponse.isSuccess()) {
-            // 如果用户没有下载过
-            BaseResponse<DtoResult> baseResponse = pointInfoFeignClient.getPointCount(uid);
-            Integer count = (Integer) baseResponse.getData().getData();
+//        // 查询用户是否下载过
+//        BaseResponse<DtoResult> dtoResultBaseResponse = pointInfoFeignClient.getByUidAndRid(uid, rid);
+//        if (!dtoResultBaseResponse.isSuccess()) {
+//            // 如果用户没有下载过
+//            BaseResponse<DtoResult> baseResponse = pointInfoFeignClient.getPointCount(uid);
+//            Integer count = (Integer) baseResponse.getData().getData();
+//
+//        }
 
-        }
-
-        String urlStr = resources.getUrl();
+//        String urlStr = resources.getUrl();
         resources.setCount(resources.getCount() + 1);
         log.info("请求下载");
-//        String urlStr = "http://img.blog.xinder.top/blog/attachment/2023-02-19---631bfd17-31b0-42c0-9333-d52e7e83c7f6_8C9ADDAC68B188C0BB5403F0444E3BA7_1676166839224.zip";
-        downLoad(urlStr, urlStr);
+        String urlStr = "http://img.blog.xinder.top/blog/attachment/2023-02-19---631bfd17-31b0-42c0-9333-d52e7e83c7f6_8C9ADDAC68B188C0BB5403F0444E3BA7_1676166839224.zip";
+        downLoad(urlStr, resources.getName() + "_" + resources.getCreateTime());
 
     }
 
@@ -104,7 +105,7 @@ public class ResourcesServiceImpl extends ServiceImpl<ResourcesMapper, Resources
             InputStream inStream = conn.getInputStream();
             HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
             response.setContentType(conn.getContentType());
-            response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(filename, "utf-8"));
 
             //将输入流的事件写出到输出事件
             servletOutputStream = response.getOutputStream();
@@ -113,11 +114,12 @@ public class ResourcesServiceImpl extends ServiceImpl<ResourcesMapper, Resources
             while ((length = inStream.read(buffer)) != -1) {
                 servletOutputStream.write(buffer, 0, length);
             }
+            System.out.println("下载完成");
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
-                servletOutputStream.close();
+                servletOutputStream.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -125,13 +127,15 @@ public class ResourcesServiceImpl extends ServiceImpl<ResourcesMapper, Resources
     }
 
     @Override
-    public ResourcesListDtoResult getPageList(PageDtoReq req) {
-        BaseResponse<UserDtoResult> currentUserBase = userFeignClient.currentUser();
-        Long uid = currentUserBase.getData().getId();
+    public ResourcesListDtoResult getPageList(PageDtoReq req, String uidStr) {
 
         Integer pageSize = req.getPageSize();
         Long currentPage = req.getCurrentPage();
         Long offset = (currentPage - 1) * pageSize;
+        Long uid = null;
+        if (!"null".equals(uidStr) && uidStr != null) {
+            uid = Long.parseLong(uidStr);
+        }
         Long rows = resourcesMapper.getCount(uid);
         List<Resources> resourcesList = resourcesMapper.pageList(req, offset, uid);
 

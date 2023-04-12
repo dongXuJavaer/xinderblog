@@ -1,6 +1,7 @@
 package com.xinder.api.bean;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -52,6 +53,12 @@ public class Resources implements Serializable {
 
     @ApiModelProperty(value = "0 不公开；   1 公开")
     private Integer state;
+
+    @ApiModelProperty(value = "分享资源作者信息")
+    @TableField(exist = false)
+    private User user;
+
+
 
 
 }
