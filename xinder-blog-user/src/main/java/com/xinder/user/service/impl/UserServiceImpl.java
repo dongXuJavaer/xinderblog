@@ -174,7 +174,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userMapper.getAllRole();
     }
 
-    public int updateUserEnabled(Boolean enabled, Long uid) {
+    public int updateUserEnabled(Integer enabled, Long uid) {
         return userMapper.updateUserEnabled(enabled, uid);
     }
 
@@ -220,6 +220,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             User user = userMapper.loadUserByUsername(username);
             redisTemplate.opsForValue().set(UserEnums.USER_ONLINE_PREFIX_KEY.getValue() + user.getUsername(),
                     user, Duration.ofMinutes(30));
+            // 用户被禁用
+            if (user.getEnabled().equals(0)) {
+                userDtoResult = DtoResult.dataDtoFail(UserDtoResult.class);
+                userDtoResult.setMsg("账号已被禁用");
+                return userDtoResult;
+            }
             log.info("登录用户 {} 信息存入redis", user.getUsername());
             userDtoResult = DtoResult.dataDtoSuccess(UserDtoResult.class);
             BeanUtils.copyProperties(user, userDtoResult);
