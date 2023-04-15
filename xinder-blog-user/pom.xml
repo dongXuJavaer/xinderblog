@@ -52,6 +52,12 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
+        <!--   定时任务-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -85,16 +91,16 @@
 
     </build>
 
-<!--    <distributionManagement>-->
-<!--        <repository>-->
-<!--            <id>mycompany-nexus-releases</id>-->
-<!--            <url>http://192.168.12.12:9081/repository/maven-releases/</url>-->
-<!--        </repository>-->
-<!--        <snapshotRepository>-->
-<!--            <id>mycompany-nexus-snapshots</id>-->
-<!--            <url>http://192.168.12.12:9081/repository/maven-snapshots/</url>-->
-<!--        </snapshotRepository>-->
-<!--    </distributionManagement>-->
+    <!--    <distributionManagement>-->
+    <!--        <repository>-->
+    <!--            <id>mycompany-nexus-releases</id>-->
+    <!--            <url>http://192.168.12.12:9081/repository/maven-releases/</url>-->
+    <!--        </repository>-->
+    <!--        <snapshotRepository>-->
+    <!--            <id>mycompany-nexus-snapshots</id>-->
+    <!--            <url>http://192.168.12.12:9081/repository/maven-snapshots/</url>-->
+    <!--        </snapshotRepository>-->
+    <!--    </distributionManagement>-->
 
 
 </project>
