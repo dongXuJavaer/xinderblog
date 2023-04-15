@@ -1,13 +1,12 @@
-package com.xinder.user.auth;
+package com.xinder.article.auth;
 
 import com.alibaba.fastjson.JSONArray;
 import com.xinder.api.enums.PermissionsEnums;
 import com.xinder.api.enums.ResultCode;
 import com.xinder.common.constant.CommonConstant;
+import com.xinder.common.exception.CheckAuthException;
 import com.xinder.common.util.TokenDecode;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

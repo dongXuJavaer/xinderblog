@@ -1,4 +1,4 @@
-package com.xinder.user.exception;
+package com.xinder.common.exception;
 
 import com.xinder.api.exception.BaseRuntimeException;
 

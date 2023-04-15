@@ -1,13 +1,14 @@
-package com.xinder.user.exception;
+package com.xinder.common.exception;
 
 import com.xinder.api.enums.ResultCode;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.result.Result;
 import com.xinder.common.abstcontroller.AbstractController;
-import com.xinder.common.exception.CheckAuthException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
  * 全局异常处理
