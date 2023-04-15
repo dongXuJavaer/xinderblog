@@ -3,14 +3,21 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xinder.user.mapper.UserMapper">
-    <select id="loadUserByUsername" resultType="com.xinder.api.bean.User">
-        SELECT * FROM user WHERE username = #{username}
+    <select id="loadUserByUsername" resultMap="baseMap">
+        SELECT *
+        FROM user
+        WHERE username = #{username}
     </select>
     <insert id="reg" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO user set username=#{username},password=#{password},nickname=#{nickname}
+        INSERT INTO user
+        set username=#{username},
+            password=#{password},
+            nickname=#{nickname}
     </insert>
     <update id="updateUserEmail">
-        UPDATE user set email=#{email} WHERE id=#{id}
+        UPDATE user
+        set email=#{email}
+        WHERE id = #{id}
     </update>
 
     <select id="getUserByNickname" resultMap="baseMap">
@@ -27,7 +34,17 @@
     </select>
 
     <select id="getUserById" resultMap="baseMap">
-        SELECT  id, username, nickname, password, enabled, email, userface, reg_time, openid, gender, create_time
+        SELECT id,
+               username,
+               nickname,
+               password,
+               enabled,
+               email,
+               userface,
+               reg_time,
+               openid,
+               gender,
+               create_time
         FROM user u
         where id = #{id}
     </select>
@@ -48,16 +65,23 @@
     </resultMap>
 
     <select id="getAllRole" resultType="com.xinder.api.bean.Role">
-        select * from roles;
+        select *
+        from roles;
     </select>
     <update id="updateUserEnabled">
-        UPDATE user set enabled=#{enabled} WHERE id=#{uid}
+        UPDATE user
+        set enabled=#{enabled}
+        WHERE id = #{uid}
     </update>
     <delete id="deleteUserById">
-        DELETE FROM user WHERE id=#{id}
+        DELETE
+        FROM user
+        WHERE id = #{id}
     </delete>
     <delete id="deleteUserRolesByUid">
-        DELETE FROM roles_user WHERE uid=#{id}
+        DELETE
+        FROM roles_user
+        WHERE uid = #{id}
     </delete>
     <insert id="setUserRoles">
         INSERT INTO roles_user(rid,uid) VALUES
@@ -78,51 +102,63 @@
         <result column="create_time" property="createTime"/>
         <result column="openid" property="openid"/>
         <result column="gender" property="gender"/>
-        <collection  column="id" property="roles" ofType="com.xinder.api.bean.Role"
-           select="com.xinder.user.mapper.RolesMapper.getRolesByUid" />
+        <collection column="id" property="roles" ofType="com.xinder.api.bean.Role"
+                    select="com.xinder.user.mapper.RolesMapper.getRolesByUid"/>
     </resultMap>
 
     <select id="selectByOpenid" resultMap="baseMap">
-        SELECT  id, username, nickname, password, enabled, email, userface, reg_time, openid, gender, create_time
+        SELECT id,
+               username,
+               nickname,
+               password,
+               enabled,
+               email,
+               userface,
+               reg_time,
+               openid,
+               gender,
+               create_time
         FROM user u
         where openid = #{openid}
     </select>
 
     <select id="selectBatchFollow" resultMap="BaseResultMap">
-        SELECT
-            u.id,
-            u.username,
-            u.nickname,
-            u.password,
-            u.enabled,
-            u.email,
-            u.userface,
-            u.reg_time,
-            u.openid,
-            u.gender,
-            u.create_time
-        FROM user u left join follow f on u.id = f.followed_uid
+        SELECT u.id,
+               u.username,
+               u.nickname,
+               u.password,
+               u.enabled,
+               u.email,
+               u.userface,
+               u.reg_time,
+               u.openid,
+               u.gender,
+               u.create_time
+        FROM user u
+                 left join follow f on u.id = f.followed_uid
         where f.uid = #{uid}
     </select>
 
     <select id="selectBatchFans" resultMap="BaseResultMap">
-         SELECT
-            u.id,
-            u.username,
-            u.nickname,
-            u.password,
-            u.enabled,
-            u.email,
-            u.userface,
-            u.reg_time,
-            u.openid,
-            u.gender,
-            u.create_time
-        FROM user u left join follow f on u.id = f.uid
+        SELECT u.id,
+               u.username,
+               u.nickname,
+               u.password,
+               u.enabled,
+               u.email,
+               u.userface,
+               u.reg_time,
+               u.openid,
+               u.gender,
+               u.create_time
+        FROM user u
+                 left join follow f on u.id = f.uid
         where f.followed_uid = #{uid}
     </select>
 
     <update id="cancelBindQQ">
-        update  `user` set openid = null where id = #{id}
+        update `user`
+        set openid = null
+        where id = #{id}
     </update>
 </mapper>

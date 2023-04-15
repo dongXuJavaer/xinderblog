@@ -30,7 +30,7 @@ public interface UserManaApi {
     List<Role> getAllRole();
 
     @RequestMapping(value = "/admin/user/enabled", method = RequestMethod.PUT)
-    RespBean updateUserEnabled(Boolean enabled, Long uid);
+    RespBean updateUserEnabled(@RequestParam("enabled") Integer enabled, @RequestParam("uid") Long uid);
 
     @RequestMapping(value = "/admin/user/{uid}", method = RequestMethod.DELETE)
     RespBean deleteUserById(@PathVariable Long uid);

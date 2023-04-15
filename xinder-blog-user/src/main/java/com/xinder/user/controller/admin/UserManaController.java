@@ -52,7 +52,7 @@ public class UserManaController extends AbstractController implements UserManaAp
     }
 
     @Override
-    public RespBean updateUserEnabled(Boolean enabled, Long uid) {
+    public RespBean updateUserEnabled(Integer enabled, Long uid) {
         if (userServiceImpl.updateUserEnabled(enabled, uid) == 1) {
             return new RespBean("success", "更新成功!");
         } else {

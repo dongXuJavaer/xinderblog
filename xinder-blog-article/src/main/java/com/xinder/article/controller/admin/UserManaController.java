@@ -50,7 +50,7 @@ public class UserManaController {
     }
 
     @RequestMapping(value = "/user/enabled", method = RequestMethod.PUT)
-    public RespBean updateUserEnabled(Boolean enabled, Long uid) {
+    public RespBean updateUserEnabled(Integer enabled, Long uid) {
 //        if (userServiceImpl.updateUserEnabled(enabled, uid) == 1) {
 //            return new RespBean("success", "更新成功!");
 //        } else {

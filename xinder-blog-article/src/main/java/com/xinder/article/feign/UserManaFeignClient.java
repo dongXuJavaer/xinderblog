@@ -18,8 +18,8 @@ public interface UserManaFeignClient extends UserManaApi {
     @RequestMapping(value = "/user/role", method = RequestMethod.PUT)
     RespBean updateUserRoles(@RequestParam("rids") Long[] rids, @RequestParam("id") Long id);
 
-    @Override
-    @RequestMapping(value = "/user/enabled", method = RequestMethod.PUT)
-    RespBean updateUserEnabled(@RequestParam("enabled") Boolean enabled, @RequestParam("uid") Long uid);
+//    @Override
+//    @RequestMapping(value = "/user/enabled", method = RequestMethod.PUT)
+//    RespBean updateUserEnabled(@RequestParam("enabled") Boolean enabled, @RequestParam("uid") Long uid);
 
 }

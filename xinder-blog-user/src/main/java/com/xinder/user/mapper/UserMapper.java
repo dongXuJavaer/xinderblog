@@ -24,7 +24,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     List<Role> getAllRole();
 
-    int updateUserEnabled(@Param("enabled") Boolean enabled, @Param("uid") Long uid);
+    int updateUserEnabled(@Param("enabled") Integer enabled, @Param("uid") Long uid);
 
     int deleteUserById(Long uid);
 
