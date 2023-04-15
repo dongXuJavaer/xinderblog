@@ -5,9 +5,11 @@ import com.xinder.api.response.RespBean;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.CategoryListDtoResult;
 import com.xinder.api.rest.CategoryApi;
+import com.xinder.article.auth.CheckAuth;
 import com.xinder.article.service.impl.CategoryServiceImpl;
 import com.xinder.common.abstcontroller.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,7 +24,8 @@ public class CategoryController extends AbstractController implements CategoryAp
     @Autowired
     CategoryServiceImpl categoryServiceImpl;
 
-    @RequestMapping(value = "/admin/category{ids}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/admin/category/{ids}", method = RequestMethod.DELETE)
+    @PreAuthorize("@checkAuth.checkUserAuth()")
     public RespBean deleteById(@PathVariable String ids) {
         boolean result = categoryServiceImpl.deleteCategoryByIds(ids);
         if (result) {
@@ -32,6 +35,7 @@ public class CategoryController extends AbstractController implements CategoryAp
     }
 
     @RequestMapping(value = "/admin/category", method = RequestMethod.POST)
+    @PreAuthorize("@checkAuth.checkUserAuth()")
     public RespBean addNewCate(Category category) {
 
         if ("".equals(category.getCateName()) || category.getCateName() == null) {
