@@ -201,12 +201,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (state == ArticleStateEnums.DELETED.getCode()) {
             return articleMapper.deleteArticleById(aids);
         } else {
-            int i =transactionTemplate.execute(status -> {
+            int i = transactionTemplate.execute(status -> {
                 int j = articleMapper.updateArticleState(aids, ArticleStateEnums.DELETED.getCode()); //放入到回收站中
-                articleList.forEach(article -> {
-                    article.setState(ArticleStateEnums.DELETED.getCode());
-                    articleESMapper.save(article);
-                });
+                List<Long> idList = articleList.stream().map(Article::getId).collect(Collectors.toList());
+                List<Article> list = articleMapper.selectBatchByIds(idList);
+                articleESMapper.saveAll(list);
                 return j;
             });
             return i;
