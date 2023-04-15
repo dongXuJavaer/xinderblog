@@ -101,12 +101,12 @@ public class ArticleController extends AbstractController implements ArticleApi 
         return articleServiceImpl.getArticleById(aid);
     }
 
-    @RequestMapping(value = "/dustbin", method = RequestMethod.PUT)
-    public RespBean updateArticleState(Long[] aids, Integer state) {
+    @Override
+    public BaseResponse<Result> updateArticleState(Long[] aids, Integer state) {
         if (articleServiceImpl.updateArticleState(aids, state) == aids.length) {
-            return new RespBean("success", "删除成功!");
+            return buildJson(Result.success("删除成功"));
         }
-        return new RespBean("error", "删除失败!");
+        return buildJson(Result.success("删除失败"));
     }
 
     @RequestMapping(value = "/restore", method = RequestMethod.PUT)
@@ -200,7 +200,13 @@ public class ArticleController extends AbstractController implements ArticleApi 
 
     @Override
     public BaseResponse<ZanStateDtoResult> zanState(Long aid) {
-        ZanStateDtoResult dtoResult =  articleServiceImpl.zanState(aid);
+        ZanStateDtoResult dtoResult = articleServiceImpl.zanState(aid);
         return buildJson(dtoResult);
+    }
+
+    @Override
+    public BaseResponse<Result> audit(Long[] aids, Integer type) {
+        Result result = articleServiceImpl.audit(aids, type);
+        return buildJson(result);
     }
 }

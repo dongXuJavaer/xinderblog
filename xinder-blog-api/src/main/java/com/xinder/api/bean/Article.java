@@ -121,6 +121,11 @@ public class Article implements Serializable {
     @ApiModelProperty(value = "是否能被评论，0: 不能   1: 能")
     private Integer commentFlag;
 
+    @TableField("remark")
+    @ApiModelProperty(value = "备注（需要被审核时使用该字段）")
+    @Field(type = FieldType.Text)
+    private String remark;
+
 
     @TableField(exist = false)
     @ApiModelProperty(value = "状态说明")

@@ -102,4 +102,12 @@ public interface ArticleApi {
     @RequestMapping(value = "/zan/state/{aid}", method = RequestMethod.GET)
     BaseResponse<ZanStateDtoResult> zanState(@PathVariable("aid") Long aid);
 
+    @ApiOperation(value = "审核帖子", notes = "审核帖子", tags = {"ArticleController"})
+    @RequestMapping(value = "/audit", method = RequestMethod.PUT)
+    BaseResponse<Result> audit(@RequestParam("aids") Long[] aids, @RequestParam("type") Integer type);
+
+    @RequestMapping(value = "/dustbin", method = RequestMethod.PUT)
+    @ApiOperation(value = "删除帖子", notes = "删除帖子", tags = {"ArticleController"})
+    BaseResponse<Result> updateArticleState(@RequestParam("aids") Long[] aids,@RequestParam("state")  Integer state);
+
 }

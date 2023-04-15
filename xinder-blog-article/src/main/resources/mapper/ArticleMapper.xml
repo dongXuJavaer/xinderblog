@@ -52,6 +52,7 @@
         <result column="create_time" property="createTime"/>
         <result column="uid" property="uid"/>
         <result column="cid" property="cid"/>
+        <result column="remark" property="remark"/>
         <result column="head_pic" property="headPic"/>
         <result column="nickname" property="nickname"/>
         <result column="cate_name" property="cateName"/>
@@ -151,6 +152,7 @@
         a.head_pic,
         a.attachment,
         a.comment_flag,
+        a.remark,
         u.`nickname` as nickname,
         c.id as cid,
         c.`cate_name` as cate_name
@@ -232,6 +234,7 @@
         a.uid as uid,
         a.cid as cid,
         a.head_pic as head_pic,
+        a.remark as remark,
         u.`nickname` as nickname,
         c.`cate_name` as cate_name
         FROM article a, `user` u, category c
@@ -252,5 +255,41 @@
         <if test="offset != null and req.pageSize != null">
             limit #{offset}, #{req.pageSize};
         </if>
+    </select>
+
+    <update id="batchUpdateStateById">
+        update article set state = #{state}
+        where id in
+        <foreach collection="articleList" item="item" open="(" close=")" separator=",">
+            #{item.id}
+        </foreach>
+    </update>
+
+    <select id="selectBatchByIds" resultMap="articleMap">
+        select a.id as id,
+        a.`title` as title,
+        a.md_content,
+        a.html_content,
+        a.summary as summary,
+        a.`edit_time` as edit_time,
+        <!--               a.`page_view`   as page_view,-->
+        a.`state` as state,
+        a.`create_time` as create_time,
+        a.uid as uid,
+        a.read_count,
+        a.head_pic,
+        a.attachment,
+        a.comment_flag,
+        a.remark,
+        u.`nickname` as nickname,
+        c.id as cid,
+        c.`cate_name` as cate_name
+        FROM article a
+        LEFT JOIN `user` u ON a.`uid` = u.`id`
+        LEFT JOIN category c ON a.`cid` = c.`id`
+        WHERE a.id in
+        <foreach collection="aids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
     </select>
 </mapper>

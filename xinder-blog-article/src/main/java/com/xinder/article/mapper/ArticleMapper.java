@@ -44,4 +44,15 @@ public interface ArticleMapper extends BaseMapper<Article> {
     Long getCount(@Param("req") ArticleDtoReq req, @Param("keyword") String keyword);
 
     List<Article> getArticleList(@Param("req") ArticleDtoReq req, @Param("offset") Long offset, @Param("keywords") String keywords);
+
+
+    Integer batchUpdateStateById(@Param("articleList") List<Article> articleList , @Param("state") Integer state);
+
+    /**
+     * 批量查询
+     *
+     * @param aids 多头
+     * @return {@link List}<{@link Article}>
+     */
+    List<Article> selectBatchByIds(@Param("aids") List<Long> aids);
 }

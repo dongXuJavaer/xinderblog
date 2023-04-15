@@ -1,10 +1,10 @@
 package com.xinder.article.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinder.api.bean.*;
+import com.xinder.api.enums.ArticleStateEnums;
 import com.xinder.api.enums.NotificationEnums;
 import com.xinder.api.enums.ZanTypeEnums;
 import com.xinder.api.request.ArticleDtoReq;
@@ -19,7 +19,6 @@ import com.xinder.article.feign.UserFeignClient;
 import com.xinder.article.mapper.*;
 import com.xinder.article.service.ArticleService;
 import com.xinder.article.service.HistoryService;
-import com.xinder.common.constant.CommonConstant;
 import com.xinder.common.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -27,6 +26,8 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,22 +35,13 @@ import org.springframework.data.elasticsearch.core.*;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.annotation.PostConstruct;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -63,6 +55,8 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
+
+    public static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
 
     @Autowired
     private ArticleMapper articleMapper;
@@ -104,17 +98,18 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Autowired
     private ZanMapper zanMapper;
 
-    @PostConstruct
-    public void init() {
-        this.importArticle();
-    }
+//    @PostConstruct
+//    public void init() {
+////        SpringUtils.getAopProxy(this).importArticle();
+//        importArticle();
+//    }
 
     public int addNewArticle(Article article) {
         //处理文章摘要
         if (article.getSummary() == null || "".equals(article.getSummary())) {
             //直接截取
             String stripHtml = stripHtml(article.getHtmlContent());
-            article.setSummary(stripHtml.substring(0, stripHtml.length() > 50 ? 50 : stripHtml.length()));
+            article.setSummary(stripHtml.substring(0, Math.min(stripHtml.length(), 50)));
         }
         if (article.getId() == -1) {
             //添加操作
@@ -194,15 +189,37 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     public int updateArticleState(Long[] aids, Integer state) {
-        if (state == 2) {
+        // 先删除ES中的数据
+        List<Article> articleList = new ArrayList<>(aids.length);
+        for (int i = 0; i < aids.length; i++) {
+            Article article = articleMapper.selectById(aids[i]);
+            article.setState(state);
+            articleList.add(article);
+            articleESMapper.deleteById(aids[i]);
+        }
+
+        if (state == ArticleStateEnums.DELETED.getCode()) {
             return articleMapper.deleteArticleById(aids);
         } else {
-            return articleMapper.updateArticleState(aids, 2);//放入到回收站中
+            int i =transactionTemplate.execute(status -> {
+                int j = articleMapper.updateArticleState(aids, ArticleStateEnums.DELETED.getCode()); //放入到回收站中
+                articleList.forEach(article -> {
+                    article.setState(ArticleStateEnums.DELETED.getCode());
+                    articleESMapper.save(article);
+                });
+                return j;
+            });
+            return i;
         }
+
     }
 
     public int restoreArticle(Integer articleId) {
-        return articleMapper.updateArticleStateById(articleId, 1); // 从回收站还原在原处
+        int i = articleMapper.updateArticleStateById(articleId, 1);// 从回收站还原在原处（变为发表状态）
+        articleESMapper.deleteById(articleId.longValue());
+        Article article = articleMapper.getArticleById(articleId.longValue());
+        articleESMapper.save(article);
+        return i;
     }
 
     public Article getArticleById(Long aid) {
@@ -350,14 +367,17 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 String stripHtml = stripHtml(article.getHtmlContent());
                 article.setSummary(stripHtml.substring(0, Math.min(stripHtml.length(), 50)));
             }
+            judgeContainSensitive(article);
             articleMapper.insert(article);
+            article = articleMapper.getArticleById(article.getId());
         } else {
             refreshTag(article);
             article.setEditTime(new Date());
+            judgeContainSensitive(article);
             articleMapper.updateArticle(article);
         }
-
-        articleESMapper.delete(article);
+        article = articleMapper.getArticleById(article.getId());
+        articleESMapper.deleteById(article.getId());
         articleESMapper.save(article);
         return Result.success("成功");
     }
@@ -423,7 +443,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (uid != null) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("uid", uid));
         }
-        if (state != null) {
+        if (state != null && state != -1) {
             boolQueryBuilder.filter(QueryBuilders.termQuery("state", state));
         }
 
@@ -503,14 +523,23 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public Result importArticle() {
         log.info("=============== 导入帖子到ES ============");
         try {
-            List<Article> articleList = articleMapper.getArticleList(null, null, null);
-            articleESMapper.saveAll(articleList);
+            transactionTemplate.executeWithoutResult(status -> {
+                articleESMapper.deleteAll();
+                List<Article> articleList = articleMapper.getArticleList(null, null, null);
+                articleESMapper.saveAll(articleList);
+            });
         } catch (Exception e) {
             e.printStackTrace();
             return Result.fail("导入失败");
         }
-        System.out.println("=============== 导入完成 ============");
+        logger.info("=============== 导入完成 ============");
         return Result.success("导入成功");
+    }
+
+    // 更新es中的帖子
+    @Scheduled(fixedDelay = 5 * 60 * 1000)
+    public void refreshArticle() {
+        this.importArticle();
     }
 
     @Override
@@ -589,5 +618,50 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Long count = zanMapper.getCountByAidAndType(aid, ZanTypeEnums.ZAN.getCode());
         dtoResult.setCount(count);
         return dtoResult;
+    }
+
+
+    private void judgeContainSensitive(Article article) {
+        Set<String> sensitiveWord = ContentFilterUtils.getSensitiveWord(article.getHtmlContent());
+        if (sensitiveWord.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            sensitiveWord.forEach(item -> sb.append("【").append(item).append("】，"));
+            article.setRemark(sb.toString());
+            article.setState(ArticleStateEnums.AUDITING.getCode());
+        }
+    }
+
+    @Override
+    public Result audit(Long[] aids, Integer type) {
+
+        Integer state = 0;
+        // 审核通过
+        if (type.equals(1)) {
+            state = ArticleStateEnums.PUBLISHED.getCode();
+        }
+        // 审核未通过
+        else {
+            state = ArticleStateEnums.DRAFT.getCode();
+        }
+
+        List<Long> longs = Arrays.asList(aids.clone());
+        List<Article> articleList = articleMapper.selectBatchByIds(longs);
+        for (Article article : articleList) {
+            article.setState(state);
+        }
+
+
+        Integer finalState = state;
+        int i = transactionTemplate.execute(status -> {
+            articleESMapper.deleteAll(articleList);
+            articleESMapper.saveAll(articleList);
+            return articleMapper.batchUpdateStateById(articleList, finalState);
+        });
+//        if (type == 0) {
+//            return Result.success("未通过审核");
+//        } else {
+//            return Result.success("未通审核");
+//        }
+        return i > 0 ? Result.success() : Result.fail();
     }
 }

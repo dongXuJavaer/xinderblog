@@ -1,5 +1,7 @@
 package com.xinder.common.util;
 
+import org.elasticsearch.common.inject.Singleton;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,7 +28,11 @@ public class SensitiveWordsUtils {
     // 获取单例
     public static SensitiveWordsUtils getInstance() {
         if (null == instance) {
-            instance = new SensitiveWordsUtils();
+            synchronized (SensitiveWordsUtils.class) {
+                if (null == instance) {
+                    instance = new SensitiveWordsUtils();
+                }
+            }
         }
         return instance;
     }
@@ -51,7 +57,7 @@ public class SensitiveWordsUtils {
     public String replaceSensitiveWord(String txt, int matchType,
                                        String replaceChar) {
         String resultTxt = txt;
-// 获取所有的敏感词
+        // 获取所有的敏感词
         Set<String> set = getSensitiveWord(txt, matchType);
         Iterator<String> iterator = set.iterator();
         String word = null;

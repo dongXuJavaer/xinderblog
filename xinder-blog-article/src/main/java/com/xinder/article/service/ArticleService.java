@@ -67,4 +67,13 @@ public interface ArticleService extends IService<Article> {
      * @return
      */
     ZanStateDtoResult zanState(Long aid);
+
+
+    /**
+     * 审核文章
+     * @param aid
+     * @param type  1 通过审核，   0 未通过审核，将帖子状态设置为0
+     * @return
+     */
+    Result audit(Long[] aid, Integer type);
 }
