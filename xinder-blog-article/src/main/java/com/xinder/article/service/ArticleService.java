@@ -76,4 +76,12 @@ public interface ArticleService extends IService<Article> {
      * @return
      */
     Result audit(Long[] aid, Integer type);
+
+    /**
+     * 通过id获查询
+     *
+     * @param aids 帖子id列表
+     * @return {@link ArticleListDtoResult}
+     */
+    ArticleListDtoResult getBatchById(Long[] aids);
 }

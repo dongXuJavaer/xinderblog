@@ -209,4 +209,10 @@ public class ArticleController extends AbstractController implements ArticleApi 
         Result result = articleServiceImpl.audit(aids, type);
         return buildJson(result);
     }
+
+    @Override
+    public ArticleListDtoResult getBatchById(Long[] aids) {
+        ArticleListDtoResult articleListDtoResult =  articleServiceImpl.getBatchById(aids);
+        return articleListDtoResult;
+    }
 }

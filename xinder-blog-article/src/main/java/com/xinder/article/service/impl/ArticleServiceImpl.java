@@ -39,6 +39,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
@@ -662,5 +663,19 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 //            return Result.success("未通审核");
 //        }
         return i > 0 ? Result.success() : Result.fail();
+    }
+
+    @Override
+    public ArticleListDtoResult getBatchById(Long[] aids) {
+        List<Long> longs = Arrays.asList(aids);
+        ArticleListDtoResult listDtoResult = DtoResult.dataDtoSuccess(ArticleListDtoResult.class);
+        if (CollectionUtils.isEmpty(longs)) {
+            listDtoResult.setList(new ArrayList<>());
+            return listDtoResult;
+        }
+        List<Article> articleList = articleMapper.selectBatchIds(longs);
+        articleList.sort((o1, o2) -> o2.getCreateTime().compareTo(o1.getCreateTime()));
+        listDtoResult.setList(articleList);
+        return listDtoResult;
     }
 }
