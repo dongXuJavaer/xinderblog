@@ -325,19 +325,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    @Transactional
     public Result updateUserInfo(UserDtoReq userDtoReq) {
         Long id = userDtoReq.getId();
-        String username = userDtoReq.getUsername();
+        UserDtoResult tokenUser = getCurrentUser();
+        String username = null;
+        // 如果用户修改了用户名
+        if (!userDtoReq.getUsername().equals(tokenUser.getUsername())) {
+            username = tokenUser.getUsername();
+            int userCount = userMapper.getCountByUsername(userDtoReq.getUsername());
+            if (userCount >= 1) {
+                return Result.fail("用户名已存在");
+            }
+        } else {
+            username = userDtoReq.getUsername();
+        }
         String userKey = UserEnums.USER_ONLINE_PREFIX_KEY.getValue() + username;
         User user = userMapper.selectById(id);
         BeanUtils.copyProperties(userDtoReq, user);
         transactionTemplate.execute(status -> {
             redisTemplate.opsForValue().set(userKey, user, 30, TimeUnit.MINUTES);
             int i = userMapper.updateById(user);
-            // TODO: 2023-03-10 修改个人账号后，token里面的username要同步修改
             return i;
         });
+
+        // 重新发放token
+        User userById = userMapper.getUserById(user.getId());
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+        login(userById.getUsername(), userById.getPassword(), response);
 
         return Result.success();
     }

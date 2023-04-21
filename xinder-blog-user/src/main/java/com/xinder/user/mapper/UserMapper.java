@@ -62,4 +62,12 @@ public interface UserMapper extends BaseMapper<User> {
      * @return int
      */
     int cancelBindQQ(User user);
+
+    /**
+     * 根据用户名查询用户数量
+     *
+     * @param username 用户名
+     * @return int
+     */
+    int getCountByUsername(@Param("username") String username);
 }

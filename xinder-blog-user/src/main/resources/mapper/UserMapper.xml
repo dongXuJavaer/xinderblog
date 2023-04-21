@@ -161,4 +161,10 @@
         set openid = null
         where id = #{id}
     </update>
+
+    <select id="getCountByUsername" resultType="int">
+        select count(*)
+        from user
+        where username = #{username}
+    </select>
 </mapper>
