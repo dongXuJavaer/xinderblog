@@ -10,6 +10,7 @@ import com.xinder.api.response.dto.PointInfoListDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
 import com.xinder.user.mapper.PointInfoMapper;
+import com.xinder.user.mapper.UserMapper;
 import com.xinder.user.service.PointInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class PointInfoServiceImpl extends ServiceImpl<PointInfoMapper, PointInfo
     private PointInfoMapper pointInfoMapper;
 
     @Override
-    public Result add(PointInfo pointInfo) {
+    public Result signIn(PointInfo pointInfo) {
         PointInfo now = pointInfoMapper.selectNow(pointInfo);
         if (now != null) {
             return Result.fail("当日已签到");
@@ -97,14 +98,10 @@ public class PointInfoServiceImpl extends ServiceImpl<PointInfoMapper, PointInfo
 
     @Override
     public Result reduce(PointInfo pointInfo) {
-        LambdaQueryWrapper<PointInfo> wrapper = new LambdaQueryWrapper<PointInfo>().eq(PointInfo::getUid, pointInfo.getUid());
-        List<PointInfo> pointInfoList = pointInfoMapper.selectList(wrapper);
-        int count = 0;
-        for (PointInfo info : pointInfoList) {
-            count += info.getPoint();
-            if (count < 0) {
-                return Result.fail("积分不足");
-            }
+        // 接收 uid, rid, content, point
+        int pointCount = (int) getPointCount(pointInfo.getUid()).getData();
+        if (pointCount < pointInfo.getPoint()) {
+            return Result.fail("积分不足");
         }
         pointInfo.setType(PointEnums.RETUCE.getCode());
         pointInfoMapper.insert(pointInfo);
@@ -116,7 +113,8 @@ public class PointInfoServiceImpl extends ServiceImpl<PointInfoMapper, PointInfo
 
         LambdaQueryWrapper<PointInfo> wrapper = new LambdaQueryWrapper<PointInfo>()
                 .eq(PointInfo::getUid, uid)
-                .eq(PointInfo::getRid, rid);
+                .eq(PointInfo::getRid, rid)
+                .eq(PointInfo::getType, PointEnums.RETUCE.getCode());
 
         PointInfo pointInfo = pointInfoMapper.selectOne(wrapper);
         DtoResult dtoResult = null;
@@ -144,5 +142,12 @@ public class PointInfoServiceImpl extends ServiceImpl<PointInfoMapper, PointInfo
         DtoResult dtoResult = DtoResult.success();
         dtoResult.setData(count);
         return dtoResult;
+    }
+
+    @Override
+    public Result add(PointInfo pointInfo) {
+        pointInfo.setType(PointEnums.ADD.getCode());
+        int i = pointInfoMapper.insert(pointInfo);
+        return i > 0 ? Result.success("添加成功") : Result.fail("添加失败");
     }
 }

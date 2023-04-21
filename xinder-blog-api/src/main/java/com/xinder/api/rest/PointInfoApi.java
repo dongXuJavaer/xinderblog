@@ -32,16 +32,20 @@ public interface PointInfoApi {
     @RequestMapping(value = "/count/{uid}", method = RequestMethod.GET)
     BaseResponse<DtoResult> getPointCount(@PathVariable("uid") Long uid);
 
-    @ApiOperation(value = "增加积分", notes = "积分明细", tags = {"PointApi"})
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    BaseResponse<Result> add(@RequestBody PointInfo pointInfo);
+    @ApiOperation(value = "签到", notes = "签到", tags = {"PointApi"})
+    @RequestMapping(value = "/sign", method = RequestMethod.POST)
+    BaseResponse<Result> signIn(@RequestBody PointInfo pointInfo);
 
-    @ApiOperation(value = "积分明细", notes = "积分明细", tags = {"PointApi"})
+    @ApiOperation(value = "积分扣减", notes = "积分扣减", tags = {"PointApi"})
     @RequestMapping(value = "/reduce", method = RequestMethod.POST)
     BaseResponse<Result> reduce(@RequestBody PointInfo pointInfo);
 
     @ApiOperation(value = "查询用户对某资源是否下载过", notes = "查询用户对某资源是否下载过", tags = {"PointApi"})
     @RequestMapping(value = "/judge", method = RequestMethod.POST)
     BaseResponse<DtoResult> getByUidAndRid(@RequestParam("uid") Long uid,@RequestParam("rid") Long rid);
+
+    @ApiOperation(value = "增加积分", notes = "查询用户对某资源是否下载过", tags = {"PointApi"})
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    BaseResponse<Result> add(@RequestBody PointInfo pointInfo);
 
 }

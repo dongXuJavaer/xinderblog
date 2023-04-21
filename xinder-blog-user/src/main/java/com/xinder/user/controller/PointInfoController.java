@@ -44,8 +44,8 @@ public class PointInfoController extends AbstractController implements PointInfo
     }
 
     @Override
-    public BaseResponse<Result> add(PointInfo pointInfo) {
-        Result result = pointInfoService.add(pointInfo);
+    public BaseResponse<Result> signIn(PointInfo pointInfo) {
+        Result result = pointInfoService.signIn(pointInfo);
         return buildJson(result);
     }
 
@@ -59,6 +59,12 @@ public class PointInfoController extends AbstractController implements PointInfo
     public BaseResponse<DtoResult> getByUidAndRid(Long uid, Long rid) {
         DtoResult dtoResult = pointInfoService.getByUidAndRid(uid, rid);
         return buildJson(dtoResult);
+    }
+
+    @Override
+    public BaseResponse<Result> add(PointInfo pointInfo) {
+        Result result = pointInfoService.add(pointInfo);
+        return buildJson(result);
     }
 }
 

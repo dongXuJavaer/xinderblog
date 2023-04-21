@@ -23,7 +23,7 @@ public interface PointInfoService extends IService<PointInfo> {
      * @param pointInfo 积分信息
      * @return {@link Result}
      */
-    Result add(PointInfo pointInfo);
+    Result signIn(PointInfo pointInfo);
 
     /**
      * 根据uid获取列表
@@ -34,7 +34,7 @@ public interface PointInfoService extends IService<PointInfo> {
     PointInfoListDtoResult getListByUid(Long uid, PageDtoReq pageDtoReq);
 
     /**
-     * 减少
+     * 积分扣减，  会判断用户积分是否充足
      *
      * @param pointInfo 点信息
      * @return {@link Result}
@@ -57,4 +57,12 @@ public interface PointInfoService extends IService<PointInfo> {
      * @return {@link DtoResult}
      */
     DtoResult getPointCount(Long uid);
+
+    /**
+     * 添加
+     *
+     * @param pointInfo 点信息
+     * @return {@link DtoResult}
+     */
+    Result add(PointInfo pointInfo);
 }

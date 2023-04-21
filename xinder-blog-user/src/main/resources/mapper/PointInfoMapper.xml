@@ -30,17 +30,20 @@
         <if test="pointInfo.uid != null">
             and uid = #{pointInfo.uid}
         </if>
-        and content != '注册赠送'
+        and content like '签到%'
     </select>
 
     <select id="selectNearDay" resultType="com.xinder.api.bean.PointInfo">
-        select * from point_info
+        select *
+        from point_info
         where TO_DAYS(now()) - TO_DAYS(create_time) &lt;= #{count}
-        and uid = #{pointInfo.uid}
-        and content != '注册赠送'
+          and uid = #{pointInfo.uid}
+          and content like '签到%'
     </select>
 
     <select id="getPointInfoByUid" resultType="com.xinder.api.bean.PointInfo">
-        select * from point_info where uid = #{uid};
+        select *
+        from point_info
+        where uid = #{uid};
     </select>
 </mapper>
