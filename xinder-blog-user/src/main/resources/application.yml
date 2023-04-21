@@ -14,6 +14,8 @@ spring:
 #    password: 123456789PP
   security:
     strategy: MODE_GLOBAL
+  main:
+    allow-bean-definition-overriding: true
 
 mybatis:
   config-location: classpath:/mybatis-config.xml
@@ -39,6 +41,7 @@ auth:
   clientId: dongyimai  #客户端账号
   clientSecret: 123 #客户端密码
   cookieDomain: xinder.top #cookie域名
+#  cookieDomain: localhost #cookie域名
   cookieMaxAge: -1     #cookie有效期
 
 encrypt:
