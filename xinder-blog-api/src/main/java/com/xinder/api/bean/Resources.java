@@ -40,7 +40,7 @@ public class Resources implements Serializable {
     private String url;
 
     @ApiModelProperty(value = "上传用户")
-    private Integer uid;
+    private Long uid;
 
     @ApiModelProperty(value = "下载所需积分")
     private Integer point;
