@@ -69,7 +69,8 @@ public class HistoryServiceImpl extends ServiceImpl<HistoryMapper, History> impl
             for (int j = 0; j < historyList.size(); j++) {
                 History history = map.get(historyList.get(j).getAid());
                 if (history != null) {
-                    updateList.add(history);
+                    // 更新之前已经浏览过的帖子的浏览时间
+                    updateList.add(history.setCreateTime(historyList.get(j).getCreateTime()));
                     historyList.remove(j);
                     j--;
                 }

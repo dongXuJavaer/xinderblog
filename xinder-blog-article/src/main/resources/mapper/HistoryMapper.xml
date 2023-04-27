@@ -10,8 +10,8 @@
     </insert>
 
     <update id="batchUpdate">
-        <foreach collection="updateList" separator=";" item="item">
-            update history set create_time = #{item.createTime} where id=#{item.id}
+        <foreach collection="updateList" item="item">
+            update history set create_time = #{item.createTime} where id = #{item.id};
         </foreach>
     </update>
 </mapper>
