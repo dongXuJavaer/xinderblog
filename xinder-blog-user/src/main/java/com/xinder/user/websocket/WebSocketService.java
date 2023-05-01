@@ -7,6 +7,7 @@ import com.xinder.api.bean.*;
 import com.xinder.api.request.SocketMsgReq;
 import com.xinder.api.enums.SocketMsgTypeEnums;
 import com.xinder.api.response.dto.MsgDtoResult;
+import com.xinder.common.constant.CommonConstant;
 import com.xinder.common.constant.DateConstant;
 import com.xinder.common.util.ContentFilterUtils;
 import com.xinder.user.mapper.*;
@@ -17,6 +18,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -69,6 +71,7 @@ public class WebSocketService {
     private static GroupMapper groupMapper;
     private static SocketInfoService socketInfoService;
     private static GroupUserMapper groupUserMapper;
+    private static RedisTemplate<String, Object> redisTemplate;
 
 
     public static void initBean(ApplicationContext applicationContext) {
@@ -79,6 +82,7 @@ public class WebSocketService {
         groupMapper = applicationContext.getBean(GroupMapper.class);
         socketInfoService = applicationContext.getBean(SocketInfoService.class);
         groupUserMapper = applicationContext.getBean(GroupUserMapper.class);
+        redisTemplate = applicationContext.getBean(RedisTemplate.class);
     }
 
 
@@ -191,14 +195,23 @@ public class WebSocketService {
         2. 给所有群成员转发消息
      */
     private void sendGroupMsg(SocketMsgReq socketMsgReq) {
+        User fromUser = userMapper.getUserById(socketMsgReq.getFromUid().longValue());
+        fromUser = fromUser != null ? fromUser : new User().setNickname("（用户已删除）");
         MsgGroup msgGroup = new MsgGroup()
                 .setSendUid(socketMsgReq.getFromUid())
                 .setContent(socketMsgReq.getContent())
                 .setGroupId(socketMsgReq.getToId())
-                .setCreateTime(LocalDateTime.now());
+                .setCreateTime(LocalDateTime.now())
+                .setFromNickname(fromUser.getNickname())
+                .setFromPic(fromUser.getUserface());
         Group group = groupMapper.selectById(msgGroup.getGroupId());
         transactionTemplate.execute(status -> {
             int insert = msgGroupMapper.insert(msgGroup);
+            // 存入redis
+            List<MsgGroup> msgGroupList = (List<MsgGroup>) redisTemplate.opsForValue().get(CommonConstant.REDIS_KEY_MSG_GROUP + ":" + msgGroup.getGroupId());
+            msgGroupList.add(msgGroup);
+            redisTemplate.opsForValue().set(CommonConstant.REDIS_KEY_MSG_GROUP + ":" + msgGroup.getGroupId(), msgGroupList);
+
             MsgDtoResult msgDtoResult = new MsgDtoResult()
                     .setFromUid(msgGroup.getSendUid())
                     .setToId(msgGroup.getGroupId())
@@ -210,8 +223,7 @@ public class WebSocketService {
                     .eq(GroupUser::getGroupId, msgGroup.getGroupId())
                     .select(GroupUser::getUid);
             List<Integer> groupUserIdList = groupUserMapper.selectList(queryWrapper)
-                    .stream()
-                    .map(GroupUser::getUid).collect(Collectors.toList());
+                    .stream().map(GroupUser::getUid).collect(Collectors.toList());
             groupUserIdList.add(group.getCreateUser());
 
             groupUserIdList.forEach(uid -> {

@@ -8,6 +8,7 @@ public enum NotificationEnums {
     FOLLOW(2, "关注通知"),
     COMMENTS(3, "帖子评论通知"),
     ZAN(4, "帖子点赞通知"),
+    REPLY(5, "评论回复通知"),
 
     ;
 

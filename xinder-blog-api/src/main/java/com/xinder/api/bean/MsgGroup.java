@@ -44,5 +44,11 @@ public class MsgGroup implements Serializable {
     @ApiModelProperty(value = "发送时间")
     private LocalDateTime createTime;
 
+    @TableField(exist = false)
+    @ApiModelProperty(value = "发送者名称")
+    private String fromNickname;
 
+    @TableField(exist = false)
+    @ApiModelProperty(value = "发送者头像（群聊时才使用该参数）")
+    private String fromPic;
 }

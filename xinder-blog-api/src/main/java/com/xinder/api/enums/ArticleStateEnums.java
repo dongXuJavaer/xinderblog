@@ -6,7 +6,7 @@ package com.xinder.api.enums;
  */
 public enum ArticleStateEnums {
 
-    DRAFT(0, "草稿"),
+    DRAFT(0, "草稿，未审核通过"),
     PUBLISHED(1, "已发表"),
     DELETED(2, "已删除"),
     NON_OPEN(3, "不公开"),

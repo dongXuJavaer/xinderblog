@@ -11,6 +11,7 @@ import com.xinder.api.response.dto.CommentListDtoResult;
 import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
+import com.xinder.common.util.ContentFilterUtils;
 import com.xinder.user.feign.ArticleFeignClient;
 import com.xinder.user.mapper.CommentsMapper;
 import com.xinder.user.mapper.NotificationMapper;
@@ -130,6 +131,8 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
         }
 
         comments.setUid(currentUser.getId());
+        String filter = ContentFilterUtils.filter(comments.getContent());
+        comments.setContent(filter);
         BaseResponse<DtoResult> resp = articleFeignClient.getArticleById(comments.getAid());
         Article article = JSON.parseObject(JSON.toJSONString(resp.getData().getData()), Article.class);
 
@@ -149,7 +152,12 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments> i
             // 如果不是根评论，那么被回复的那个人也要被通知到
             if (comments.getParentId() != null) {
                 Comments com = commentsMapper.selectById(comments.getParentId());
-                notification.setToUid(com.getUid());
+                Notification reply = new Notification();
+                BeanUtils.copyProperties(notification, reply);
+                reply.setId(null);
+                reply.setToUid(com.getUid());
+                reply.setType(NotificationEnums.REPLY.getCode());
+                notificationMapper.insert(notification);
             }
         });
 

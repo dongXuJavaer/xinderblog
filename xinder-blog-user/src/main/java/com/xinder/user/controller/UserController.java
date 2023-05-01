@@ -98,9 +98,9 @@ public class UserController extends AbstractController implements UserApi {
     /**
      * qq登录
      *
-     * @param accessToken
-     * @param response
-     * @return
+     * @param accessToken 请求到QQ官方的
+     * @param response    响应
+     * @return 用户信息
      */
     @RequestMapping("/login/qq")
     public BaseResponse<UserDtoResult> qqLogin(
@@ -111,12 +111,23 @@ public class UserController extends AbstractController implements UserApi {
         return buildJson(userDtoResult);
     }
 
+    /**
+     * 注销
+     *
+     * @return 注销结果
+     */
     @Override
     public BaseResponse<DtoResult> logout() {
         DtoResult dtoResult = userServiceImpl.logout();
         return buildJson(dtoResult);
     }
 
+    /**
+     * 根据用户id获取
+     *
+     * @param uid 用户id
+     * @return {@link BaseResponse}<{@link UserDtoSimpleResult}>
+     */
     @Override
     public BaseResponse<UserDtoSimpleResult> getUserByIdFront(@PathVariable("uid") Long uid) {
         UserDtoSimpleResult simpleResult = userServiceImpl.getUserByIdFront(uid);

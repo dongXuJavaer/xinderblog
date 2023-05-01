@@ -2,10 +2,9 @@ package com.xinder.common.util;
 
 import org.elasticsearch.common.inject.Singleton;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * 敏感词工具类
@@ -20,9 +19,17 @@ public class SensitiveWordsUtils {
     // 单例
     private static SensitiveWordsUtils instance = null;
 
+    private SensitiveWordInit sensitiveWordInit;
+
     // 构造函数，初始化敏感词库
     private SensitiveWordsUtils() {
-        sensitiveWordMap = new SensitiveWordInit().initKeyWord();
+        sensitiveWordInit = new SensitiveWordInit();
+        sensitiveWordMap = sensitiveWordInit.initKeyWord();
+    }
+
+    // 提供给获取敏感词汇的使用
+    public SensitiveWordInit getSensitiveWordInit() {
+        return sensitiveWordInit;
     }
 
     // 获取单例
@@ -36,6 +43,79 @@ public class SensitiveWordsUtils {
         }
         return instance;
     }
+
+    // 刷新单例对象
+    public static void refresh() {
+        instance = new SensitiveWordsUtils();
+    }
+
+    // 添加敏感词
+    public static boolean add(String content) {
+        //敏感词库
+        File file = new File(SensitiveWordInit.filePath);
+        try {
+            // 文件是否是文件 和 是否存在
+            if (!file.isFile() || !file.exists()) {
+                file.createNewFile();
+            }
+
+            // 获取文件输出流
+            OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.UTF_8);
+            BufferedWriter bufferedWriter = new BufferedWriter(writer);
+            bufferedWriter.newLine();
+            bufferedWriter.write(content);
+            bufferedWriter.flush();
+            // 关闭文件流
+            writer.close();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // 删除敏感词汇
+    public static boolean delete(String content) {
+        //敏感词库
+        File file = new File(SensitiveWordInit.filePath);
+        try {
+            // 文件是否是文件 和 是否存在
+            if (!file.isFile() || !file.exists()) {
+                file.createNewFile();
+            }
+            // 读取文件输入流
+            InputStreamReader read = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
+            BufferedReader bufferedReader = new BufferedReader(read);
+            String txt = null;
+            List<String> list = new ArrayList<>();
+            while ((txt = bufferedReader.readLine()) != null) {
+                boolean equals = txt.equals(content);
+                if (equals) {
+                    continue;
+                }
+                list.add(txt);
+            }
+            bufferedReader.close();
+            read.close();
+
+            // 获取文件输出流
+            OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
+            BufferedWriter bufferedWriter = new BufferedWriter(writer);
+            for (String str : list) {
+                bufferedWriter.write(str);
+                bufferedWriter.newLine();
+                bufferedWriter.flush();
+            }
+            // 关闭文件流
+            bufferedWriter.close();
+            writer.close();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
     // 获取文字中的敏感词
     public Set<String> getSensitiveWord(String txt, int matchType) {

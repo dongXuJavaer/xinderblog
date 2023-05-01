@@ -13,15 +13,25 @@ import java.util.Set;
  * 敏感词初始化工具类
  */
 public class SensitiveWordInit {
+
+    public static final String filePath = "xinder-blog-common/src/main/resources/sensitivewords.txt";
+
     // 字符编码
     private String ENCODING = "UTF-8";
+
+    // 敏感字库
+    private  Set<String> wordSet;
 
     // 初始化敏感字库
     public Map initKeyWord() {
         // 读取敏感词库 ,存入Set中
-        Set<String> wordSet = readSensitiveWordFile();
+        wordSet = readSensitiveWordFile();
         // 将敏感词库加入到HashMap中//确定有穷自动机DFA
         return addSensitiveWordToHashMap(wordSet);
+    }
+
+    public Set<String> getWordSet() {
+        return wordSet;
     }
 
     /**
@@ -70,7 +80,7 @@ public class SensitiveWordInit {
          */
         //敏感词库
         File file = new File(
-                "xinder-blog-common/src/main/resources/sensitivewords.txt");
+                filePath);
         try {
             // 读取文件输入流
             InputStreamReader read = new InputStreamReader(new FileInputStream(file), ENCODING);
@@ -83,6 +93,9 @@ public class SensitiveWordInit {
                 String txt = null;
                 // 读取文件，将文件内容放入到set中
                 while ((txt = br.readLine()) != null) {
+                    if (txt.equals("")){
+                        continue;
+                    }
                     wordSet.add(txt);
                 }
                 br.close();
