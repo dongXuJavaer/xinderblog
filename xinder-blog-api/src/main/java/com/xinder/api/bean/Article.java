@@ -122,7 +122,7 @@ public class Article implements Serializable {
     private Integer commentFlag;
 
     @TableField("remark")
-    @ApiModelProperty(value = "备注（需要被审核时使用该字段）")
+    @ApiModelProperty(value = "备注（需要被审核时使用该字段，有哪些敏感词）")
     @Field(type = FieldType.Text)
     private String remark;
 
