@@ -424,7 +424,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (StringUtils.isEmpty(keywords)) {
             builder.withQuery(QueryBuilders.matchAllQuery());
         } else {
-            builder.withQuery(QueryBuilders.multiMatchQuery(keywords, "title", "summary"));
+            builder.withQuery(QueryBuilders.multiMatchQuery(keywords, "title", "summary","mdContent"));
         }
 
         builder.withPageable(PageRequest.of(currentPage.intValue() - 1, pageSize))//   分页

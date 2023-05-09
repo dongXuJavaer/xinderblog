@@ -24,7 +24,7 @@
     <update id="updateArticle" parameterType="com.xinder.api.bean.Article">
         UPDATE article SET
         title=#{title},md_content=#{mdContent},
-        html_content=#{htmlContent},summary=#{summary},cid=#{cid},edit_time=#{editTime}
+        html_content=#{htmlContent},summary=#{summary},cid=#{cid},edit_time=#{editTime},remark=#{remark}
         <if test="state!=null">
             ,state=#{state}
         </if>
