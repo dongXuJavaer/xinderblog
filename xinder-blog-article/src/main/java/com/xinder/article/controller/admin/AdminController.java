@@ -2,6 +2,7 @@ package com.xinder.article.controller.admin;
 
 import com.xinder.api.bean.Article;
 import com.xinder.api.response.RespBean;
+import com.xinder.api.response.result.Result;
 import com.xinder.article.service.impl.ArticleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,5 +48,17 @@ public class AdminController {
             return new RespBean("success", "删除成功!");
         }
         return new RespBean("error", "删除失败!");
+    }
+
+    /**
+     * 审核文章
+     * @param aids
+     * @param type
+     * @return
+     */
+    @RequestMapping("audit")
+    public Result audit(Long[] aids, Integer type) {
+        Result result = articleServiceImpl.audit(aids, type);
+        return result;
     }
 }
