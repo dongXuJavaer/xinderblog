@@ -1,5 +1,6 @@
 package com.xinder.common.exception;
 
+import com.xinder.api.enums.ResultCode;
 import com.xinder.api.exception.BaseRuntimeException;
 
 /**
@@ -11,6 +12,10 @@ public class CheckAuthException extends BaseRuntimeException {
 
     public CheckAuthException(Integer code, String message) {
         super(code, message);
+    }
+
+    public CheckAuthException(ResultCode resultCode) {
+        super(resultCode.getCode(), resultCode.getDesc());
     }
 
     public CheckAuthException(String message) {

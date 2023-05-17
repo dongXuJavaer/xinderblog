@@ -1,5 +1,6 @@
 package com.xinder.common.auth;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.xinder.api.enums.PermissionsEnums;
 import com.xinder.api.enums.ResultCode;
@@ -39,7 +40,7 @@ public class CheckAuth {
         boolean contains =
                 authorities.contains("ROLE_" + PermissionsEnums.ADMINISTRATORS.getValue());
         if (!contains) {
-            throw new CheckAuthException(ResultCode.UNAUTHORIZED.getCode(), ResultCode.UNAUTHORIZED.getDesc());
+            throw new CheckAuthException(ResultCode.UNAUTHORIZED);
         }
         return true;
     }
