@@ -11,10 +11,10 @@ spring:
 
   main:
     allow-bean-definition-overriding: true
-#  redis:
-#    host: 39.105.106.135
-#    port: 6379
-#    password: 123456789PP
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 
 
 mybatis:

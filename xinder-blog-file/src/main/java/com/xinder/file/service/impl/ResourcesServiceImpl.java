@@ -8,6 +8,7 @@ import com.xinder.api.enums.PointEnums;
 import com.xinder.api.request.comm.PageDtoReq;
 import com.xinder.api.response.base.BaseResponse;
 import com.xinder.api.response.dto.ResourcesListDtoResult;
+import com.xinder.api.response.dto.UserDtoResult;
 import com.xinder.api.response.result.DtoResult;
 import com.xinder.api.response.result.Result;
 import com.xinder.file.feign.PointInfoFeignClient;
@@ -61,22 +62,26 @@ public class ResourcesServiceImpl extends ServiceImpl<ResourcesMapper, Resources
         // 查询用户是否下载过, 查询成功是下载过，没有查询成功则是没有下载过
         // 没有下载过则需要扣减积分（扣减积分的记录就是下载记录）
         BaseResponse<DtoResult> dtoResultBaseResponse = pointInfoFeignClient.getByUidAndRid(uid, rid);
-        if (!dtoResultBaseResponse.isSuccess()) {
 
+        // 自己下载自己的资源，无需校验积分
+
+        if (!dtoResultBaseResponse.isSuccess() && !rid.equals(resources.getUid())) {
+
+            // 下载资源者的积分扣减信息
             PointInfo pointInfo = new PointInfo()
                     .setPoint(resources.getPoint())
                     .setType(PointEnums.RETUCE.getCode())
-                    .setContent("下载资源，扣减积分")
+                    .setContent("下载资源 【" + resources.getName() + "】，扣减积分")
                     .setRid(rid)
                     .setUid(uid);
 
-            double downPoint = resources.getCount().doubleValue();
-            int num = (int) (downPoint* 0.6 + 0.5);
+            double downPoint = resources.getPoint().doubleValue();
+            int num = (int) (downPoint * 0.6 + 0.5);
             System.out.println("-----" + num);
             PointInfo addPoint = new PointInfo()
                     .setUid(resources.getUid())
                     .setRid(rid)
-                    .setContent("资源被别人下载，活获得 60% 奖励")
+                    .setContent("资源【" + resources.getName() + "】被别人下载，活获得 60% 奖励")
                     .setType(PointEnums.ADD.getCode())
                     .setPoint(num);
 
