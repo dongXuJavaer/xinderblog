@@ -180,6 +180,12 @@ public class ArticleController extends AbstractController implements ArticleApi 
     }
 
     @Override
+    public BaseResponse<Result> remove(Long aid) {
+        Result result =  articleService.removeArticle(aid);
+        return buildJson(result);
+    }
+
+    @Override
     public BaseResponse<Result> importArticle() {
         Result result = articleService.importArticle();
         return buildJson(result);

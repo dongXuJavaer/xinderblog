@@ -78,6 +78,10 @@ public interface ArticleApi {
     @RequestMapping(value = "/publish", method = RequestMethod.POST)
     BaseResponse<Result> publish(@RequestBody Article article);
 
+    @ApiOperation(value = "删除帖子（放入回收站）", notes = "发表/修改 帖子", tags = {"ArticleApi"})
+    @RequestMapping(value = "/remove/{aid}", method = RequestMethod.GET)
+    BaseResponse<Result> remove(@PathVariable("aid") Long aid);
+
     /**
      * 导入数据
      * @return

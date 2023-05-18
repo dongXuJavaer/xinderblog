@@ -84,4 +84,11 @@ public interface ArticleService extends IService<Article> {
      * @return {@link ArticleListDtoResult}
      */
     ArticleListDtoResult getBatchById(Long[] aids);
+
+    /**
+     * 用户删除帖子（放入回收站）
+     * @param aid
+     * @return
+     */
+    Result removeArticle(Long aid);
 }

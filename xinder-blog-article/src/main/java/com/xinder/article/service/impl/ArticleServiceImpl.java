@@ -424,7 +424,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (StringUtils.isEmpty(keywords)) {
             builder.withQuery(QueryBuilders.matchAllQuery());
         } else {
-            builder.withQuery(QueryBuilders.multiMatchQuery(keywords, "title", "summary","mdContent"));
+            builder.withQuery(QueryBuilders.multiMatchQuery(keywords, "title", "summary", "mdContent"));
         }
 
         builder.withPageable(PageRequest.of(currentPage.intValue() - 1, pageSize))//   分页
@@ -677,5 +677,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleList.sort((o1, o2) -> o2.getCreateTime().compareTo(o1.getCreateTime()));
         listDtoResult.setList(articleList);
         return listDtoResult;
+    }
+
+    @Override
+    public Result removeArticle(Long aid) {
+        Article article = articleMapper.getArticleById(aid);
+        article.setState(ArticleStateEnums.DELETED.getCode());
+        articleESMapper.deleteById(aid);
+        int i = articleMapper.updateById(article);
+        return i > 0 ? Result.success("删除成功") : Result.success("删除失败");
     }
 }
